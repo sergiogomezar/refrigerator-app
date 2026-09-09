@@ -44,6 +44,8 @@ demo/
   ESTADO.md               Este documento.
   GUION-HOGAR.md          Guion para narrar la demo de hogar en vivo, con tiempos y preguntas probables.
   GUION-RESTAURANTES.md   Lo mismo para la demo B2B.
+  vercel.json             Configuración del despliegue estático en Vercel.
+  .vercelignore           Lo que NO se publica: este documento, los guiones, checkpoints y tools.
   checkpoints/            Copias de cada checkpoint anterior. Archivar antes de sobrescribir.
   tools/probe.py          Arnés de medición headless. Ver abajo.
   tools/probe.html        Arnés viejo por iframe. No sirve bajo file://, ver abajo.
@@ -63,6 +65,26 @@ Dura 3:12. Controles: `espacio` reproducir/pausa · `←` `→` beat anterior/si
 
 Para presentarlas en vivo, los guiones con tiempos están en `GUION-HOGAR.md` y
 `GUION-RESTAURANTES.md`. El de hogar reemplaza al viejo `GUION.md`, que se eliminó.
+
+## Cómo publicarla
+
+Las dos demos son archivos estáticos hermanos y se publican como un solo sitio de Vercel, con
+esta carpeta (`demo/`) como raíz del proyecto. No hay build ni dependencias.
+
+```bash
+cd demo
+npx vercel login          # una sola vez, abre el navegador
+npx vercel link --yes --project freezai-demo
+npx vercel deploy --prod --yes
+```
+
+Queda `/` con la demo de hogar y `/restaurantes` con la B2B. El selector de la esquina superior
+derecha alterna entre las dos: son dos enlaces, no una aplicación, así que funciona igual servido
+y abierto con `file://`.
+
+`vercel.json` activa `cleanUrls` y manda no cachear, para que un redespliegue se vea de inmediato
+en la sala. `.vercelignore` deja fuera este documento, los guiones, `checkpoints/` y `tools/`:
+solo se suben los dos HTML.
 
 ## Cómo está construida
 
@@ -159,6 +181,16 @@ ingredientes, y faltaba **la receta completa**.
   hay que tocarla en `#invdet` y en M4.
 - **La tarjeta va centrada** (`justify-content:center`). Se probó arriba y dejaba un tercio de
   pantalla vacío debajo.
+
+Y el sitio publicado, en el mismo checkpoint:
+
+- **Selector de demo** (`.demosel`) en la esquina superior derecha, donde antes estaba la etiqueta
+  `CHECKPOINT 6` / `VERSIÓN B2B`, que además ya estaba desactualizada. Son dos enlaces entre
+  archivos hermanos, así que no hay estado que sincronizar.
+- **La barra superior se apretaba a 1280.** Con el selector adentro se partía en dos filas, le
+  robaba 43 px al escenario y el rail desbordaba 25 px en tablet. Se agregó un `@media
+  (max-width:1360px)` que esconde el subtítulo de la marca y encoge momentos y botones. La barra
+  vuelve a caber en una fila y el desborde desaparece.
 
 Verificación: las dos demos pasan los cinco tamaños en móvil y tablet, 39 beats, con **0
 desbordes**.

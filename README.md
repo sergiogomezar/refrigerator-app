@@ -18,6 +18,10 @@ de viabilidad de la idea y su refinamiento feature por feature.
 | [docs/03-integraciones-compra.md](docs/03-integraciones-compra.md) | Catálogo de plataformas donde se puede cerrar la compra, escalera de opciones y bloqueos que pueden hacer inviable la integración. |
 | [docs/04-perfiles-familiares.md](docs/04-perfiles-familiares.md) | Especificación de los perfiles familiares: listas de ingredientes por persona y resolución por comensales. |
 
+Las dos demos se publican como un solo sitio estático de Vercel, con `demo/` como raíz del
+proyecto: `/` es la demo de hogar y `/restaurantes` la B2B, y el selector de la esquina superior
+derecha alterna entre las dos. Los pasos están en [demo/ESTADO.md](demo/ESTADO.md).
+
 Versiones publicadas como página web:
 
 - **Features consolidadas:** https://claude.ai/code/artifact/1e8e097c-b4b2-428e-9275-f47017836d39

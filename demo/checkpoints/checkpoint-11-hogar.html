@@ -72,6 +72,13 @@ body::before{
 .devsel button:hover{background:var(--teal-soft); color:var(--teal)}
 .devsel button.is-on{background:var(--teal); color:#fff}
 .ckpt{font-family:var(--mono); font-size:.67rem; color:var(--chrome-faint); letter-spacing:.04em}
+/* Selector de demo: las dos demos son dos archivos hermanos, así que el cambio es un enlace.
+   Funciona igual servido desde Vercel y abierto con file:// desde el disco. */
+.demosel{display:flex; border:1px solid var(--stage-line-2); border-radius:4px; overflow:hidden; background:#fff}
+.demosel a{font-family:var(--mono); font-size:.67rem; letter-spacing:.05em; text-decoration:none; color:var(--chrome-muted); padding:.4rem .7rem; transition:all .2s ease}
+.demosel a + a{border-left:1px solid var(--stage-line)}
+.demosel a:hover{background:var(--teal-soft); color:var(--teal)}
+.demosel a.is-on{background:var(--teal); color:#fff}
 
 /* moments double as a jump menu during Q&A */
 .moment{cursor:pointer}
@@ -554,6 +561,13 @@ body[data-device="tablet"] .voice{padding:1.6rem 2rem 1.9rem; gap:.9rem}
 .clock-el{font-family:var(--mono); font-size:.62rem; color:var(--chrome-faint); letter-spacing:.04em; min-width:3.2rem; text-align:right}
 
 @media (max-width:1400px){ .hint{display:none} }
+/* A 1280 la barra superior se partía en dos filas y le robaba 43px al escenario, que el rail
+   acusaba como desborde. Con el selector de demo dentro, el cromo se aprieta antes de partirse. */
+@media (max-width:1360px){
+  .brand-sub{display:none}
+  .moment{font-size:.6rem; padding:.26rem .36rem}
+  .devsel button,.demosel a{font-size:.62rem; padding:.36rem .52rem}
+}
 
 :focus-visible{outline:2px solid var(--teal); outline-offset:2px}
 
@@ -795,7 +809,10 @@ body.paused *{animation-play-state:paused !important}
         <button data-dev="mobile" class="is-on">Móvil</button>
         <button data-dev="tablet">Tablet</button>
       </div>
-      <div class="ckpt">CHECKPOINT 6</div>
+      <div class="demosel">
+        <a href="index.html" class="is-on">Hogar</a>
+        <a href="restaurantes.html">Restaurantes</a>
+      </div>
     </div>
   </div>
 
