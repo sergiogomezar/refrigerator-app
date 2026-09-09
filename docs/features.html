@@ -1,0 +1,265 @@
+<title>Features de Freezai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+  :root {
+    --ground: #f1f4f4;
+    --surface: #ffffff;
+    --surface-2: #e6eded;
+    --ink: #0f1d1f;
+    --ink-muted: #53676a;
+    --line: #ccdad9;
+    --line-strong: #a5b9b8;
+    --accent: #0a6a77;
+    --accent-quiet: #dbebee;
+    --fresh: #2d7a53;
+    --warn: #9a5a06;
+    --radius: 3px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0c1416; --surface: #141e21; --surface-2: #1b2729;
+      --ink: #e6edec; --ink-muted: #90a3a3; --line: #28383b; --line-strong: #3b4f53;
+      --accent: #59c6d3; --accent-quiet: #14313a; --fresh: #72c598; --warn: #dea74f;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0c1416; --surface: #141e21; --surface-2: #1b2729;
+    --ink: #e6edec; --ink-muted: #90a3a3; --line: #28383b; --line-strong: #3b4f53;
+    --accent: #59c6d3; --accent-quiet: #14313a; --fresh: #72c598; --warn: #dea74f;
+  }
+
+  body {
+    background: var(--ground); color: var(--ink);
+    font-family: "Source Serif 4", Georgia, serif; font-size: 16.5px; line-height: 1.58;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, .eyebrow, .phase, .gnum, .meta, th, .legend { font-family: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif; }
+  .mono, .stat-n { font-family: "IBM Plex Mono", Consolas, monospace; }
+
+  .page { max-width: 60rem; margin: 0 auto; padding: 2.75rem 1.25rem 6rem; display: flex; flex-direction: column; gap: 2.75rem; }
+
+  header { display: flex; flex-direction: column; gap: 1rem; }
+  .eyebrow { font-size: .7rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin: 0; }
+  h1 { font-size: clamp(2.3rem, 6.5vw, 3.6rem); font-weight: 800; line-height: 1; letter-spacing: -.03em; margin: 0; }
+  .deck { font-size: 1.16rem; color: var(--ink-muted); margin: 0; max-width: 38rem; }
+  .deck strong { color: var(--ink); font-weight: 600; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .stat { background: var(--surface); padding: .9rem 1rem; display: flex; flex-direction: column; gap: .15rem; }
+  .stat-n { font-size: 1.5rem; font-weight: 600; color: var(--accent); letter-spacing: -.02em; }
+  .stat-l { font-size: .82rem; color: var(--ink-muted); line-height: 1.3; }
+  .legend { display: flex; flex-wrap: wrap; gap: .4rem 1rem; font-size: .78rem; color: var(--ink-muted); align-items: center; padding-top: .3rem; border-top: 1px solid var(--line); }
+
+  .phase { font-size: .64rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; padding: .15rem .42rem; border: 1px solid currentColor; border-radius: var(--radius); white-space: nowrap; }
+  .p1 { color: var(--fresh); }
+  .p2 { color: var(--warn); }
+  .pf { color: var(--accent); }
+
+  .group { display: flex; flex-direction: column; gap: 0; background: var(--surface); border: 1px solid var(--line); }
+  .group > h2 {
+    margin: 0; font-size: 1.22rem; font-weight: 700; letter-spacing: -.01em;
+    padding: .95rem 1.2rem; border-bottom: 1px solid var(--line-strong); background: var(--surface-2);
+    display: flex; align-items: baseline; gap: .7rem;
+  }
+  .group > h2 .gnum { font-family: "IBM Plex Mono", monospace; font-size: .78rem; font-weight: 600; color: var(--accent); }
+  .group > p.intro { margin: 0; padding: .9rem 1.2rem 0; color: var(--ink-muted); font-size: .95rem; max-width: 44rem; }
+  .rows { display: flex; flex-direction: column; }
+  .row { display: grid; grid-template-columns: minmax(0, 1fr) 5.5rem; gap: .3rem 1rem; padding: .8rem 1.2rem; border-top: 1px solid var(--line); align-items: baseline; }
+  .row:first-child { border-top: 1px solid var(--line); }
+  .row .t { font-family: "Bricolage Grotesque", sans-serif; font-weight: 700; font-size: 1rem; letter-spacing: -.005em; }
+  .row .d { font-size: .95rem; grid-column: 1; }
+  .row .phase { justify-self: end; grid-row: 1; grid-column: 2; }
+  @media (max-width: 34rem) {
+    .row { grid-template-columns: 1fr; }
+    .row .phase { justify-self: start; grid-column: 1; grid-row: auto; }
+  }
+  .row .code { font-family: "IBM Plex Mono", monospace; font-size: .85em; background: var(--surface-2); padding: .05em .3em; border-radius: 2px; }
+
+  .note { background: var(--accent-quiet); border: 1px solid var(--line); padding: 1.1rem 1.25rem; display: flex; flex-direction: column; gap: .5rem; }
+  .note h3 { margin: 0; font-size: 1.02rem; font-weight: 700; }
+  .note p { margin: 0; font-size: .97rem; max-width: 46rem; }
+
+  footer { border-top: 2px solid var(--line-strong); padding-top: 1.2rem; color: var(--ink-muted); font-size: .88rem; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<div class="page">
+
+<header>
+  <p class="eyebrow">Alcance funcional consolidado</p>
+  <h1>Features de Freezai</h1>
+  <p class="deck">Todo lo que el producto hace, agrupado por área y marcado por fase. <strong>Versión 1</strong> es lo que se construye primero, <strong>versión 2</strong> lo que llega después con hardware opcional y datos de retail, y <strong>futuro</strong> lo que se habilita con socios y nuevos canales.</p>
+  <div class="stats">
+    <div class="stat"><span class="stat-n">11</span><span class="stat-l">áreas funcionales</span></div>
+    <div class="stat"><span class="stat-n">73</span><span class="stat-l">features definidas</span></div>
+    <div class="stat"><span class="stat-n">51</span><span class="stat-l">en la versión 1</span></div>
+    <div class="stat"><span class="stat-n">3</span><span class="stat-l">vías de captura sin formularios</span></div>
+  </div>
+  <p class="legend">
+    <span class="phase p1">v1</span> <span>Primera entrega</span>
+    <span class="phase p2">v2</span> <span>Segunda entrega</span>
+    <span class="phase pf">Futuro</span> <span>Habilitado por socios y canales nuevos</span>
+  </p>
+</header>
+
+<div class="group">
+  <h2><span class="gnum">01</span> Captura de datos</h2>
+  <p class="intro">Tres vías para que la comida entre al inventario sin llenar formularios, más el retorno automático de lo que se compró en línea.</p>
+  <div class="rows">
+    <div class="row"><span class="t">Dictado por voz</span><span class="phase p1">v1</span><span class="d">El usuario dice lo que guardó — "metí dos litros de leche y una bandeja de huevos" — y la app extrae producto, cantidad y fecha, y lo agrega al inventario.</span></div>
+    <div class="row"><span class="t">Foto del ticket</span><span class="phase p1">v1</span><span class="d">Una foto carga toda la compra de golpe. Los ítems entran como borrador editable para confirmar cantidades en un paso.</span></div>
+    <div class="row"><span class="t">Escaneo de código de barras</span><span class="phase p1">v1</span><span class="d">Para agregar un producto puntual con su ficha completa.</span></div>
+    <div class="row"><span class="t">Entrada manual</span><span class="phase p1">v1</span><span class="d">Disponible siempre, como alternativa cuando el usuario la prefiere.</span></div>
+    <div class="row"><span class="t">Comprobante de compra en línea</span><span class="phase p1">v1</span><span class="d">El usuario comparte el correo de confirmación de su pedido y los productos entran al inventario con su fecha estimada, ya con los cambios que hizo el repartidor.</span></div>
+    <div class="row"><span class="t">Diccionario de productos que aprende</span><span class="phase p1">v1</span><span class="d">Cada corrección del usuario mejora el reconocimiento de los nombres abreviados de su supermercado.</span></div>
+    <div class="row"><span class="t">Importación desde el programa de fidelidad</span><span class="phase p2">v2</span><span class="d">El usuario conecta su cuenta del supermercado y la compra aparece sola, sin fotos ni dictado.</span></div>
+  </div>
+</div>
+
+<div class="group">
+  <h2><span class="gnum">02</span> Inventario</h2>
+  <p class="intro">El estado de la cocina, compartido por toda la casa y siempre al día.</p>
+  <div class="rows">
+    <div class="row"><span class="t">Ficha por producto</span><span class="phase p1">v1</span><span class="d">Cantidad, zona de guardado, fecha impresa, fecha de apertura y estado declarado por el usuario.</span></div>
+    <div class="row"><span class="t">Tres zonas de guardado</span><span class="phase p1">v1</span><span class="d">Nevera, congelador y despensa, cada una con su propia vida útil para el mismo producto.</span></div>
+    <div class="row"><span class="t">Vida útil estimada</span><span class="phase p1">v1</span><span class="d">Para frescos sin fecha impresa, calculada por producto y zona a partir de tablas de referencia.</span></div>
+    <div class="row"><span class="t">Recalculo al abrir</span><span class="phase p1">v1</span><span class="d">Un botón de "abierto hoy" ajusta la estimación: la leche cerrada dura semanas, abierta cinco días.</span></div>
+    <div class="row"><span class="t">Sobras como producto propio</span><span class="phase p1">v1</span><span class="d">Se registran por voz o etiqueta, con caducidad automática de tres días y nombre libre.</span></div>
+    <div class="row"><span class="t">Modo congelador</span><span class="phase p1">v1</span><span class="d">Fecha de congelación y aviso de "úsalo antes de", para lo que se guarda y se olvida.</span></div>
+    <div class="row"><span class="t">Inventario compartido del hogar</span><span class="phase p1">v1</span><span class="d">Todos los miembros ven y editan el mismo estado, en tiempo real.</span></div>
+    <div class="row"><span class="t">Estado declarado por el usuario</span><span class="phase p1">v1</span><span class="d"><span class="code">está bien</span>, <span class="code">dudoso</span> o <span class="code">ya no</span>: quien ve el producto ajusta la estimación con un toque.</span></div>
+    <div class="row"><span class="t">Funciona sin conexión</span><span class="phase p1">v1</span><span class="d">Consulta y edición del inventario dentro del supermercado o con señal intermitente.</span></div>
+  </div>
+</div>
+
+<div class="group">
+  <h2><span class="gnum">03</span> Caducidad y prioridad de consumo</h2>
+  <p class="intro">La app sabe qué conviene aprovechar antes y lo dice a tiempo.</p>
+  <div class="rows">
+    <div class="row"><span class="t">Aprovecha primero</span><span class="phase p1">v1</span><span class="d">Orden FEFO: lo que vence primero se propone primero, con la lista corta de lo que está en su mejor momento hoy.</span></div>
+    <div class="row"><span class="t">Pantalla de inicio con lo del día</span><span class="phase p1">v1</span><span class="d">Al abrir la app: tres productos para aprovechar y tres cosas que hacer con ellos.</span></div>
+    <div class="row"><span class="t">Avisos oportunos</span><span class="phase p1">v1</span><span class="d">Notificación cuando algo entra en sus últimos días, en el momento en que todavía se puede usar.</span></div>
+    <div class="row"><span class="t">Temperatura declarada</span><span class="phase p1">v1</span><span class="d">El usuario indica la temperatura de su nevera una vez y las estimaciones se ajustan a ella.</span></div>
+    <div class="row"><span class="t">Sensor Bluetooth de temperatura</span><span class="phase p2">v2</span><span class="d">Con un sensor comercial de bajo costo, la vida útil se ajusta a la temperatura real medida dentro del electrodoméstico.</span></div>
+    <div class="row"><span class="t">Alerta de corte de frío</span><span class="phase p2">v2</span><span class="d">"Tu nevera estuvo a 12 °C durante tres horas: revisa lácteos y carne", tras un corte de luz o una puerta mal cerrada.</span></div>
+  </div>
+</div>
+
+<div class="group">
+  <h2><span class="gnum">04</span> Recetas y qué cocinar</h2>
+  <p class="intro">Sugerencias hechas con lo que hay en casa, y el toque que mantiene el inventario al día.</p>
+  <div class="rows">
+    <div class="row"><span class="t">Tres niveles de disponibilidad</span><span class="phase p1">v1</span><span class="d"><span class="code">cocinable ya</span> con lo que hay, <span class="code">falta 1–2</span> ingredientes secundarios, y <span class="code">falta lo principal</span>.</span></div>
+    <div class="row"><span class="t">Ordenadas por lo que conviene aprovechar</span><span class="phase p1">v1</span><span class="d">Primero los platos que usan lo que está en su mejor momento.</span></div>
+    <div class="row"><span class="t">Cociné esto</span><span class="phase p1">v1</span><span class="d">Un toque descuenta los ingredientes de la receta del inventario. El ciclo se cierra sin trabajo extra.</span></div>
+    <div class="row"><span class="t">Faltantes a la lista</span><span class="phase p1">v1</span><span class="d">Lo que falte para una receta elegida pasa directo a la lista de compras.</span></div>
+    <div class="row"><span class="t">Recetario propio de clásicos</span><span class="phase p1">v1</span><span class="d">Los platos de todos los días, con texto propio y cantidades ajustadas a las porciones de la casa.</span></div>
+    <div class="row"><span class="t">Recetas de creadores</span><span class="phase p1">v1</span><span class="d">Enlace a blogs y sitios de cocina para las recetas de autor, con crédito visible al creador.</span></div>
+    <div class="row"><span class="t">Ajuste de porciones</span><span class="phase p1">v1</span><span class="d">La receta se escala según cuántos comen esa noche.</span></div>
+    <div class="row"><span class="t">Plan semanal de comidas</span><span class="phase p2">v2</span><span class="d">Menú de la semana armado desde el inventario, con la lista de compras como diferencia entre el plan y lo que hay.</span></div>
+  </div>
+</div>
+
+<div class="group">
+  <h2><span class="gnum">05</span> Perfiles familiares</h2>
+  <p class="intro">Cada miembro de la casa tiene sus ingredientes, y cada comida se resuelve según quién está en la mesa.</p>
+  <div class="rows">
+    <div class="row"><span class="t">Tres listas por persona</span><span class="phase p1">v1</span><span class="d"><span class="code">no puede</span> excluye la receta, <span class="code">evita</span> la baja de orden, <span class="code">le encanta</span> la sube. Más notas libres.</span></div>
+    <div class="row"><span class="t">Presets de un toque</span><span class="phase p1">v1</span><span class="d">Vegetariano, vegano, sin cerdo, halal, kosher, sin lácteos, sin gluten, sin frutos secos, sin mariscos, sin picante.</span></div>
+    <div class="row"><span class="t">Jerarquía de ingredientes</span><span class="phase p1">v1</span><span class="d">Cada restricción cubre los derivados: "sin lácteos" arrastra mantequilla, crema, queso y suero.</span></div>
+    <div class="row"><span class="t">Selector de comensales</span><span class="phase p1">v1</span><span class="d">Quién come hoy define el filtro: las restricciones de la comida son la unión de las de todos los presentes.</span></div>
+    <div class="row"><span class="t">Escenas guardadas</span><span class="phase p1">v1</span><span class="d">Cena familiar, solo adultos, los niños, solo yo, e invitado como perfil temporal para la visita.</span></div>
+    <div class="row"><span class="t">Matriz de quién come qué</span><span class="phase p1">v1</span><span class="d">Miembros y categorías de ingredientes en una sola vista, para planear la semana de un golpe.</span></div>
+    <div class="row"><span class="t">Motivo visible en cada receta</span><span class="phase p1">v1</span><span class="d"><span class="code">sirve para Ana y Luis · no para Sofía (maní)</span>, con el detalle a la vista.</span></div>
+    <div class="row"><span class="t">Sustituciones sugeridas</span><span class="phase p1">v1</span><span class="d">Antes de descartar una receta, la app propone el reemplazo: leche por bebida vegetal, crema por coco.</span></div>
+    <div class="row"><span class="t">Aprende de lo que se cocina</span><span class="phase p1">v1</span><span class="d">Un pulgar por miembro después de cada comida ajusta gustos y disgustos con el uso.</span></div>
+  </div>
+</div>
+
+<div class="group">
+  <h2><span class="gnum">06</span> Plan de alimentación</h2>
+  <p class="intro">El usuario declara cómo quiere comer y la app organiza las sugerencias alrededor de eso.</p>
+  <div class="rows">
+    <div class="row"><span class="t">Plan declarado por el usuario</span><span class="phase p1">v1</span><span class="d">"Sin lácteos", "alto en proteína", "cinco comidas al día", "1 800 kcal": la app recibe el plan y filtra y ordena con él.</span></div>
+    <div class="row"><span class="t">Preferencias por miembro</span><span class="phase p1">v1</span><span class="d">Cada persona de la casa tiene su propio plan y sus propias metas.</span></div>
+    <div class="row"><span class="t">Información nutricional de la receta</span><span class="phase p2">v2</span><span class="d">Macros y porciones por plato, para quien quiere seguir su plan con números.</span></div>
+    <div class="row"><span class="t">Canal de nutricionistas</span><span class="phase pf">Futuro</span><span class="d">El profesional carga el plan de su paciente y la app lo ejecuta en la cocina, con seguimiento de lo que se cocinó.</span></div>
+  </div>
+</div>
+
+<div class="group">
+  <h2><span class="gnum">07</span> Lista de compras</h2>
+  <p class="intro">Una sola lista, siempre disponible, siempre actualizada, compartida por toda la casa.</p>
+  <div class="rows">
+    <div class="row"><span class="t">Lista viva</span><span class="phase p1">v1</span><span class="d">Se alimenta de cuatro fuentes: lo que se agotó, lo que está por vencer y se repone siempre, los faltantes de una receta y lo que agrega cualquiera a mano o por voz.</span></div>
+    <div class="row"><span class="t">Estados por ítem</span><span class="phase p1">v1</span><span class="d"><span class="code">sugerido</span>, <span class="code">confirmado</span> y <span class="code">comprado</span>: lo comprado entra al inventario y lo pendiente permanece para la próxima.</span></div>
+    <div class="row"><span class="t">Imprescindibles marcados</span><span class="phase p1">v1</span><span class="d">Una estrella en lo que nunca puede faltar en esa casa, y de ahí en adelante la app aprende de la recompra.</span></div>
+    <div class="row"><span class="t">Orden por pasillo</span><span class="phase p1">v1</span><span class="d">Agrupada por categoría para recorrer el supermercado una sola vez.</span></div>
+    <div class="row"><span class="t">Compartida en tiempo real</span><span class="phase p1">v1</span><span class="d">Quien va al súper marca y el resto de la casa lo ve al instante.</span></div>
+    <div class="row"><span class="t">Envío por WhatsApp</span><span class="phase p1">v1</span><span class="d">La lista se manda al grupo de la casa o al chat del tendero del barrio, lista para pedir.</span></div>
+    <div class="row"><span class="t">Presupuesto semanal</span><span class="phase p2">v2</span><span class="d">Cuánto va costando la lista y cómo se compara con las semanas anteriores.</span></div>
+    <div class="row"><span class="t">Comparación de precios entre tiendas</span><span class="phase p2">v2</span><span class="d">Dónde conviene comprar la canasta de esta semana.</span></div>
+  </div>
+</div>
+
+<div class="group">
+  <h2><span class="gnum">08</span> Compra del faltante</h2>
+  <p class="intro">Desde la lista, el usuario llega a comprar en el canal que prefiera, y la compra vuelve al inventario.</p>
+  <div class="rows">
+    <div class="row"><span class="t">Salida a la plataforma de domicilio</span><span class="phase p1">v1</span><span class="d">Rappi, PedidosYa, Uber Eats, DiDi Food o la app del supermercado se abren con los productos de la lista ya identificados y buscados.</span></div>
+    <div class="row"><span class="t">Pedido al tendero por WhatsApp</span><span class="phase p1">v1</span><span class="d">La lista se envía como mensaje al comercio del barrio, que es donde se compra buena parte del mercado diario.</span></div>
+    <div class="row"><span class="t">Lista al portapapeles</span><span class="phase p1">v1</span><span class="d">Copiar toda la compra en un toque para pegarla en cualquier buscador o chat.</span></div>
+    <div class="row"><span class="t">Retorno por comprobante</span><span class="phase p1">v1</span><span class="d">El usuario comparte el correo o la pantalla del pedido y todo entra al inventario con su fecha estimada.</span></div>
+    <div class="row"><span class="t">Programa de afiliados</span><span class="phase p1">v1</span><span class="d">Los enlaces de compra generan comisión por pedido, con la relación comercial declarada al usuario.</span></div>
+    <div class="row"><span class="t">Carrito armado dentro de la plataforma</span><span class="phase pf">Futuro</span><span class="d">Habilitar el carrito completo en Rappi, Uber Eats y otras plataformas de domicilio, sujeto al programa de socios de cada una, que se abre por volumen de pedidos generados. El diseño lo contempla desde ahora.</span></div>
+    <div class="row"><span class="t">Integración con retailer directo</span><span class="phase pf">Futuro</span><span class="d">Catálogo, precios y carrito con cadenas como Éxito, Cencosud, Soriana o Chedraui, por acuerdo comercial.</span></div>
+    <div class="row"><span class="t">Middleware de receta a carrito</span><span class="phase pf">Futuro</span><span class="d">Un solo acuerdo con un intermediario especializado habilita decenas de retailers de una vez.</span></div>
+  </div>
+</div>
+
+<div class="group">
+  <h2><span class="gnum">09</span> Ahorro y desperdicio</h2>
+  <p class="intro">El valor del producto, hecho visible en dinero.</p>
+  <div class="rows">
+    <div class="row"><span class="t">Tiré esto</span><span class="phase p1">v1</span><span class="d">Registrar lo que se botó en dos toques, con el motivo.</span></div>
+    <div class="row"><span class="t">Contador de dinero</span><span class="phase p1">v1</span><span class="d">Cuánto se desperdició este mes y cuánto se aprovechó, en la moneda del usuario.</span></div>
+    <div class="row"><span class="t">Reporte mensual del hogar</span><span class="phase p1">v1</span><span class="d">Qué se pierde con más frecuencia y en qué categoría, para cambiar la compra.</span></div>
+    <div class="row"><span class="t">Meta de reducción</span><span class="phase p2">v2</span><span class="d">El hogar fija una meta y la app muestra el avance semana a semana.</span></div>
+    <div class="row"><span class="t">Donación de excedentes</span><span class="phase pf">Futuro</span><span class="d">Ofrecer a vecinos lo que no se va a consumir a tiempo.</span></div>
+  </div>
+</div>
+
+<div class="group">
+  <h2><span class="gnum">10</span> Hardware opcional</h2>
+  <p class="intro">Accesorios comerciales que la app reconoce. Ninguno es necesario para usar el producto.</p>
+  <div class="rows">
+    <div class="row"><span class="t">Sensor Bluetooth de temperatura y humedad</span><span class="phase p2">v2</span><span class="d">Modelos comerciales certificados como compatibles, entre 10 y 25 dólares. Habilitan la vida útil ajustada y la alerta de corte de frío.</span></div>
+    <div class="row"><span class="t">Etiquetas NFC o QR para recipientes</span><span class="phase p2">v2</span><span class="d">Un toque del teléfono registra las sobras: qué es, de cuándo y cuántos días quedan.</span></div>
+    <div class="row"><span class="t">Báscula Bluetooth de cocina</span><span class="phase p2">v2</span><span class="d">Cantidades exactas al guardar y al servir.</span></div>
+    <div class="row"><span class="t">Impresora térmica de etiquetas</span><span class="phase pf">Futuro</span><span class="d">Etiqueta con producto, fecha, hora y responsable. Pensada para el canal profesional.</span></div>
+  </div>
+</div>
+
+<div class="group">
+  <h2><span class="gnum">11</span> Canal profesional</h2>
+  <p class="intro">La misma base de producto, para cocinas que trabajan con inventario y cumplimiento.</p>
+  <div class="rows">
+    <div class="row"><span class="t">Etiquetado FEFO de preparaciones</span><span class="phase pf">Futuro</span><span class="d">Cada preparación sale etiquetada con fecha, hora y responsable.</span></div>
+    <div class="row"><span class="t">Bitácora de temperatura</span><span class="phase pf">Futuro</span><span class="d">Registro continuo y exportable de cámaras y neveras, listo para inspección.</span></div>
+    <div class="row"><span class="t">Costo de merma</span><span class="phase pf">Futuro</span><span class="d">Cuánto dinero se pierde, en qué insumo y en qué turno.</span></div>
+    <div class="row"><span class="t">Multi-sede</span><span class="phase pf">Futuro</span><span class="d">Varias cocinas o puntos de servicio bajo una sola vista de operaciones.</span></div>
+    <div class="row"><span class="t">Licenciamiento a fabricantes</span><span class="phase pf">Futuro</span><span class="d">El inventario inteligente dentro de la aplicación de un fabricante de electrodomésticos.</span></div>
+  </div>
+</div>
+
+<div class="note">
+  <h3>Base común a todas las features</h3>
+  <p>Español y localización por país, con nombres de producto y unidades del mercado donde se usa. Funciona en teléfonos de gama baja y sin conexión. Base de productos que mejora con cada corrección de los usuarios. Todo el contenido generado se identifica como tal, y las estimaciones se presentan como estimaciones: la app lleva la cuenta y la persona decide.</p>
+</div>
+
+<footer>
+  <p>Alcance funcional consolidado, 4 de septiembre de 2026. Complementa el dossier de producto, que contiene el análisis de viabilidad, el mercado, las integraciones y el detalle legal.</p>
+</footer>
+
+</div>

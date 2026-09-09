@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Freezai · Visión de producto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --stage:#eceff0;
+  --stage-line:#d4dfde;
+  --stage-line-2:#bccbca;
+  --chrome-ink:#0f1d1f;
+  --chrome-muted:#55696c;
+  --chrome-faint:#8a9fa1;
+
+  --teal:#0a6a77;
+  --teal-soft:#dceaed;
+  --teal-line:#a9cfd5;
+  --green:#2d7a53;
+  --green-soft:#dcefe4;
+  --green-line:#a8d4bd;
+  --red:#a8402f;
+  --red-soft:#f7e3df;
+  --red-line:#e0b3aa;
+  --amber:#9a5a06;
+  --amber-soft:#f7ecd8;
+  --amber-line:#dfc08a;
+
+  --app-bg:#f4f7f6;
+  --app-surface:#ffffff;
+  --app-surface-2:#e7edec;
+  --app-ink:#0f1d1f;
+  --app-muted:#5b7073;
+  --app-line:#d5e0df;
+  --app-accent:#0a6a77;
+  --app-accent-quiet:#dceaed;
+  --app-warn:#9a5a06;
+  --app-warn-quiet:#f7ead5;
+
+  --sans:"Bricolage Grotesque",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0; background:var(--stage); color:var(--chrome-ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; overflow:hidden}
+body::before{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background:
+    radial-gradient(120vw 90vh at 28% -12%, #dcebec 0%, transparent 62%),
+    radial-gradient(90vw 70vh at 98% 112%, #e1eaf1 0%, transparent 60%);
+}
+.stage{position:relative; z-index:1; height:100vh; display:grid; grid-template-rows:auto minmax(0,1fr) auto}
+
+/* ---------- top bar ---------- */
+.topbar{display:flex; align-items:center; justify-content:space-between; gap:.9rem 1.5rem; flex-wrap:wrap; padding:.78rem 1.6rem; border-bottom:1px solid var(--stage-line); background:#ffffff9c}
+.brand{display:flex; align-items:center; gap:.7rem}
+.brand-mark{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;background:linear-gradient(150deg,#0f8896,var(--teal)); color:#fff; font-weight:800; font-size:.9rem; letter-spacing:-.03em}
+.brand-name{font-weight:800; font-size:1.02rem; letter-spacing:-.02em}
+.brand-sub{font-size:.68rem; letter-spacing:.15em; text-transform:uppercase; color:var(--chrome-faint); font-weight:600}
+
+.moments{display:flex; align-items:center; gap:.28rem; flex-wrap:wrap}
+.moment{font-family:var(--mono); font-size:.64rem; letter-spacing:.03em; padding:.28rem .48rem; border:1px solid var(--stage-line-2); border-radius:3px; color:var(--chrome-faint); background:#fff; transition:all .5s ease}
+.moment.is-active{color:#fff; background:var(--teal); border-color:var(--teal); font-weight:500}
+.moment.is-done{color:var(--teal); border-color:var(--teal-line); background:var(--teal-soft)}
+
+.topright{display:flex; align-items:center; gap:.9rem}
+.devsel{display:flex; border:1px solid var(--stage-line-2); border-radius:4px; overflow:hidden; background:#fff}
+.devsel button{font-family:var(--mono); font-size:.67rem; letter-spacing:.05em; border:0; background:transparent; color:var(--chrome-muted); padding:.4rem .7rem; cursor:pointer; transition:all .2s ease}
+.devsel button + button{border-left:1px solid var(--stage-line)}
+.devsel button:hover{background:var(--teal-soft); color:var(--teal)}
+.devsel button.is-on{background:var(--teal); color:#fff}
+.ckpt{font-family:var(--mono); font-size:.67rem; color:var(--chrome-faint); letter-spacing:.04em}
+
+/* ---------- body ---------- */
+.body{min-height:0; display:grid; grid-template-columns:minmax(0,1fr) 25.5rem; align-items:center; gap:2rem; padding:1.05rem 1.6rem}
+@media (max-width:1120px){ .body{grid-template-columns:1fr; align-content:start; overflow:auto} }
+
+/* ---------- device ---------- */
+.device-wrap{display:grid; place-items:center; min-height:0; height:100%; overflow:hidden}
+.device{
+  position:relative; flex:none; transform-origin:center center;
+  width:var(--dev-w); height:var(--dev-h); border-radius:var(--dev-r); padding:var(--dev-pad);
+  background:linear-gradient(160deg,#38494e,#162226 58%);
+  box-shadow:0 34px 70px -26px #16333a80, 0 4px 14px -4px #16333a33, 0 0 0 1px #ffffff26 inset;
+}
+body[data-device="mobile"] .device{ --dev-w:352px; --dev-h:722px; --dev-r:42px; --dev-pad:11px; --scr-r:32px }
+body[data-device="tablet"] .device{ --dev-w:610px; --dev-h:812px; --dev-r:26px; --dev-pad:15px; --scr-r:13px }
+
+.screen{position:relative; width:100%; height:100%; border-radius:var(--scr-r); overflow:hidden; background:var(--app-bg); color:var(--app-ink); display:flex; flex-direction:column}
+
+.sleep{position:absolute; inset:0; z-index:5; display:grid; place-content:center; justify-items:center; gap:.2rem; background:#0a1214; color:#7f9599; transition:opacity .7s ease}
+.sleep.is-hidden{opacity:0; pointer-events:none}
+.sleep-time{font-size:3.6rem; font-weight:600; letter-spacing:-.04em; color:#cfe0e2; line-height:1}
+.sleep-date{font-size:.86rem}
+.sleep-note{margin-top:1.4rem; font-family:var(--mono); font-size:.66rem; color:#4c6165; letter-spacing:.06em}
+body[data-device="tablet"] .sleep-time{font-size:5.2rem}
+body[data-device="tablet"] .sleep-date{font-size:1.05rem}
+
+.statusbar{display:flex; justify-content:space-between; align-items:center; padding:.85rem 1.15rem .3rem; font-size:.72rem; font-weight:600; color:var(--app-muted); font-family:var(--mono); letter-spacing:.02em}
+.sb-right{display:flex; gap:.3rem; align-items:center}
+.sb-bar{width:3px;background:currentColor;border-radius:1px}
+body[data-device="tablet"] .statusbar{font-size:.82rem; padding:1rem 1.6rem .4rem}
+
+/* ---------- views ---------- */
+.app{flex:1; min-height:0; position:relative}
+.view{
+  position:absolute; inset:0; display:flex; flex-direction:column; overflow:hidden;
+  padding:0 1.15rem 1rem; pointer-events:none;
+  opacity:0; transform:translateY(10px); transition:opacity .5s ease, transform .5s cubic-bezier(.2,.8,.2,1);
+}
+.view.is-on{opacity:1; transform:none}
+body[data-device="tablet"] .view{padding:0 1.6rem 1.5rem}
+
+.rev{opacity:0; transform:translateY(10px); transition:opacity .55s ease, transform .55s cubic-bezier(.2,.8,.2,1)}
+.rev.is-in{opacity:1; transform:none}
+
+.app-greet{font-size:.78rem; color:var(--app-muted); font-weight:600; letter-spacing:.02em; margin:.7rem 0 .1rem}
+.app-title{font-size:1.42rem; font-weight:800; letter-spacing:-.03em; line-height:1.1; margin:0 0 .55rem}
+.app-title .brk{display:block}
+.ctx-chips{display:flex; flex-wrap:wrap; gap:.3rem; margin-bottom:.95rem}
+.chip{font-size:.68rem; font-weight:600; padding:.22rem .48rem; border-radius:999px; background:var(--app-accent-quiet); color:var(--app-accent); white-space:nowrap}
+.chip.n{background:var(--app-surface-2); color:var(--app-muted)}
+
+body[data-device="tablet"] .app-greet{font-size:.95rem; margin:1rem 0 .2rem}
+body[data-device="tablet"] .app-title{font-size:2.15rem; margin-bottom:.8rem}
+body[data-device="tablet"] .app-title .brk{display:inline}
+body[data-device="tablet"] .chip{font-size:.8rem; padding:.28rem .6rem}
+body[data-device="tablet"] .ctx-chips{margin-bottom:1.4rem}
+
+.app-cols{display:flex; flex-direction:column; min-height:0}
+.col{display:flex; flex-direction:column; min-height:0}
+body[data-device="tablet"] .app-cols{display:grid; grid-template-columns:1fr 1fr; column-gap:1.5rem; align-items:start}
+body[data-device="tablet"] .cards{margin-bottom:0}
+
+.sec-label{font-size:.63rem; font-weight:600; letter-spacing:.13em; text-transform:uppercase; color:var(--app-muted); margin:.2rem 0 .45rem; display:flex; align-items:center; gap:.4rem}
+.sec-label::after{content:""; flex:1; height:1px; background:var(--app-line)}
+body[data-device="tablet"] .sec-label{font-size:.7rem; margin-bottom:.7rem}
+
+/* ---- M1 ---- */
+.cards{display:flex; flex-direction:column; gap:.4rem; margin-bottom:1rem}
+.card{display:grid; grid-template-columns:38px minmax(0,1fr) auto; align-items:center; gap:.65rem; background:var(--app-surface); border:1px solid var(--app-line); border-radius:10px; padding:.5rem .6rem}
+.card-ico{width:38px;height:38px;border-radius:9px; display:grid; place-items:center; font-size:1.15rem; background:var(--app-surface-2)}
+.card-t{font-weight:700; font-size:.88rem; letter-spacing:-.01em; line-height:1.2}
+.card-s{font-size:.72rem; color:var(--app-muted); line-height:1.3}
+.tag{font-family:var(--mono); font-size:.6rem; font-weight:500; padding:.2rem .38rem; border-radius:4px; white-space:nowrap}
+.tag.hot{background:var(--app-warn-quiet); color:var(--app-warn)}
+.tag.soon{background:var(--app-accent-quiet); color:var(--app-accent)}
+body[data-device="tablet"] .cards{gap:.55rem}
+body[data-device="tablet"] .card{grid-template-columns:48px minmax(0,1fr) auto; padding:.7rem .8rem; border-radius:12px}
+body[data-device="tablet"] .card-ico{width:48px;height:48px;font-size:1.5rem;border-radius:11px}
+body[data-device="tablet"] .card-t{font-size:1.02rem}
+body[data-device="tablet"] .card-s{font-size:.82rem}
+body[data-device="tablet"] .tag{font-size:.68rem; padding:.24rem .45rem}
+
+.recipes{display:flex; flex-direction:column; gap:.35rem}
+.rec{display:flex; align-items:center; justify-content:space-between; gap:.6rem; background:var(--app-surface); border:1px solid var(--app-line); border-radius:10px; padding:.55rem .7rem}
+.rec-t{font-weight:700; font-size:.86rem; letter-spacing:-.01em}
+.rec-s{font-size:.7rem; color:var(--app-muted); margin-top:.08rem}
+.rec-m{font-family:var(--mono); font-size:.64rem; color:var(--app-accent); white-space:nowrap}
+body[data-device="tablet"] .recipes{gap:.55rem}
+body[data-device="tablet"] .rec{padding:.75rem .9rem; border-radius:12px}
+body[data-device="tablet"] .rec-t{font-size:1rem}
+body[data-device="tablet"] .rec-s{font-size:.82rem}
+body[data-device="tablet"] .rec-m{font-size:.72rem}
+
+/* ---- M2 ---- */
+.diners{display:flex; flex-direction:column; gap:.35rem; margin-bottom:.9rem}
+.diner{display:grid; grid-template-columns:30px minmax(0,1fr); gap:.6rem; align-items:center; background:var(--app-surface); border:1px solid var(--app-line); border-radius:10px; padding:.42rem .55rem}
+.av{width:30px;height:30px;border-radius:50%; display:grid; place-items:center; background:var(--app-accent-quiet); color:var(--app-accent); font-weight:800; font-size:.8rem}
+.av.you{background:var(--app-surface-2); color:var(--app-muted)}
+.dn{font-weight:700; font-size:.84rem; line-height:1.15}
+.dr{font-size:.7rem; color:var(--app-muted); line-height:1.25}
+.dr.alert{color:var(--red); font-weight:600}
+body[data-device="tablet"] .diner{grid-template-columns:38px minmax(0,1fr); padding:.6rem .75rem; border-radius:12px}
+body[data-device="tablet"] .av{width:38px;height:38px;font-size:.95rem}
+body[data-device="tablet"] .dn{font-size:.98rem}
+body[data-device="tablet"] .dr{font-size:.8rem}
+
+.fchips{display:flex; flex-wrap:wrap; gap:.3rem; margin-bottom:.9rem}
+.fchip{font-family:var(--mono); font-size:.66rem; padding:.24rem .45rem; border-radius:4px; background:var(--green-soft); border:1px solid var(--green-line); color:var(--green); white-space:nowrap}
+body[data-device="tablet"] .fchip{font-size:.76rem; padding:.3rem .55rem}
+
+.rec2{background:var(--app-surface); border:1px solid var(--app-line); border-radius:10px; padding:.55rem .65rem; display:flex; flex-direction:column; gap:.35rem; transition:transform .18s ease}
+.rec2.ok{border-color:var(--green-line)}
+.rec2.no{background:#fbf4f2; border-color:var(--red-line)}
+.rec2-h{display:flex; align-items:flex-start; justify-content:space-between; gap:.5rem}
+.mark{width:19px;height:19px;border-radius:50%; display:grid; place-items:center; flex:none; font-size:.68rem; font-weight:700; color:#fff}
+.mark.ok{background:var(--green)}
+.mark.no{background:var(--red)}
+.why{font-size:.7rem; line-height:1.3; color:var(--green); font-weight:600; border-top:1px dashed var(--green-line); padding-top:.3rem}
+.why.bad{color:var(--red); border-top-color:var(--red-line)}
+.rec2.no .rec-t{color:var(--app-muted)}
+body[data-device="tablet"] .rec2{padding:.75rem .85rem; border-radius:12px; gap:.45rem}
+body[data-device="tablet"] .why{font-size:.8rem}
+body[data-device="tablet"] .mark{width:22px;height:22px;font-size:.78rem}
+
+/* ---- M3 ---- */
+.banner{
+  display:grid; grid-template-columns:22px minmax(0,1fr); gap:.6rem; align-items:center;
+  border-radius:9px; padding:.5rem .65rem; margin-bottom:.85rem;
+  background:var(--red-soft); border:1px solid var(--red-line);
+  transition:background .5s ease, border-color .5s ease;
+}
+.banner.okstate{background:var(--green-soft); border-color:var(--green-line)}
+.bmark{width:22px;height:22px;border-radius:50%; display:grid; place-items:center; font-size:.72rem; font-weight:700; color:#fff; background:var(--red); transition:background .5s ease}
+.banner.okstate .bmark{background:var(--green)}
+.btxt b{display:block; font-size:.85rem; font-weight:700; color:var(--red); letter-spacing:-.01em; transition:color .5s ease}
+.banner.okstate .btxt b{color:var(--green)}
+.btxt .bsub{font-size:.72rem; color:var(--app-muted)}
+body[data-device="tablet"] .banner{grid-template-columns:26px minmax(0,1fr); padding:.7rem .85rem; border-radius:11px; margin-bottom:1.2rem}
+body[data-device="tablet"] .bmark{width:26px;height:26px;font-size:.85rem}
+body[data-device="tablet"] .btxt b{font-size:1rem}
+body[data-device="tablet"] .btxt .bsub{font-size:.82rem}
+
+.ings{display:flex; flex-direction:column; gap:.3rem; margin-bottom:.9rem}
+.ing{
+  display:grid; grid-template-columns:18px minmax(0,1fr) auto; gap:.55rem; align-items:center;
+  background:var(--app-surface); border:1px solid var(--app-line); border-radius:8px; padding:.4rem .55rem;
+  font-size:.82rem; font-weight:600;
+}
+.ing.bad{background:#fbf4f2; border-color:var(--red-line)}
+.ing i{font-style:normal; font-family:var(--mono); font-size:.65rem; color:var(--app-muted); font-weight:400; text-align:right}
+.ing.bad i{color:var(--red)}
+.ick{width:18px;height:18px;border-radius:50%; display:grid; place-items:center; font-size:.62rem; font-weight:700; color:#fff}
+.ick.ok{background:var(--green)}
+.ick.no{background:var(--red)}
+@keyframes swapflash{0%{background:var(--teal-soft)}100%{background:var(--app-surface)}}
+.ing.swapped{animation:swapflash 1.1s ease}
+body[data-device="tablet"] .ing{padding:.55rem .75rem; font-size:.95rem; border-radius:10px; grid-template-columns:22px minmax(0,1fr) auto}
+body[data-device="tablet"] .ing i{font-size:.76rem}
+body[data-device="tablet"] .ick{width:22px;height:22px;font-size:.72rem}
+
+.propose{
+  border:1px solid var(--teal-line); background:linear-gradient(180deg,#eef7f8,#ffffff); border-radius:10px;
+  padding:.6rem .7rem; display:flex; flex-direction:column; gap:.35rem; transition:border-color .5s ease;
+}
+.propose.accepted{border-color:var(--green-line); background:linear-gradient(180deg,var(--green-soft),#fff)}
+.ptag{font-family:var(--mono); font-size:.58rem; letter-spacing:.11em; text-transform:uppercase; color:var(--teal); font-weight:500}
+.propose.accepted .ptag{color:var(--green)}
+.ptitle{font-size:.88rem; font-weight:700; letter-spacing:-.01em; line-height:1.2}
+.pwhy{font-size:.72rem; color:var(--app-muted); line-height:1.35}
+.pacts{display:flex; gap:.35rem; margin-top:.15rem}
+.pbtn{
+  font-family:var(--sans); font-size:.74rem; font-weight:700; border-radius:6px; padding:.38rem .6rem;
+  border:1px solid var(--app-line); background:#fff; color:var(--app-muted); cursor:default; transition:all .3s ease;
+}
+.pbtn.primary{background:var(--app-accent); border-color:var(--app-accent); color:#fff}
+.propose.accepted .pbtn{opacity:.35}
+.propose.accepted .pbtn.primary{background:var(--green); border-color:var(--green); opacity:1}
+body[data-device="tablet"] .propose{padding:.85rem .95rem; border-radius:12px; gap:.5rem}
+body[data-device="tablet"] .ptitle{font-size:1.02rem}
+body[data-device="tablet"] .pwhy{font-size:.82rem}
+body[data-device="tablet"] .pbtn{font-size:.85rem; padding:.5rem .8rem}
+
+.cookbar{margin-top:.8rem}
+.cookbtn{
+  width:100%; font-family:var(--sans); font-size:.92rem; font-weight:700; letter-spacing:-.01em;
+  background:var(--app-ink); color:#fff; border:0; border-radius:9px; padding:.65rem; cursor:default;
+  transition:transform .18s ease;
+}
+body[data-device="tablet"] .cookbtn{font-size:1.05rem; padding:.85rem; border-radius:11px}
+
+/* ---- M4 ---- */
+.deltas{display:flex; flex-direction:column; gap:.32rem; margin-bottom:.9rem}
+.dl{
+  display:grid; grid-template-columns:26px minmax(0,1fr) auto; gap:.55rem; align-items:center;
+  background:var(--app-surface); border:1px solid var(--app-line); border-radius:8px; padding:.42rem .55rem;
+  font-size:.82rem; font-weight:600;
+}
+.dl .ico{font-size:1rem; text-align:center}
+.dl .qty{font-family:var(--mono); font-size:.7rem; font-weight:500; color:var(--app-muted); white-space:nowrap}
+.dl .qty s{opacity:.55}
+.dl .qty b{color:var(--green); font-weight:600}
+.dl .qty b.out{color:var(--red)}
+body[data-device="tablet"] .dl{padding:.58rem .75rem; font-size:.95rem; border-radius:10px; grid-template-columns:30px minmax(0,1fr) auto}
+body[data-device="tablet"] .dl .qty{font-size:.8rem}
+body[data-device="tablet"] .dl .ico{font-size:1.25rem}
+
+.adds{display:flex; flex-direction:column; gap:.32rem; margin-bottom:.9rem}
+.add{
+  display:flex; align-items:baseline; justify-content:space-between; gap:.5rem;
+  background:var(--app-accent-quiet); border:1px solid var(--teal-line); border-radius:8px; padding:.42rem .58rem;
+  font-size:.82rem; font-weight:700; color:var(--app-accent);
+}
+.add i{font-style:normal; font-family:var(--mono); font-size:.65rem; font-weight:400; color:var(--app-muted)}
+body[data-device="tablet"] .add{padding:.58rem .78rem; font-size:.95rem; border-radius:10px}
+body[data-device="tablet"] .add i{font-size:.76rem}
+
+.closer{border:1px solid var(--app-line); background:var(--app-surface); border-radius:10px; padding:.7rem .8rem; text-align:center}
+.closer-n{font-family:var(--mono); font-size:2.2rem; font-weight:500; color:var(--app-accent); line-height:1; letter-spacing:-.03em}
+.closer-t{font-size:.72rem; color:var(--app-muted); margin-top:.2rem; line-height:1.3}
+.closer-w{font-size:.76rem; color:var(--green); font-weight:700; margin-top:.45rem; border-top:1px dashed var(--green-line); padding-top:.4rem}
+body[data-device="tablet"] .closer-n{font-size:3rem}
+body[data-device="tablet"] .closer-t{font-size:.85rem}
+body[data-device="tablet"] .closer-w{font-size:.9rem}
+
+/* ---- overlays ---- */
+.zero{
+  position:absolute; inset:auto 0 0 0; z-index:8; padding:1.6rem 1.15rem 1.4rem;
+  background:linear-gradient(to top, var(--app-bg) 58%, #f4f7f600);
+  display:flex; flex-direction:column; gap:.55rem; align-items:center;
+  opacity:0; transform:translateY(16px); transition:opacity .6s ease, transform .6s cubic-bezier(.2,.8,.2,1); pointer-events:none;
+}
+.zero.is-in{opacity:1; transform:none}
+.zero-row{display:flex; gap:.4rem}
+.zero-n{font-family:var(--mono); font-size:.7rem; color:var(--teal); letter-spacing:.03em; border:1px solid var(--teal-line); border-radius:4px; padding:.32rem .55rem; background:#fff}
+.zero-c{font-size:.9rem; color:var(--app-ink); font-weight:700; letter-spacing:-.01em}
+body[data-device="tablet"] .zero-n{font-size:.82rem; padding:.4rem .7rem}
+body[data-device="tablet"] .zero-c{font-size:1.1rem}
+
+.voice{
+  position:absolute; inset:auto 0 0 0; z-index:9; padding:1.1rem 1.05rem 1.3rem;
+  background:linear-gradient(to top,#062026fa 55%,#06202600);
+  display:flex; flex-direction:column; align-items:center; gap:.7rem;
+  opacity:0; transform:translateY(20px); transition:opacity .5s ease, transform .5s cubic-bezier(.2,.8,.2,1); pointer-events:none;
+}
+.voice.is-in{opacity:1; transform:none}
+.wave{display:flex; align-items:center; gap:3px; height:34px}
+.wave i{display:block; width:3px; height:6px; border-radius:2px; background:#4fd1e0; animation:wv 1s ease-in-out infinite}
+@keyframes wv{0%,100%{height:5px;opacity:.5}50%{height:26px;opacity:1}}
+.mic-label{font-family:var(--mono); font-size:.62rem; letter-spacing:.14em; text-transform:uppercase; color:#4fd1e0}
+.transcript{font-size:.98rem; font-weight:600; line-height:1.35; text-align:center; color:#eaf5f5; letter-spacing:-.01em; min-height:2.6em; max-width:26rem}
+.transcript .w{opacity:0; transition:opacity .18s ease}
+.transcript .w.is-in{opacity:1}
+body[data-device="tablet"] .wave{height:44px; gap:4px}
+body[data-device="tablet"] .wave i{width:4px}
+body[data-device="tablet"] .transcript{font-size:1.3rem; min-height:2.4em}
+body[data-device="tablet"] .voice{padding:1.6rem 2rem 1.9rem; gap:.9rem}
+
+/* touch indicator — touch is a first-class channel, so it gets a visual */
+.tapdot{
+  position:absolute; z-index:14; width:40px; height:40px; margin:-20px 0 0 -20px; border-radius:50%;
+  border:2px solid var(--app-accent); background:#0a6a7726; opacity:0; pointer-events:none;
+}
+.tapdot.go{animation:tapring .85s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes tapring{
+  0%{opacity:0; transform:scale(.35)}
+  22%{opacity:1; transform:scale(.72)}
+  100%{opacity:0; transform:scale(1.9)}
+}
+.is-pressed{transform:scale(.975)}
+
+/* ---------- rail ---------- */
+.rail{height:100%; min-height:0; display:flex; flex-direction:column; gap:.6rem; border-left:1px solid var(--stage-line); padding-left:1.5rem}
+@media (max-width:1120px){ .rail{border-left:0; padding-left:0; border-top:1px solid var(--stage-line); padding-top:1.2rem; height:auto} }
+
+.rail-h{font-size:.62rem; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--chrome-faint); display:flex; align-items:center; gap:.5rem}
+.rail-h::after{content:""; flex:1; height:1px; background:var(--stage-line)}
+
+.pipe{display:flex; flex-direction:column}
+.node{display:grid; grid-template-columns:22px minmax(0,1fr); gap:.6rem; align-items:center; padding:.2rem 0; position:relative}
+.node::before{content:""; position:absolute; left:10.5px; top:0; bottom:0; width:1px; background:var(--stage-line)}
+.node:first-child::before{top:50%}
+.node:last-child::before{bottom:50%}
+.dot{position:relative; z-index:1; width:22px;height:22px;border-radius:50%; border:1px solid var(--stage-line-2); background:#fff; display:grid; place-items:center; font-family:var(--mono); font-size:.6rem; color:var(--chrome-faint); transition:all .45s ease}
+.node-l{font-size:.79rem; font-weight:600; color:var(--chrome-faint); letter-spacing:-.01em; transition:color .45s ease}
+.node-n{font-size:.65rem; color:var(--chrome-faint); opacity:0; transition:opacity .45s ease; font-family:var(--mono)}
+.node.is-on .dot{border-color:var(--teal); color:#fff; background:var(--teal); box-shadow:0 0 0 4px #0a6a771f}
+.node.is-on .node-l{color:var(--chrome-ink)}
+.node.is-on .node-n{opacity:1; color:var(--chrome-muted)}
+.node.is-sys.is-on .dot{border-color:var(--green); background:var(--green); box-shadow:0 0 0 4px #2d7a531f}
+.node.is-tap.is-on .dot{border-color:var(--amber); background:var(--amber); box-shadow:0 0 0 4px #9a5a061f}
+.node.is-skip .node-l{color:var(--chrome-faint); text-decoration:line-through}
+.node.is-skip .node-n{opacity:1; color:var(--chrome-faint)}
+
+.legend{display:flex; flex-wrap:wrap; gap:.15rem .7rem; font-family:var(--mono); font-size:.58rem; color:var(--chrome-faint); letter-spacing:.05em; text-transform:uppercase}
+.legend span{display:inline-flex; align-items:center; gap:.28rem}
+.lg{width:7px;height:7px;border-radius:50%; display:inline-block}
+.lg.ctx{background:var(--chrome-faint)}
+.lg.ia{background:var(--teal)}
+.lg.tap{background:var(--amber)}
+.lg.sys{background:var(--green)}
+
+.log{flex:1; min-height:4rem; overflow-y:auto; display:flex; flex-direction:column; gap:.32rem; padding-right:.4rem; scrollbar-width:thin; scrollbar-color:var(--stage-line-2) transparent}
+.log::-webkit-scrollbar{width:5px}
+.log::-webkit-scrollbar-thumb{background:var(--stage-line-2); border-radius:3px}
+.li{display:grid; grid-template-columns:5.2rem minmax(0,1fr); gap:.55rem; align-items:baseline; opacity:0; transform:translateX(-6px); transition:opacity .45s ease, transform .45s cubic-bezier(.2,.8,.2,1)}
+.li.is-in{opacity:1; transform:none}
+.li-k{font-family:var(--mono); font-size:.57rem; letter-spacing:.09em; text-transform:uppercase; padding:.12rem 0; text-align:right}
+.li-v{font-size:.78rem; line-height:1.36; color:var(--chrome-ink)}
+.li-v em{font-style:normal; color:var(--chrome-muted)}
+.li.k-ctx .li-k{color:var(--chrome-faint)}
+.li.k-ctx .li-v{color:var(--chrome-muted)}
+.li.k-ai  .li-k{color:var(--teal)}
+.li.k-tap .li-k{color:var(--amber)}
+.li.k-tap .li-v{color:var(--chrome-muted); font-style:italic}
+.li.k-sys .li-k{color:var(--green)}
+.li.k-sys .li-v{font-weight:600}
+.li-v mark{background:var(--red-soft); color:var(--red); font-weight:600; padding:0 .2em; border-radius:2px}
+.li-v ins{background:var(--green-soft); color:var(--green); text-decoration:none; font-weight:600; padding:0 .2em; border-radius:2px}
+
+.intent{display:flex; flex-wrap:wrap; gap:.28rem; margin-top:.25rem}
+.ic{font-family:var(--mono); font-size:.65rem; padding:.18rem .4rem; border-radius:4px; border:1px solid var(--teal-line); color:var(--teal); background:var(--teal-soft); opacity:0; transform:translateY(4px); transition:opacity .35s ease, transform .35s ease}
+.ic.is-in{opacity:1; transform:none}
+
+.swap{flex:none}
+.truth{border:1px solid var(--stage-line); border-radius:6px; padding:.58rem .7rem; font-size:.73rem; line-height:1.45; color:var(--chrome-muted); background:#fff}
+.truth b{color:var(--green); font-weight:700}
+.truth i{font-style:normal; color:var(--teal); font-weight:700}
+.truth.is-off{display:none}
+
+.filters{display:none; border:1px solid var(--stage-line); border-radius:6px; background:#fff; padding:.58rem .7rem}
+.filters.is-on{display:block}
+.filters-h{font-family:var(--mono); font-size:.59rem; letter-spacing:.09em; text-transform:uppercase; color:var(--amber); margin-bottom:.42rem; display:flex; justify-content:space-between; gap:.5rem}
+.filters-h span{color:var(--chrome-faint)}
+.ff{
+  display:flex; align-items:center; justify-content:space-between; gap:.6rem; font-size:.71rem; color:var(--chrome-muted);
+  border:1px solid var(--stage-line); border-radius:4px; padding:.22rem .4rem; margin-bottom:.2rem; background:#fafcfc; overflow:hidden;
+  opacity:0; transform:translateY(4px); max-height:2.2rem;
+  transition:opacity .3s ease, transform .3s ease, max-height .45s ease, padding .45s ease, margin .45s ease, border-color .45s ease;
+}
+.ff.is-in{opacity:1; transform:none}
+.ff i{font-style:normal; font-family:var(--mono); font-size:.65rem; color:var(--chrome-faint)}
+.filters.is-collapsed .ff{max-height:0; opacity:0; padding-top:0; padding-bottom:0; margin-bottom:0; border-color:transparent}
+.ff-result{max-height:0; opacity:0; overflow:hidden; transition:max-height .5s ease .25s, opacity .5s ease .25s; font-size:.81rem; line-height:1.4; color:var(--chrome-ink); font-weight:600}
+.filters.is-collapsed .ff-result{max-height:10rem; opacity:1}
+.ff-result small{display:block; font-family:var(--mono); font-size:.62rem; font-weight:400; color:var(--teal); margin-top:.3rem; letter-spacing:.03em}
+
+/* boundary panel — the M3 argument */
+.bound{display:none; border:1px solid var(--stage-line); border-radius:6px; background:#fff; padding:.58rem .7rem}
+.bound.is-on{display:block}
+.bound-h{font-family:var(--mono); font-size:.59rem; letter-spacing:.09em; text-transform:uppercase; color:var(--chrome-faint); margin-bottom:.45rem}
+.brow{display:grid; grid-template-columns:4.6rem minmax(0,1fr); gap:.55rem; align-items:baseline; font-size:.74rem; line-height:1.35; margin-bottom:.28rem; opacity:0; transform:translateY(4px); transition:opacity .35s ease, transform .35s ease}
+.brow.is-in{opacity:1; transform:none}
+.brow b{font-family:var(--mono); font-size:.6rem; letter-spacing:.07em; text-transform:uppercase; text-align:right; font-weight:500}
+.brow.ia b{color:var(--teal)}
+.brow.tap b{color:var(--amber)}
+.brow.sys b{color:var(--green)}
+.brow span{color:var(--chrome-muted)}
+.brow.sys span{color:var(--chrome-ink); font-weight:600}
+
+/* ---------- footer ---------- */
+.footer{border-top:1px solid var(--stage-line); background:#ffffffcc}
+.beatbar{height:2px; background:var(--stage-line); position:relative; overflow:hidden}
+.beatbar i{display:block; height:100%; width:100%; background:linear-gradient(90deg,#12909f,var(--teal)); transform-origin:left; transform:scaleX(0)}
+.beatbar i.run{animation:fill linear forwards}
+@keyframes fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+.narrate{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:1.5rem; align-items:center; padding:.8rem 1.6rem .95rem}
+.caption{font-size:1.02rem; line-height:1.4; letter-spacing:-.01em; min-height:2.8em; color:var(--chrome-ink); max-width:62rem}
+.caption .w{opacity:0; transition:opacity .2s ease}
+.caption .w.is-in{opacity:1}
+.caption b{color:var(--teal); font-weight:700}
+
+.transport{display:flex; align-items:center; gap:.45rem}
+.btn{font-family:var(--mono); font-size:.7rem; letter-spacing:.05em; color:var(--chrome-muted); background:#fff; border:1px solid var(--stage-line-2); border-radius:4px; padding:.42rem .7rem; cursor:pointer; transition:all .2s ease; white-space:nowrap}
+.btn:hover{color:var(--teal); border-color:var(--teal-line); background:var(--teal-soft)}
+.btn.primary{color:#fff; background:var(--teal); border-color:var(--teal); font-weight:500}
+.btn.primary:hover{background:#0b7d8c; color:#fff}
+.hint{font-family:var(--mono); font-size:.62rem; color:var(--chrome-faint); letter-spacing:.04em; margin-left:.4rem}
+
+:focus-visible{outline:2px solid var(--teal); outline-offset:2px}
+
+.endcard{position:fixed; inset:0; z-index:40; display:grid; place-content:center; justify-items:center; gap:1rem; background:#eceff0f2; backdrop-filter:blur(6px); text-align:center; padding:2rem; opacity:0; pointer-events:none; transition:opacity .6s ease}
+.endcard.is-in{opacity:1; pointer-events:auto}
+.endcard h2{font-size:2rem; font-weight:800; letter-spacing:-.03em; margin:0}
+.endcard p{color:var(--chrome-muted); max-width:36rem; margin:0; font-size:.98rem; line-height:1.55}
+.endcard .next{font-family:var(--mono); font-size:.72rem; color:var(--teal); border:1px solid var(--teal-line); background:var(--teal-soft); border-radius:4px; padding:.45rem .7rem; letter-spacing:.04em}
+
+body.paused *{animation-play-state:paused !important}
+</style>
+</head>
+<body data-device="mobile">
+
+<div class="stage">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">F</div>
+      <div>
+        <div class="brand-name">Freezai</div>
+        <div class="brand-sub">Visión de producto</div>
+      </div>
+    </div>
+
+    <div class="moments">
+      <span class="moment" data-m="1">M1 · La app ya sabe</span>
+      <span class="moment" data-m="2">M2 · Una frase</span>
+      <span class="moment" data-m="3">M3 · IA / Sistema</span>
+      <span class="moment" data-m="4">M4 · Cierra el ciclo</span>
+      <span class="moment" data-m="5">M5 · Al carrito</span>
+      <span class="moment" data-m="6">M6 · El valor</span>
+    </div>
+
+    <div class="topright">
+      <div class="devsel" id="devsel">
+        <button data-dev="mobile" class="is-on">Móvil</button>
+        <button data-dev="tablet">Tablet</button>
+      </div>
+      <div class="ckpt">CHECKPOINT 3</div>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <div class="device-wrap" id="deviceWrap">
+      <div class="device" id="device">
+        <div class="screen" id="screen">
+
+          <div class="sleep" id="sleep">
+            <div class="sleep-time">7:02</div>
+            <div class="sleep-date">martes, 4 de septiembre</div>
+            <div class="sleep-note">SIN NOTIFICACIONES</div>
+          </div>
+
+          <div class="statusbar">
+            <span id="clock">7:02</span>
+            <span class="sb-right">
+              <span class="sb-bar" style="height:5px"></span>
+              <span class="sb-bar" style="height:7px"></span>
+              <span class="sb-bar" style="height:9px"></span>
+              <span style="margin-left:.35rem">86%</span>
+            </span>
+          </div>
+
+          <div class="app">
+
+            <!-- ===== M1 ===== -->
+            <div class="view" data-view="m1">
+              <div class="app-head">
+                <div class="app-greet rev" data-r="1">Buenas noches, Carolina</div>
+                <h2 class="app-title rev" data-r="1">Tres cosas para<span class="brk"> </span>aprovechar hoy</h2>
+                <div class="ctx-chips rev" data-r="2">
+                  <span class="chip">34 productos en casa</span>
+                  <span class="chip n">nevera · congelador · despensa</span>
+                </div>
+              </div>
+              <div class="app-cols">
+                <div class="col">
+                  <div class="sec-label rev" data-r="3">Aprovecha primero</div>
+                  <div class="cards">
+                    <div class="card rev" data-r="3">
+                      <div class="card-ico">🍗</div>
+                      <div><div class="card-t">Pechuga de pollo</div><div class="card-s">500 g · nevera</div></div>
+                      <span class="tag hot">vence mañana</span>
+                    </div>
+                    <div class="card rev" data-r="4">
+                      <div class="card-ico">🥬</div>
+                      <div><div class="card-t">Espinaca fresca</div><div class="card-s">1 bolsa · nevera</div></div>
+                      <span class="tag hot">2 días</span>
+                    </div>
+                    <div class="card rev" data-r="5">
+                      <div class="card-ico">🥛</div>
+                      <div><div class="card-t">Crema de leche</div><div class="card-s">abierta el domingo · nevera</div></div>
+                      <span class="tag soon">3 días</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="sec-label rev" data-r="6">Qué hacer con eso</div>
+                  <div class="recipes">
+                    <div class="rec rev" data-r="6">
+                      <div><div class="rec-t">Salteado de pollo y espinaca</div><div class="rec-s">20 min · cocinable ya</div></div>
+                      <div class="rec-m">usa 2</div>
+                    </div>
+                    <div class="rec rev" data-r="7">
+                      <div><div class="rec-t">Crema de espinaca</div><div class="rec-s">25 min · cocinable ya</div></div>
+                      <div class="rec-m">usa 2</div>
+                    </div>
+                    <div class="rec rev" data-r="8">
+                      <div><div class="rec-t">Pollo a la crema</div><div class="rec-s">30 min · cocinable ya</div></div>
+                      <div class="rec-m">usa 3</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ===== M2 ===== -->
+            <div class="view" data-view="m2">
+              <div class="app-head">
+                <div class="app-greet rev" data-q="1">Cena de hoy · 3 porciones</div>
+                <h2 class="app-title rev" data-q="1">Para Ana, Sofía<span class="brk"> </span>y tú</h2>
+              </div>
+              <div class="app-cols">
+                <div class="col">
+                  <div class="sec-label rev" data-q="2">En la mesa</div>
+                  <div class="diners">
+                    <div class="diner rev" data-q="2"><span class="av">A</span><div><div class="dn">Ana</div><div class="dr">evita lácteos</div></div></div>
+                    <div class="diner rev" data-q="2"><span class="av">S</span><div><div class="dn">Sofía</div><div class="dr alert">alergia · maní</div></div></div>
+                    <div class="diner rev" data-q="2"><span class="av you">C</span><div><div class="dn">Carolina</div><div class="dr">sin restricción</div></div></div>
+                  </div>
+                  <div class="sec-label rev" data-q="3">Filtro aplicado</div>
+                  <div class="fchips">
+                    <span class="fchip rev" data-q="3">sin lácteos</span>
+                    <span class="fchip rev" data-q="3">sin maní</span>
+                    <span class="fchip rev" data-q="3">≤ 30 min</span>
+                    <span class="fchip rev" data-q="3">usa lo que vence</span>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="sec-label rev" data-q="4">2 de 12 recetas sirven hoy</div>
+                  <div class="recipes">
+                    <div class="rec2 ok rev" data-q="4">
+                      <div class="rec2-h">
+                        <div><div class="rec-t">Salteado de pollo y espinaca</div><div class="rec-s">20 min · cocinable ya</div></div>
+                        <span class="mark ok">✓</span>
+                      </div>
+                      <div class="why">sirve para los 3 · usa el pollo que vence mañana</div>
+                    </div>
+                    <div class="rec2 ok rev" data-q="5">
+                      <div class="rec2-h">
+                        <div><div class="rec-t">Arroz al wok con pollo</div><div class="rec-s">25 min · cocinable ya</div></div>
+                        <span class="mark ok">✓</span>
+                      </div>
+                      <div class="why">sirve para los 3 · usa el pollo y la espinaca</div>
+                    </div>
+                    <div class="rec2 no rev" data-q="6" id="blockedCard">
+                      <div class="rec2-h">
+                        <div><div class="rec-t">Pollo a la crema</div><div class="rec-s">30 min · cocinable ya</div></div>
+                        <span class="mark no">✕</span>
+                      </div>
+                      <div class="why bad">no sirve para Ana · lleva crema de leche</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ===== M3 ===== -->
+            <div class="view" data-view="m3" id="viewM3">
+              <div class="app-head">
+                <div class="app-greet rev" data-s="1">Receta · 3 porciones ajustadas</div>
+                <h2 class="app-title rev" data-s="1">Pollo a la crema</h2>
+              </div>
+
+              <div class="banner rev" data-s="1" id="banner">
+                <span class="bmark">✕</span>
+                <div class="btxt"><b>Bloqueado para Ana</b><span class="bsub">lleva crema de leche</span></div>
+              </div>
+
+              <div class="app-cols">
+                <div class="col">
+                  <div class="sec-label rev" data-s="2">Ingredientes</div>
+                  <div class="ings">
+                    <div class="ing rev" data-s="2"><span class="ick ok">✓</span>Pechuga de pollo<i>500 g · en casa</i></div>
+                    <div class="ing bad rev" data-s="2" id="ingSwap"><span class="ick no" id="ingMark">✕</span><span id="ingName">Crema de leche</span><i id="ingNote">200 ml · bloquea a Ana</i></div>
+                    <div class="ing rev" data-s="3"><span class="ick ok">✓</span>Cebolla<i>1 unidad · en casa</i></div>
+                    <div class="ing rev" data-s="3"><span class="ick ok">✓</span>Arroz<i>300 g · en casa</i></div>
+                  </div>
+                </div>
+
+                <div class="col">
+                  <div class="sec-label rev" data-s="4">Sugerencia</div>
+                  <div class="propose rev" data-s="4" id="propose">
+                    <div class="ptag" id="ptag">IA · propuesta</div>
+                    <div class="ptitle">Cambiar crema de leche por crema de coco</div>
+                    <div class="pwhy">Ana puede comer y Sofía también. La tienes en la despensa desde junio, sin abrir.</div>
+                    <div class="pacts">
+                      <button class="pbtn primary" id="btnAccept">Aceptar cambio</button>
+                      <button class="pbtn">Ver otra opción</button>
+                    </div>
+                  </div>
+                  <div class="cookbar rev" data-s="6">
+                    <button class="cookbtn" id="btnCook">Cociné esto</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ===== M4 ===== -->
+            <div class="view" data-view="m4">
+              <div class="app-head">
+                <div class="app-greet rev" data-t="1">Hace un momento · 8:14 p.m.</div>
+                <h2 class="app-title rev" data-t="1">Cocinaste<span class="brk"> </span>pollo a la crema</h2>
+              </div>
+              <div class="app-cols">
+                <div class="col">
+                  <div class="sec-label rev" data-t="2">Inventario actualizado solo</div>
+                  <div class="deltas">
+                    <div class="dl rev" data-t="2"><span class="ico">🍗</span>Pechuga de pollo<span class="qty"><s>500 g</s> → <b class="out">0</b></span></div>
+                    <div class="dl rev" data-t="3"><span class="ico">🥥</span>Crema de coco<span class="qty"><s>200 ml</s> → <b class="out">0</b></span></div>
+                    <div class="dl rev" data-t="3"><span class="ico">🧅</span>Cebolla<span class="qty"><s>2</s> → <b>1</b></span></div>
+                    <div class="dl rev" data-t="4"><span class="ico">🍚</span>Arroz<span class="qty"><s>1 kg</s> → <b>700 g</b></span></div>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="sec-label rev" data-t="5">A la lista de compras</div>
+                  <div class="adds">
+                    <div class="add rev" data-t="5">+ Pechuga de pollo <i>se agotó</i></div>
+                    <div class="add rev" data-t="5">+ Crema de coco <i>se agotó</i></div>
+                  </div>
+                  <div class="closer rev" data-t="6">
+                    <div class="closer-n">0</div>
+                    <div class="closer-t">cantidades editadas a mano por una persona</div>
+                    <div class="closer-w">El pollo que vencía mañana ya no se va a botar</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="zero" id="zero">
+            <div class="zero-row">
+              <span class="zero-n">0 formularios</span>
+              <span class="zero-n">0 preguntas</span>
+              <span class="zero-n">0 toques</span>
+            </div>
+            <div class="zero-c">La app abrió hablando</div>
+          </div>
+
+          <div class="voice" id="voice">
+            <div class="wave" id="wave"></div>
+            <div class="mic-label">Escuchando</div>
+            <div class="transcript" id="transcript"></div>
+          </div>
+
+          <div class="tapdot" id="tapdot"></div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== RAIL ===== -->
+    <div class="rail">
+
+      <div class="rail-h">Motor del producto</div>
+      <div class="pipe">
+        <div class="node" data-n="ctx"><div class="dot">1</div><div><div class="node-l">Contexto</div><div class="node-n">lo que ya sabe</div></div></div>
+        <div class="node" data-n="voz"><div class="dot">2</div><div><div class="node-l">Habla</div><div class="node-n">intención en una frase</div></div></div>
+        <div class="node" data-n="ia"><div class="dot">3</div><div><div class="node-l">Entiende</div><div class="node-n">IA interpreta y propone</div></div></div>
+        <div class="node is-sys" data-n="dec"><div class="dot">4</div><div><div class="node-l">Decide</div><div class="node-n">sistema determinista</div></div></div>
+        <div class="node is-sys" data-n="exe"><div class="dot">5</div><div><div class="node-l">Ejecuta</div><div class="node-n">acción real</div></div></div>
+        <div class="node is-tap" data-n="cfm"><div class="dot">6</div><div><div class="node-l">Confirma</div><div class="node-n">la persona toca</div></div></div>
+      </div>
+
+      <div class="rail-h">Traza</div>
+      <div class="legend">
+        <span><i class="lg ctx"></i>Contexto</span>
+        <span><i class="lg ia"></i>IA</span>
+        <span><i class="lg tap"></i>Toque</span>
+        <span><i class="lg sys"></i>Sistema</span>
+      </div>
+
+      <div class="log" id="log">
+        <div class="li k-ctx" data-l="1"><div class="li-k">Contexto</div><div class="li-v">Hora local · <em>martes 7:02 p.m., hora de cena</em></div></div>
+        <div class="li k-ctx" data-l="2"><div class="li-k">Contexto</div><div class="li-v">Inventario · <em>34 productos en 3 zonas</em></div></div>
+        <div class="li k-ctx" data-l="3"><div class="li-k">Contexto</div><div class="li-v">Hogar · <em>4 miembros, escena habitual: cena familiar</em></div></div>
+        <div class="li k-ctx" data-l="4"><div class="li-k">Contexto</div><div class="li-v">Porciones · <em>3 platos por cena en promedio</em></div></div>
+        <div class="li k-sys" data-l="5"><div class="li-k">Sistema</div><div class="li-v">FEFO ordena 34 productos por fecha real</div></div>
+        <div class="li k-sys" data-l="6"><div class="li-k">Sistema</div><div class="li-v">3 productos en sus últimos días</div></div>
+        <div class="li k-sys" data-l="7"><div class="li-k">Sistema</div><div class="li-v">12 recetas cocinables con lo que hay</div></div>
+
+        <div class="li k-ai" data-l="8"><div class="li-k">IA</div><div class="li-v">Transcribe el audio · <em>1 frase, 9 palabras</em></div></div>
+        <div class="li k-ai" data-l="9"><div class="li-k">IA</div><div class="li-v">Extrae la intención<div class="intent">
+          <span class="ic" data-i="1">comida = cena</span>
+          <span class="ic" data-i="2">tiempo ≤ 30 min</span>
+          <span class="ic" data-i="3">comensales = Ana, Sofía, yo</span>
+          <span class="ic" data-i="4">usar = lo que vence</span>
+        </div></div></div>
+        <div class="li k-ctx" data-l="10"><div class="li-k">Contexto</div><div class="li-v">Ana · <em>evita lácteos (declarado en su perfil)</em></div></div>
+        <div class="li k-ctx" data-l="11"><div class="li-k">Contexto</div><div class="li-v">Sofía · <em>alergia a maní (declarada, no inferida)</em></div></div>
+        <div class="li k-sys" data-l="12"><div class="li-k">Sistema</div><div class="li-v">Unión de restricciones de los 3 comensales</div></div>
+        <div class="li k-sys" data-l="13"><div class="li-k">Sistema</div><div class="li-v">Filtro duro sobre 12 recetas → 2 aptas</div></div>
+        <div class="li k-sys" data-l="14"><div class="li-k">Sistema</div><div class="li-v">1 receta bloqueada · <mark>crema de leche → Ana</mark></div></div>
+
+        <div class="li k-tap" data-l="15"><div class="li-k">Toque</div><div class="li-v">Abre la receta bloqueada</div></div>
+        <div class="li k-sys" data-l="16"><div class="li-k">Sistema</div><div class="li-v">Bloqueo activo · nombra el ingrediente y a quién afecta</div></div>
+        <div class="li k-ai"  data-l="17"><div class="li-k">IA</div><div class="li-v">Propone sustitución · <em>crema de leche → crema de coco</em></div></div>
+        <div class="li k-ctx" data-l="18"><div class="li-k">Contexto</div><div class="li-v">Crema de coco · <em>en despensa desde junio, sin abrir</em></div></div>
+        <div class="li k-tap" data-l="19"><div class="li-k">Toque</div><div class="li-v">Acepta el cambio</div></div>
+        <div class="li k-sys" data-l="20"><div class="li-k">Sistema</div><div class="li-v">Re-evalúa restricciones · <ins>apta para los 3</ins></div></div>
+
+        <div class="li k-tap" data-l="21"><div class="li-k">Toque</div><div class="li-v">"Cociné esto"</div></div>
+        <div class="li k-sys" data-l="22"><div class="li-k">Sistema</div><div class="li-v">Descuenta 4 ingredientes del inventario</div></div>
+        <div class="li k-sys" data-l="23"><div class="li-k">Sistema</div><div class="li-v">2 productos agotados → lista de compras</div></div>
+        <div class="li k-sys" data-l="24"><div class="li-k">Sistema</div><div class="li-v">Pollo consumido antes de vencer · <ins>$0 desperdiciados</ins></div></div>
+      </div>
+
+      <div class="swap">
+        <div class="truth" id="truth">
+          <b>El sistema decide la verdad.</b> La <i>IA interpreta</i> lo que se dice.
+          Fechas, cantidades, alergias y dinero nunca son una inferencia.
+        </div>
+
+        <div class="filters" id="filters">
+          <div class="filters-h"><span id="filtersCount">7 campos · 4 pantallas</span>Sin voz, esto sería así</div>
+          <div class="ff" data-f="1">Tipo de comida <i>Cena ▾</i></div>
+          <div class="ff" data-f="2">Tiempo máximo <i>30 min ▾</i></div>
+          <div class="ff" data-f="3">Número de comensales <i>3 ▾</i></div>
+          <div class="ff" data-f="4">Excluir alérgeno <i>Maní ▾</i></div>
+          <div class="ff" data-f="5">Excluir categoría <i>Lácteos ▾</i></div>
+          <div class="ff" data-f="6">Ingrediente principal <i>Pollo ▾</i></div>
+          <div class="ff" data-f="7">Ordenar por <i>Caducidad ▾</i></div>
+          <div class="ff-result">“¿Qué hago de cena? Algo rápido, están Ana y Sofía.”<small>1 FRASE · 3 SEGUNDOS · 0 CAMPOS</small></div>
+        </div>
+
+        <div class="bound" id="bound">
+          <div class="bound-h">Quién hace qué en una alergia</div>
+          <div class="brow ia" data-b="1"><b>IA</b><span>Propone una salida. No la aplica.</span></div>
+          <div class="brow tap" data-b="2"><b>Persona</b><span>Acepta o rechaza con un toque.</span></div>
+          <div class="brow sys" data-b="3"><b>Sistema</b><span>Recalcula la restricción y levanta el bloqueo. Solo él puede.</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="beatbar"><i id="beatbar"></i></div>
+    <div class="narrate">
+      <div class="caption" id="caption"></div>
+      <div class="transport">
+        <button class="btn primary" id="btnPlay">▶ Reproducir</button>
+        <button class="btn" id="btnNext">Siguiente ›</button>
+        <button class="btn" id="btnRestart">↻ Reiniciar</button>
+        <span class="hint">espacio · → · R · M/T</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="endcard" id="endcard">
+  <h2>M1 a M4 listos.</h2>
+  <p>La app que ya sabe, la frase que reemplaza siete filtros, la frontera entre lo que propone la IA y lo que decide el sistema, y el ciclo que se cierra sin que nadie mantenga el inventario. Falta la salida al carrito y el valor en dinero.</p>
+  <span class="next">SIGUIENTE · CHECKPOINT 4 — M5 y M6, el momento de negocio</span>
+  <button class="btn primary" onclick="Demo.restart()">↻ Ver de nuevo</button>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  const $  = s => document.querySelector(s);
+  const $$ = s => Array.from(document.querySelectorAll(s));
+
+  const deviceWrap = $('#deviceWrap');
+  const device     = $('#device');
+  const screenEl   = $('#screen');
+  const sleep      = $('#sleep');
+  const zero       = $('#zero');
+  const voice      = $('#voice');
+  const wave       = $('#wave');
+  const transcript = $('#transcript');
+  const caption    = $('#caption');
+  const beatbar    = $('#beatbar');
+  const endcard    = $('#endcard');
+  const log        = $('#log');
+  const truth      = $('#truth');
+  const filters    = $('#filters');
+  const bound      = $('#bound');
+  const tapdot     = $('#tapdot');
+  const clock      = $('#clock');
+  const viewM3     = $('#viewM3');
+  const m3Html     = viewM3.innerHTML;   // pristine copy, restored on restart
+
+  for (let i=0;i<28;i++){
+    const b = document.createElement('i');
+    b.style.animationDelay = (i*0.055).toFixed(2)+'s';
+    b.style.animationDuration = (0.75 + (i%5)*0.11).toFixed(2)+'s';
+    wave.appendChild(b);
+  }
+
+  /* ---------- device fit ---------- */
+  function fitDevice(){
+    device.style.transform = 'scale(1)';
+    const availW = deviceWrap.clientWidth  - 16;
+    const availH = deviceWrap.clientHeight - 16;
+    const w = device.offsetWidth, h = device.offsetHeight;
+    if (!w || !h || availW <= 0 || availH <= 0) return;
+    device.style.transform = 'scale(' + Math.min(1, availW/w, availH/h).toFixed(4) + ')';
+  }
+  window.addEventListener('resize', fitDevice);
+
+  /* ---------- scene helpers ---------- */
+  function revealUpTo(attr, n){
+    $$('['+attr+']').forEach(el => el.classList.toggle('is-in', +el.getAttribute(attr) <= n));
+  }
+  function setView(name){
+    $$('.view').forEach(v => v.classList.toggle('is-on', v.dataset.view === name));
+  }
+  function node(name, state){
+    const el = document.querySelector('.node[data-n="'+name+'"]');
+    if (!el) return;
+    el.classList.remove('is-on','is-skip');
+    if (state) el.classList.add(state);
+  }
+  function clearNodes(){ $$('.node').forEach(el => el.classList.remove('is-on','is-skip')); }
+  function setMoment(n){
+    $$('.moment').forEach(el=>{
+      const m = +el.dataset.m;
+      el.classList.toggle('is-active', m === n);
+      el.classList.toggle('is-done', n !== null && m < n);
+    });
+  }
+
+  /* touch indicator, anchored to a real element and corrected for the device scale */
+  function tapOn(selector){
+    const el = document.querySelector(selector);
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const s = screenEl.getBoundingClientRect();
+    const scale = s.width / (screenEl.offsetWidth || 1);
+    if (!r.width) return;
+    tapdot.style.left = ((r.left + r.width/2  - s.left) / scale) + 'px';
+    tapdot.style.top  = ((r.top  + r.height/2 - s.top ) / scale) + 'px';
+    tapdot.classList.remove('go'); void tapdot.offsetWidth; tapdot.classList.add('go');
+    el.classList.add('is-pressed');
+    later(()=> el.classList.remove('is-pressed'), 260);
+  }
+
+  /* deferred scene actions: cancelled on beat change, flushed on pause
+     (pausing must leave a COMPLETE frame, never a half-revealed one) */
+  let pending = [];
+  function later(fn, ms){
+    const id = setTimeout(()=>{ pending = pending.filter(p => p.id !== id); fn(); }, ms);
+    pending.push({ id, fn });
+  }
+  function killPending(){ pending.forEach(p => clearTimeout(p.id)); pending = []; }
+  function flushPending(){ const q = pending; pending = []; q.forEach(p => { clearTimeout(p.id); p.fn(); }); }
+
+  function speak(el, text, span){
+    el.innerHTML = '';
+    if (!text) return;
+    const words = text.split(' ');
+    words.forEach((w,i)=>{
+      const s = document.createElement('span');
+      s.className = 'w';
+      s.innerHTML = w + (i < words.length-1 ? '&nbsp;' : '');
+      el.appendChild(s);
+    });
+    const step = Math.max(28, Math.min(90, (span*0.55)/words.length));
+    Array.from(el.children).forEach((s,i)=> later(()=> s.classList.add('is-in'), 120 + i*step));
+  }
+
+  function stagger(attr, nums, gap){
+    nums.forEach((n,i)=> later(()=>{
+      const el = document.querySelector('['+attr+'="'+n+'"]');
+      if (!el) return;
+      el.classList.add('is-in');
+      if (el.classList.contains('li')) log.scrollTop = log.scrollHeight;
+    }, i*gap));
+  }
+
+  function railPanel(which){
+    truth.classList.toggle('is-off', which !== 'truth');
+    filters.classList.toggle('is-on', which === 'filters');
+    bound.classList.toggle('is-on', which === 'bound');
+    if (which !== 'filters') filters.classList.remove('is-collapsed');
+  }
+
+  /* M3: the substitution is applied by the SYSTEM, only after the person accepts */
+  function m3Unlock(){
+    const b = $('#banner');
+    b.classList.add('okstate');
+    b.querySelector('.bmark').textContent = '✓';
+    b.querySelector('.btxt b').textContent = 'Apta para los 3';
+    b.querySelector('.bsub').textContent = 'con crema de coco, que ya está en casa';
+
+    const ing = $('#ingSwap');
+    ing.classList.remove('bad');
+    ing.classList.add('swapped');
+    const mk = $('#ingMark');
+    mk.className = 'ick ok'; mk.textContent = '✓';
+    $('#ingName').textContent = 'Crema de coco';
+    $('#ingNote').textContent = '200 ml · despensa';
+
+    $('#propose').classList.add('accepted');
+    $('#ptag').textContent = 'Cambio aceptado';
+    $('#btnAccept').textContent = '✓ Aplicado';
+  }
+
+  /* ---------- choreography ---------- */
+  const beats = [
+
+    /* ===== M1 ===== */
+    { id:'intro', dur:3600, moment:null,
+      say:'Martes, 7:02 de la noche. Nadie ha abierto la app todavía.',
+      enter(){ resetScene(); } },
+
+    { id:'m1-ctx', dur:6200, moment:1,
+      say:'Antes de preguntar nada, el producto ya sabe <b>cuatro cosas</b> sobre esta casa.',
+      enter(){ node('ctx','is-on'); node('voz','is-skip'); node('ia','is-skip'); stagger('data-l',[1,2,3,4],900); } },
+
+    { id:'m1-wake', dur:3000, moment:1,
+      say:'La app se abre. Ninguna pantalla de bienvenida, ningún formulario.',
+      enter(){ sleep.classList.add('is-hidden'); setView('m1'); revealUpTo('data-r',2); } },
+
+    { id:'m1-fefo', dur:5200, moment:1,
+      say:'Un sistema determinista ordena por fecha real. <b>No es una opinión de la IA.</b>',
+      enter(){ node('dec','is-on'); stagger('data-l',[5,6],900); } },
+
+    { id:'m1-cards', dur:5200, moment:1,
+      say:'Tres productos en su mejor momento hoy, y el motivo a la vista.',
+      enter(){ node('exe','is-on'); revealUpTo('data-r',5); } },
+
+    { id:'m1-recipes', dur:5000, moment:1,
+      say:'Y tres cosas que se pueden cocinar con ellos, esta noche, sin ir a comprar nada.',
+      enter(){ stagger('data-l',[7],300); revealUpTo('data-r',8); } },
+
+    { id:'m1-zero', dur:5400, moment:1,
+      say:'Nadie escribió. Nadie llenó campos. Nadie respondió preguntas. <b>La app abrió hablando.</b>',
+      enter(){ node('cfm','is-on'); zero.classList.add('is-in'); } },
+
+    /* ===== M2 ===== */
+    { id:'m2-listen', dur:2800, moment:2,
+      say:'Pero esta noche no comen los cuatro de siempre.',
+      enter(){
+        zero.classList.remove('is-in');
+        clearNodes(); node('ctx','is-on');
+        voice.classList.add('is-in'); speak(transcript,'',0);
+      } },
+
+    { id:'m2-speak', dur:5400, moment:2,
+      say:'Carolina no busca un filtro. Habla.',
+      enter(){
+        node('voz','is-on');
+        speak(transcript,'“¿Qué hago de cena? Algo rápido, están Ana y Sofía.”',4400);
+        stagger('data-l',[8],1600);
+      } },
+
+    { id:'m2-parse', dur:5200, moment:2,
+      say:'La IA extrae <b>cuatro variables</b> de una sola frase.',
+      enter(){ node('ia','is-on'); stagger('data-l',[9],150); stagger('data-i',[1,2,3,4],620); } },
+
+    { id:'m2-know', dur:5000, moment:2,
+      say:'Y dos cosas que nadie tuvo que decir, porque el producto ya las sabía.',
+      enter(){ node('ctx','is-on'); stagger('data-l',[10,11],1400); } },
+
+    { id:'m2-union', dur:5600, moment:2,
+      say:'El sistema une las restricciones de quien está en la mesa. <b>Eso no lo decide la IA.</b>',
+      enter(){
+        voice.classList.remove('is-in');
+        node('dec','is-on'); setView('m2'); revealUpTo('data-q',3);
+        stagger('data-l',[12],700);
+      } },
+
+    { id:'m2-results', dur:5400, moment:2,
+      say:'Dos recetas de doce. Cada una dice <b>por qué</b> sirve y qué aprovecha.',
+      enter(){ node('exe','is-on'); revealUpTo('data-q',5); stagger('data-l',[13],500); } },
+
+    { id:'m2-blocked', dur:5600, moment:2,
+      say:'Y la que no sirve también se ve, con el motivo. <b>Nadie descubre la alergia en la mesa.</b>',
+      enter(){ node('cfm','is-on'); revealUpTo('data-q',6); stagger('data-l',[14],400); } },
+
+    { id:'m2-filters', dur:6200, moment:2,
+      say:'Esto es lo que la persona habría tenido que llenar en cualquier app de hoy.',
+      enter(){ railPanel('filters'); stagger('data-f',[1,2,3,4,5,6,7],620); } },
+
+    { id:'m2-collapse', dur:5800, moment:2,
+      say:'Una frase. Tres segundos. <b>Cero campos.</b>',
+      enter(){ filters.classList.add('is-collapsed'); $('#filtersCount').textContent = '7 campos → 1 frase'; } },
+
+    /* ===== M3 — la IA propone, el sistema decide ===== */
+    { id:'m3-tap', dur:3800, moment:3,
+      say:'Pero Carolina quiere ese plato. Toca el que está bloqueado.',
+      enter(){
+        railPanel('truth');
+        clearNodes(); node('cfm','is-on');
+        tapOn('#blockedCard');
+        stagger('data-l',[15],900);
+      } },
+
+    { id:'m3-detail', dur:5400, moment:3,
+      say:'El sistema no dice “no se puede”. Dice <b>qué</b> lo bloquea y <b>a quién</b> afecta.',
+      enter(){
+        setView('m3'); revealUpTo('data-s',3);
+        node('dec','is-on');
+        stagger('data-l',[16],700);
+      } },
+
+    { id:'m3-propose', dur:6000, moment:3,
+      say:'Entonces la IA propone una salida — y propone con lo que ya hay en la casa.',
+      enter(){
+        node('ia','is-on');
+        revealUpTo('data-s',4);
+        railPanel('bound');
+        stagger('data-b',[1],200);
+        stagger('data-l',[17,18],1500);
+      } },
+
+    { id:'m3-confirm', dur:4400, moment:3,
+      say:'La persona decide. Un toque.',
+      enter(){
+        node('cfm','is-on');
+        tapOn('#btnAccept');
+        stagger('data-b',[2],200);
+        stagger('data-l',[19],700);
+      } },
+
+    { id:'m3-unlock', dur:6200, moment:3,
+      say:'Y solo entonces el sistema levanta el bloqueo. <b>Una alergia nunca se resuelve con una inferencia.</b>',
+      enter(){
+        node('dec','is-on');
+        m3Unlock();
+        revealUpTo('data-s',6);
+        stagger('data-b',[3],300);
+        stagger('data-l',[20],900);
+      } },
+
+    /* ===== M4 — el ciclo se cierra solo ===== */
+    { id:'m4-cook', dur:4000, moment:4,
+      say:'Se cocina. Y aquí pasa lo único que ninguna app de despensa ha logrado sostener.',
+      enter(){
+        railPanel('truth');
+        clearNodes(); node('cfm','is-on');
+        clock.textContent = '8:14';
+        tapOn('#btnCook');
+        stagger('data-l',[21],1000);
+      } },
+
+    { id:'m4-deltas', dur:6200, moment:4,
+      say:'Un toque descuenta los ingredientes. <b>Nadie editó una cantidad.</b>',
+      enter(){
+        node('dec','is-on'); node('exe','is-on');
+        setView('m4'); revealUpTo('data-t',4);
+        stagger('data-l',[22],600);
+      } },
+
+    { id:'m4-list', dur:5400, moment:4,
+      say:'Lo que se agotó cae solo en la lista de compras. Sin que nadie lo escriba.',
+      enter(){ revealUpTo('data-t',5); stagger('data-l',[23],500); } },
+
+    { id:'m4-close', dur:6400, moment:4,
+      say:'El inventario sigue vivo sin que nadie lo mantenga. <b>Ese es el problema que mata a todas las demás.</b>',
+      enter(){ revealUpTo('data-t',6); stagger('data-l',[24],700); } },
+
+    { id:'end', dur:1400, moment:4,
+      say:'',
+      enter(){ endcard.classList.add('is-in'); } }
+  ];
+
+  /* ---------- engine ---------- */
+  let idx = -1, timer = null, tStart = 0, tRemain = 0, playing = false;
+
+  function resetScene(){
+    killPending();
+    viewM3.innerHTML = m3Html;      // undo the M3 substitution mutations
+    sleep.classList.remove('is-hidden');
+    zero.classList.remove('is-in');
+    voice.classList.remove('is-in');
+    endcard.classList.remove('is-in');
+    tapdot.classList.remove('go');
+    transcript.innerHTML = '';
+    clock.textContent = '7:02';
+    setView(null);
+    railPanel('truth');
+    $('#filtersCount').textContent = '7 campos · 4 pantallas';
+    $$('.rev').forEach(el=>el.classList.remove('is-in'));
+    $$('.li').forEach(el=>el.classList.remove('is-in'));
+    $$('.ic').forEach(el=>el.classList.remove('is-in'));
+    $$('.ff').forEach(el=>el.classList.remove('is-in'));
+    $$('.brow').forEach(el=>el.classList.remove('is-in'));
+    log.scrollTop = 0;
+    clearNodes();
+    setMoment(null);
+  }
+
+  function runBeat(i){
+    killPending();
+    idx = i;
+    const b = beats[i];
+    if (b.moment !== undefined) setMoment(b.moment);
+    b.enter && b.enter();
+    speak(caption, b.say, b.dur);
+    schedule(b.dur);
+  }
+
+  function schedule(ms){
+    clearTimeout(timer);
+    tRemain = ms; tStart = performance.now();
+    beatbar.classList.remove('run');
+    void beatbar.offsetWidth;
+    beatbar.style.animationDuration = ms + 'ms';
+    beatbar.classList.add('run');
+    if (!playing) return;
+    timer = setTimeout(()=>{
+      if (idx < beats.length - 1) runBeat(idx + 1);
+      else stop();
+    }, ms);
+  }
+
+  function play(){
+    if (idx >= beats.length - 1 && endcard.classList.contains('is-in')) return restart();
+    playing = true;
+    document.body.classList.remove('paused');
+    $('#btnPlay').textContent = '❚❚ Pausa';
+    if (idx < 0) { runBeat(0); return; }
+    schedule(Math.max(350, tRemain));
+  }
+
+  function pause(){
+    playing = false;
+    document.body.classList.add('paused');
+    $('#btnPlay').textContent = '▶ Reproducir';
+    clearTimeout(timer);
+    flushPending();   // finish this beat's reveals so the frozen frame reads complete
+    tRemain = Math.max(400, tRemain - (performance.now() - tStart));
+  }
+
+  function stop(){ playing = false; $('#btnPlay').textContent = '▶ Reproducir'; }
+
+  function next(){ clearTimeout(timer); if (idx < beats.length - 1) runBeat(idx + 1); }
+
+  function restart(){
+    clearTimeout(timer);
+    resetScene();
+    idx = -1; tRemain = 0;
+    playing = true;
+    document.body.classList.remove('paused');
+    $('#btnPlay').textContent = '❚❚ Pausa';
+    runBeat(0);
+  }
+
+  /* ---------- device switch ---------- */
+  function setDevice(d){
+    if (document.body.dataset.device === d) return;
+    document.body.dataset.device = d;
+    $$('#devsel button').forEach(b => b.classList.toggle('is-on', b.dataset.dev === d));
+    fitDevice();
+    restart();   // layout changes between devices, so replay from the top
+  }
+  $$('#devsel button').forEach(b => b.onclick = () => setDevice(b.dataset.dev));
+
+  /* ---------- controls ---------- */
+  $('#btnPlay').onclick    = () => playing ? pause() : play();
+  $('#btnNext').onclick    = () => { playing = true; document.body.classList.remove('paused'); next(); };
+  $('#btnRestart').onclick = restart;
+
+  document.addEventListener('keydown', e => {
+    if (e.code === 'Space'){ e.preventDefault(); playing ? pause() : play(); }
+    if (e.code === 'ArrowRight'){ e.preventDefault(); playing = true; document.body.classList.remove('paused'); next(); }
+    if (e.key === 'r' || e.key === 'R'){ restart(); }
+    if (e.key === 'm' || e.key === 'M'){ setDevice('mobile'); }
+    if (e.key === 't' || e.key === 'T'){ setDevice('tablet'); }
+  });
+
+  window.Demo = { play, pause, restart, next, setDevice };
+
+  fitDevice();
+  resetScene();
+  speak(caption, 'Presiona <b>reproducir</b>. La demo se cuenta sola.', 2000);
+
+})();
+</script>
+</body>
+</html>

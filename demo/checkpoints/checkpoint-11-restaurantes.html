@@ -1,0 +1,2111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Freezai Pro · Restaurantes y hoteles</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --stage:#eceff0;
+  --stage-line:#d4dfde;
+  --stage-line-2:#bccbca;
+  --chrome-ink:#0f1d1f;
+  --chrome-muted:#55696c;
+  --chrome-faint:#8a9fa1;
+
+  --teal:#0a6a77;
+  --teal-soft:#dceaed;
+  --teal-line:#a9cfd5;
+  --green:#2d7a53;
+  --green-soft:#dcefe4;
+  --green-line:#a8d4bd;
+  --red:#a8402f;
+  --red-soft:#f7e3df;
+  --red-line:#e0b3aa;
+  --amber:#9a5a06;
+
+  --app-bg:#f4f7f6;
+  --app-surface:#ffffff;
+  --app-surface-2:#e7edec;
+  --app-ink:#0f1d1f;
+  --app-muted:#5b7073;
+  --app-line:#d5e0df;
+  --app-accent:#0a6a77;
+  --app-accent-quiet:#dceaed;
+  --app-warn:#9a5a06;
+  --app-warn-quiet:#f7ead5;
+
+  --sans:"Bricolage Grotesque",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0; background:var(--stage); color:var(--chrome-ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; overflow:hidden}
+body::before{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background:
+    radial-gradient(120vw 90vh at 28% -12%, #dcebec 0%, transparent 62%),
+    radial-gradient(90vw 70vh at 98% 112%, #e1eaf1 0%, transparent 60%);
+}
+.stage{position:relative; z-index:1; height:100vh; display:grid; grid-template-rows:auto minmax(0,1fr) auto}
+
+/* ---------- top bar ---------- */
+.topbar{display:flex; align-items:center; justify-content:space-between; gap:.9rem 1.5rem; flex-wrap:wrap; padding:.78rem 1.6rem; border-bottom:1px solid var(--stage-line); background:#ffffff9c}
+.brand{display:flex; align-items:center; gap:.7rem}
+.brand-mark{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;background:linear-gradient(150deg,#0f8896,var(--teal)); color:#fff; font-weight:800; font-size:.9rem; letter-spacing:-.03em}
+.brand-name{font-weight:800; font-size:1.02rem; letter-spacing:-.02em}
+.brand-sub{font-size:.68rem; letter-spacing:.15em; text-transform:uppercase; color:var(--chrome-faint); font-weight:600}
+
+.moments{display:flex; align-items:center; gap:.28rem; flex-wrap:wrap}
+.moment{font-family:var(--mono); font-size:.64rem; letter-spacing:.03em; padding:.28rem .48rem; border:1px solid var(--stage-line-2); border-radius:3px; color:var(--chrome-faint); background:#fff; transition:all .5s ease}
+.moment.is-active{color:#fff; background:var(--teal); border-color:var(--teal); font-weight:500}
+.moment.is-done{color:var(--teal); border-color:var(--teal-line); background:var(--teal-soft)}
+
+.topright{display:flex; align-items:center; gap:.9rem}
+.devsel{display:flex; border:1px solid var(--stage-line-2); border-radius:4px; overflow:hidden; background:#fff}
+.devsel button{font-family:var(--mono); font-size:.67rem; letter-spacing:.05em; border:0; background:transparent; color:var(--chrome-muted); padding:.4rem .7rem; cursor:pointer; transition:all .2s ease}
+.devsel button + button{border-left:1px solid var(--stage-line)}
+.devsel button:hover{background:var(--teal-soft); color:var(--teal)}
+.devsel button.is-on{background:var(--teal); color:#fff}
+.ckpt{font-family:var(--mono); font-size:.67rem; color:var(--chrome-faint); letter-spacing:.04em}
+
+/* moments double as a jump menu during Q&A */
+.moment{cursor:pointer}
+.moment:hover{border-color:var(--teal-line); color:var(--teal)}
+.moment.is-active:hover{color:#fff}
+
+/* ---------- body ---------- */
+.body{min-height:0; display:grid; grid-template-columns:minmax(0,1fr) 25.5rem; align-items:center; gap:2rem; padding:1.05rem 1.6rem}
+@media (max-width:1120px){ .body{grid-template-columns:1fr; align-content:start; overflow:auto} }
+
+/* ---------- device ---------- */
+.device-wrap{display:grid; place-items:start center; min-height:0; height:100%; overflow:hidden}
+.device{
+  position:relative; flex:none; transform-origin:top center;
+  width:var(--dev-w); height:var(--dev-h); border-radius:var(--dev-r); padding:var(--dev-pad);
+  background:linear-gradient(160deg,#38494e,#162226 58%);
+  box-shadow:0 34px 70px -26px #16333a80, 0 4px 14px -4px #16333a33, 0 0 0 1px #ffffff26 inset;
+}
+body[data-device="mobile"] .device{ --dev-w:352px; --dev-h:722px; --dev-r:42px; --dev-pad:11px; --scr-r:32px }
+body[data-device="tablet"] .device{ --dev-w:610px; --dev-h:812px; --dev-r:26px; --dev-pad:15px; --scr-r:13px }
+
+.screen{position:relative; width:100%; height:100%; border-radius:var(--scr-r); overflow:hidden; background:var(--app-bg); color:var(--app-ink); display:flex; flex-direction:column}
+
+.sleep{position:absolute; inset:0; z-index:5; display:grid; place-content:center; justify-items:center; gap:.2rem; background:#0a1214; color:#7f9599; transition:opacity .7s ease}
+.sleep.is-hidden{opacity:0; pointer-events:none}
+.sleep-time{font-size:3.6rem; font-weight:600; letter-spacing:-.04em; color:#cfe0e2; line-height:1}
+.sleep-date{font-size:.86rem}
+.sleep-note{margin-top:1.4rem; font-family:var(--mono); font-size:.66rem; color:#4c6165; letter-spacing:.06em}
+body[data-device="tablet"] .sleep-time{font-size:5.2rem}
+body[data-device="tablet"] .sleep-date{font-size:1.05rem}
+
+.statusbar{display:flex; justify-content:space-between; align-items:center; padding:.85rem 1.15rem .3rem; font-size:.72rem; font-weight:600; color:var(--app-muted); font-family:var(--mono); letter-spacing:.02em}
+.sb-right{display:flex; gap:.3rem; align-items:center}
+.sb-bar{width:3px;background:currentColor;border-radius:1px}
+body[data-device="tablet"] .statusbar{font-size:.82rem; padding:1rem 1.6rem .4rem}
+
+/* ---------- views ---------- */
+.app{flex:1; min-height:0; position:relative}
+.view{
+  position:absolute; inset:0; display:flex; flex-direction:column; overflow:hidden;
+  padding:0 1.15rem 1rem; pointer-events:none;
+  opacity:0; transform:translateY(12px); transition:opacity .5s ease, transform .6s cubic-bezier(.2,.8,.2,1);
+}
+/* Six identical crossfades in a row read as one long dissolve, so each moment enters with
+   the gesture its own story asks for. M2 and M5 share one on purpose: both open with a
+   spoken sentence, so both move forward the same way. */
+.view[data-view="m1"]{transform:translateY(16px) scale(.985)}  /* la cocina despierta */
+.view[data-view="m2"]{transform:translateX(28px)}              /* avanza */
+.view[data-view="m3"]{transform:scale(1.055)}                  /* entra al detalle */
+.view[data-view="m4"]{transform:translateY(-18px)}             /* el resultado cae en su sitio */
+.view[data-view="m5"]{transform:translateX(28px)}              /* avanza */
+.view[data-view="m6"]{transform:translateX(-32px)}             /* el pedido vuelve solo */
+.view.is-on{opacity:1; transform:none; transition-delay:.09s}
+body[data-device="tablet"] .view{padding:0 1.6rem 1.5rem}
+
+.rev{opacity:0; transform:translateY(10px); transition:opacity .55s ease, transform .55s cubic-bezier(.2,.8,.2,1)}
+.rev.is-in{opacity:1; transform:none}
+
+.app-greet{font-size:.78rem; color:var(--app-muted); font-weight:600; letter-spacing:.02em; margin:.7rem 0 .1rem}
+.app-title{font-size:1.42rem; font-weight:800; letter-spacing:-.03em; line-height:1.1; margin:0 0 .55rem}
+.app-title .brk{display:block}
+.ctx-chips{display:flex; flex-wrap:wrap; gap:.3rem; margin-bottom:.95rem}
+.chip{font-size:.68rem; font-weight:600; padding:.22rem .48rem; border-radius:999px; background:var(--app-accent-quiet); color:var(--app-accent); white-space:nowrap}
+.chip.n{background:var(--app-surface-2); color:var(--app-muted)}
+
+body[data-device="tablet"] .app-greet{font-size:.95rem; margin:1rem 0 .2rem}
+body[data-device="tablet"] .app-title{font-size:2.15rem; margin-bottom:.8rem}
+body[data-device="tablet"] .app-title .brk{display:inline}
+body[data-device="tablet"] .chip{font-size:.8rem; padding:.28rem .6rem}
+body[data-device="tablet"] .ctx-chips{margin-bottom:1.4rem}
+
+.app-cols{display:flex; flex-direction:column; min-height:0}
+.col{display:flex; flex-direction:column; min-height:0}
+body[data-device="tablet"] .app-cols{display:grid; grid-template-columns:1fr 1fr; column-gap:1.5rem; align-items:start}
+body[data-device="tablet"] .cards{margin-bottom:0}
+
+.sec-label{font-size:.63rem; font-weight:600; letter-spacing:.13em; text-transform:uppercase; color:var(--app-muted); margin:.2rem 0 .45rem; display:flex; align-items:center; gap:.4rem}
+.sec-label::after{content:""; flex:1; height:1px; background:var(--app-line)}
+body[data-device="tablet"] .sec-label{font-size:.7rem; margin-bottom:.7rem}
+
+/* ---- M1 ---- */
+.cards{display:flex; flex-direction:column; gap:.4rem; margin-bottom:1rem}
+.card{display:grid; grid-template-columns:38px minmax(0,1fr) auto; align-items:center; gap:.65rem; background:var(--app-surface); border:1px solid var(--app-line); border-radius:10px; padding:.5rem .6rem}
+.card-ico{width:38px;height:38px;border-radius:9px; display:grid; place-items:center; background:var(--app-surface-2)}
+.gi{width:19px;height:19px;fill:var(--app-accent);display:block}
+.dl .gi,.inrow .gi{width:17px;height:17px;fill:var(--app-muted)}
+body[data-device="tablet"] .card-ico .gi{width:24px;height:24px}
+body[data-device="tablet"] .dl .gi,body[data-device="tablet"] .inrow .gi{width:20px;height:20px}
+.card-t{font-weight:700; font-size:.88rem; letter-spacing:-.01em; line-height:1.2}
+.card-s{font-size:.72rem; color:var(--app-muted); line-height:1.3}
+.tag{font-family:var(--mono); font-size:.6rem; font-weight:500; padding:.2rem .38rem; border-radius:4px; white-space:nowrap}
+.tag.hot{background:var(--app-warn-quiet); color:var(--app-warn)}
+.tag.soon{background:var(--app-accent-quiet); color:var(--app-accent)}
+body[data-device="tablet"] .cards{gap:.55rem}
+/* On the tablet the M1 column is only ~250px wide: icon + title + tag on one line broke
+   "Merluza fresca" across three lines, so the tag drops under the text instead. */
+body[data-device="tablet"] .card{grid-template-columns:48px minmax(0,1fr); row-gap:.3rem; padding:.7rem .8rem; border-radius:12px}
+body[data-device="tablet"] .card > .card-ico{grid-column:1; grid-row:1/3}
+body[data-device="tablet"] .card > div{grid-column:2; grid-row:1}
+body[data-device="tablet"] .card > .tag{grid-column:2; grid-row:2; justify-self:start}
+body[data-device="tablet"] .card-ico{width:48px;height:48px;font-size:1.5rem;border-radius:11px}
+body[data-device="tablet"] .card-t{font-size:1.02rem}
+body[data-device="tablet"] .card-s{font-size:.82rem}
+body[data-device="tablet"] .tag{font-size:.68rem; padding:.24rem .45rem}
+
+.recipes{display:flex; flex-direction:column; gap:.35rem}
+.rec{display:flex; align-items:center; justify-content:space-between; gap:.6rem; background:var(--app-surface); border:1px solid var(--app-line); border-radius:10px; padding:.55rem .7rem}
+.rec-t{font-weight:700; font-size:.86rem; letter-spacing:-.01em}
+.rec-s{font-size:.7rem; color:var(--app-muted); margin-top:.08rem}
+.rec-m{font-family:var(--mono); font-size:.64rem; color:var(--app-accent); white-space:nowrap}
+body[data-device="tablet"] .recipes{gap:.55rem}
+body[data-device="tablet"] .rec{padding:.75rem .9rem; border-radius:12px}
+body[data-device="tablet"] .rec-t{font-size:1rem}
+body[data-device="tablet"] .rec-s{font-size:.82rem}
+body[data-device="tablet"] .rec-m{font-size:.72rem}
+
+/* ---- M2 ---- */
+.diners{display:flex; flex-direction:column; gap:.35rem; margin-bottom:.9rem}
+.diner{display:grid; grid-template-columns:30px minmax(0,1fr); gap:.6rem; align-items:center; background:var(--app-surface); border:1px solid var(--app-line); border-radius:10px; padding:.42rem .55rem}
+.av{width:30px;height:30px;border-radius:50%; display:grid; place-items:center; background:var(--app-accent-quiet); color:var(--app-accent); font-weight:800; font-size:.8rem}
+.av.you{background:var(--app-surface-2); color:var(--app-muted)}
+.dn{font-weight:700; font-size:.84rem; line-height:1.15}
+.dr{font-size:.7rem; color:var(--app-muted); line-height:1.25}
+.dr.alert{color:var(--red); font-weight:600}
+body[data-device="tablet"] .diner{grid-template-columns:38px minmax(0,1fr); padding:.6rem .75rem; border-radius:12px}
+body[data-device="tablet"] .av{width:38px;height:38px;font-size:.95rem}
+body[data-device="tablet"] .dn{font-size:.98rem}
+body[data-device="tablet"] .dr{font-size:.8rem}
+
+.fchips{display:flex; flex-wrap:wrap; gap:.3rem; margin-bottom:.9rem}
+.fchip{font-family:var(--mono); font-size:.66rem; padding:.24rem .45rem; border-radius:4px; background:var(--green-soft); border:1px solid var(--green-line); color:var(--green); white-space:nowrap}
+body[data-device="tablet"] .fchip{font-size:.76rem; padding:.3rem .55rem}
+
+.rec2{background:var(--app-surface); border:1px solid var(--app-line); border-radius:10px; padding:.55rem .65rem; display:flex; flex-direction:column; gap:.35rem; transition:transform .18s ease}
+.rec2.ok{border-color:var(--green-line)}
+.rec2.no{background:#fbf4f2; border-color:var(--red-line)}
+.rec2-h{display:flex; align-items:flex-start; justify-content:space-between; gap:.5rem}
+.mark{width:19px;height:19px;border-radius:50%; display:grid; place-items:center; flex:none; font-size:.68rem; font-weight:700; color:#fff}
+.mark.ok{background:var(--green)}
+.mark.no{background:var(--red)}
+.why{font-size:.7rem; line-height:1.3; color:var(--green); font-weight:600; border-top:1px dashed var(--green-line); padding-top:.3rem}
+.why.bad{color:var(--red); border-top-color:var(--red-line)}
+.rec2.no .rec-t{color:var(--app-muted)}
+body[data-device="tablet"] .rec2{padding:.75rem .85rem; border-radius:12px; gap:.45rem}
+body[data-device="tablet"] .why{font-size:.8rem}
+body[data-device="tablet"] .mark{width:22px;height:22px;font-size:.78rem}
+
+/* ---- M3 ---- */
+.banner{display:grid; grid-template-columns:22px minmax(0,1fr); gap:.6rem; align-items:center; border-radius:9px; padding:.5rem .65rem; margin-bottom:.85rem; background:var(--red-soft); border:1px solid var(--red-line); transition:background .5s ease, border-color .5s ease}
+.banner.okstate{background:var(--green-soft); border-color:var(--green-line)}
+.banner.info{background:var(--app-accent-quiet); border-color:var(--teal-line)}
+.bmark{width:22px;height:22px;border-radius:50%; display:grid; place-items:center; font-size:.72rem; font-weight:700; color:#fff; background:var(--red); transition:background .5s ease}
+.banner.okstate .bmark{background:var(--green)}
+.banner.info .bmark{background:var(--teal)}
+.btxt b{display:block; font-size:.85rem; font-weight:700; color:var(--red); letter-spacing:-.01em; transition:color .5s ease}
+.banner.okstate .btxt b{color:var(--green)}
+.banner.info .btxt b{color:var(--teal)}
+.btxt .bsub{font-size:.72rem; color:var(--app-muted)}
+body[data-device="tablet"] .banner{grid-template-columns:26px minmax(0,1fr); padding:.7rem .85rem; border-radius:11px; margin-bottom:1.2rem}
+body[data-device="tablet"] .bmark{width:26px;height:26px;font-size:.85rem}
+body[data-device="tablet"] .btxt b{font-size:1rem}
+body[data-device="tablet"] .btxt .bsub{font-size:.82rem}
+
+.ings{display:flex; flex-direction:column; gap:.3rem; margin-bottom:.9rem}
+.ing{display:grid; grid-template-columns:18px minmax(0,1fr) auto; gap:.55rem; align-items:center; background:var(--app-surface); border:1px solid var(--app-line); border-radius:8px; padding:.4rem .55rem; font-size:.82rem; font-weight:600}
+.ing.bad{background:#fbf4f2; border-color:var(--red-line)}
+.ing i{font-style:normal; font-family:var(--mono); font-size:.65rem; color:var(--app-muted); font-weight:400; text-align:right}
+.ing.bad i{color:var(--red)}
+.ick{width:18px;height:18px;border-radius:50%; display:grid; place-items:center; font-size:.62rem; font-weight:700; color:#fff}
+.ick.ok{background:var(--green)}
+.ick.no{background:var(--red)}
+@keyframes swapflash{0%{background:var(--teal-soft)}100%{background:var(--app-surface)}}
+.ing.swapped{animation:swapflash 1.1s ease}
+body[data-device="tablet"] .ing{padding:.55rem .75rem; font-size:.95rem; border-radius:10px; grid-template-columns:22px minmax(0,1fr) auto}
+body[data-device="tablet"] .ing i{font-size:.76rem}
+body[data-device="tablet"] .ick{width:22px;height:22px;font-size:.72rem}
+
+.propose{border:1px solid var(--teal-line); background:linear-gradient(180deg,#eef7f8,#ffffff); border-radius:10px; padding:.6rem .7rem; display:flex; flex-direction:column; gap:.35rem; transition:border-color .5s ease}
+.propose.accepted{border-color:var(--green-line); background:linear-gradient(180deg,var(--green-soft),#fff)}
+.ptag{font-family:var(--mono); font-size:.58rem; letter-spacing:.11em; text-transform:uppercase; color:var(--teal); font-weight:500}
+.propose.accepted .ptag{color:var(--green)}
+.ptitle{font-size:.88rem; font-weight:700; letter-spacing:-.01em; line-height:1.2}
+.pwhy{font-size:.72rem; color:var(--app-muted); line-height:1.35}
+.pacts{display:flex; gap:.35rem; margin-top:.15rem}
+.pbtn{font-family:var(--sans); font-size:.74rem; font-weight:700; border-radius:6px; padding:.38rem .6rem; border:1px solid var(--app-line); background:#fff; color:var(--app-muted); cursor:default; transition:all .3s ease}
+.pbtn.primary{background:var(--app-accent); border-color:var(--app-accent); color:#fff}
+.propose.accepted .pbtn{opacity:.35}
+.propose.accepted .pbtn.primary{background:var(--green); border-color:var(--green); opacity:1}
+body[data-device="tablet"] .propose{padding:.85rem .95rem; border-radius:12px; gap:.5rem}
+body[data-device="tablet"] .ptitle{font-size:1.02rem}
+body[data-device="tablet"] .pwhy{font-size:.82rem}
+body[data-device="tablet"] .pbtn{font-size:.85rem; padding:.5rem .8rem}
+
+.cookbar{margin-top:.8rem}
+.cookbtn{width:100%; font-family:var(--sans); font-size:.92rem; font-weight:700; letter-spacing:-.01em; background:var(--app-ink); color:#fff; border:0; border-radius:9px; padding:.65rem; cursor:default; transition:transform .18s ease}
+body[data-device="tablet"] .cookbtn{font-size:1.05rem; padding:.85rem; border-radius:11px}
+
+/* ---- M4 ---- */
+.deltas{display:flex; flex-direction:column; gap:.32rem; margin-bottom:.9rem}
+.dl{display:grid; grid-template-columns:26px minmax(0,1fr) auto; gap:.55rem; align-items:center; background:var(--app-surface); border:1px solid var(--app-line); border-radius:8px; padding:.42rem .55rem; font-size:.82rem; font-weight:600}
+.dl .ico{font-size:1rem; text-align:center}
+.dl .qty{font-family:var(--mono); font-size:.7rem; font-weight:500; color:var(--app-muted); white-space:nowrap}
+.dl .qty s{opacity:.55}
+.dl .qty b{color:var(--green); font-weight:600}
+.dl .qty b.out{color:var(--red)}
+body[data-device="tablet"] .dl{padding:.58rem .75rem; font-size:.95rem; border-radius:10px; grid-template-columns:30px minmax(0,1fr) auto}
+body[data-device="tablet"] .dl .qty{font-size:.8rem}
+body[data-device="tablet"] .dl .ico{font-size:1.25rem}
+
+.adds{display:flex; flex-direction:column; gap:.32rem; margin-bottom:.9rem}
+.add{display:flex; align-items:baseline; justify-content:space-between; gap:.5rem; background:var(--app-accent-quiet); border:1px solid var(--teal-line); border-radius:8px; padding:.42rem .58rem; font-size:.82rem; font-weight:700; color:var(--app-accent)}
+.add i{font-style:normal; font-family:var(--mono); font-size:.65rem; font-weight:400; color:var(--app-muted)}
+body[data-device="tablet"] .add{padding:.58rem .78rem; font-size:.95rem; border-radius:10px}
+body[data-device="tablet"] .add i{font-size:.76rem}
+
+.closer{border:1px solid var(--app-line); background:var(--app-surface); border-radius:10px; padding:.7rem .8rem; text-align:center}
+.closer-n{font-family:var(--mono); font-size:2.2rem; font-weight:500; color:var(--app-accent); line-height:1; letter-spacing:-.03em}
+.closer-t{font-size:.72rem; color:var(--app-muted); margin-top:.2rem; line-height:1.3}
+.closer-w{font-size:.76rem; color:var(--green); font-weight:700; margin-top:.45rem; border-top:1px dashed var(--green-line); padding-top:.4rem}
+body[data-device="tablet"] .closer-n{font-size:3rem}
+body[data-device="tablet"] .closer-t{font-size:.85rem}
+body[data-device="tablet"] .closer-w{font-size:.9rem}
+
+/* ---- M5: shopping list ---- */
+.aisle{font-family:var(--mono); font-size:.6rem; letter-spacing:.12em; text-transform:uppercase; color:var(--app-muted); margin:.5rem 0 .25rem}
+.aisle:first-of-type{margin-top:0}
+.litem{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:.5rem .6rem; align-items:baseline; background:var(--app-surface); border:1px solid var(--app-line); border-radius:8px; padding:.4rem .55rem; margin-bottom:.25rem; font-size:.82rem; font-weight:700}
+.litem .lq{font-family:var(--mono); font-size:.68rem; font-weight:500; color:var(--app-muted)}
+.litem .lr{grid-column:1/-1; font-size:.66rem; font-weight:500; color:var(--app-accent)}
+.litem .lr.star{color:var(--app-warn)}
+body[data-device="tablet"] .litem{padding:.55rem .75rem; font-size:.95rem; border-radius:10px}
+body[data-device="tablet"] .litem .lq{font-size:.78rem}
+body[data-device="tablet"] .litem .lr{font-size:.76rem}
+body[data-device="tablet"] .aisle{font-size:.68rem}
+
+.total{display:flex; align-items:baseline; justify-content:space-between; gap:.6rem; border-top:2px solid var(--app-line); margin-top:.55rem; padding-top:.5rem}
+.total span{font-size:.74rem; color:var(--app-muted); font-weight:600}
+.total b{font-family:var(--mono); font-size:1.05rem; font-weight:600; letter-spacing:-.02em}
+body[data-device="tablet"] .total b{font-size:1.3rem}
+body[data-device="tablet"] .total span{font-size:.85rem}
+
+.chans{display:flex; flex-direction:column; gap:.35rem}
+.chan{display:flex; flex-direction:column; align-items:flex-start; gap:.1rem; text-align:left; width:100%; font-family:var(--sans); border:1px solid var(--app-line); background:#fff; border-radius:9px; padding:.5rem .65rem; cursor:default; transition:all .4s ease}
+.chan b{font-size:.86rem; font-weight:700; letter-spacing:-.01em; color:var(--app-ink)}
+.chan span{font-size:.68rem; color:var(--app-muted)}
+.chan.primary{background:var(--app-accent); border-color:var(--app-accent)}
+.chan.primary b{color:#fff}
+.chan.primary span{color:#cfe7ea}
+.chan.sent{background:var(--green); border-color:var(--green)}
+.chan.sent b{color:#fff}
+.chan.sent span{color:#d6f0e2}
+body[data-device="tablet"] .chan{padding:.7rem .9rem; border-radius:11px}
+body[data-device="tablet"] .chan b{font-size:1rem}
+body[data-device="tablet"] .chan span{font-size:.8rem}
+
+.disclose{margin-top:.55rem; font-size:.68rem; line-height:1.4; color:var(--app-muted); border:1px dashed var(--app-line); border-radius:7px; padding:.42rem .55rem; background:var(--app-surface-2)}
+.disclose b{color:var(--app-ink); font-weight:700}
+body[data-device="tablet"] .disclose{font-size:.78rem; padding:.6rem .75rem}
+
+/* M5 is the densest view: on the small screen it clipped 25px, so it gets a tighter rhythm */
+body[data-device="mobile"] .view[data-view="m5"] .app-greet{margin:.5rem 0 .05rem}
+body[data-device="mobile"] .view[data-view="m5"] .app-title{font-size:1.28rem; margin-bottom:.4rem}
+body[data-device="mobile"] .litem{padding:.34rem .55rem; margin-bottom:.2rem}
+body[data-device="mobile"] .aisle{margin:.4rem 0 .2rem}
+body[data-device="mobile"] .chan{padding:.42rem .65rem}
+body[data-device="mobile"] .chans{gap:.3rem}
+body[data-device="mobile"] .disclose{margin-top:.4rem; padding:.34rem .5rem; font-size:.64rem; line-height:1.35}
+body[data-device="mobile"] .litem{font-size:.79rem}
+body[data-device="mobile"] .litem .lr{font-size:.63rem}
+body[data-device="mobile"] .chan b{font-size:.82rem}
+body[data-device="mobile"] .chan span{font-size:.65rem}
+body[data-device="mobile"] .view[data-view="m5"] .sec-label{margin:.15rem 0 .35rem}
+body[data-device="mobile"] .view[data-view="m5"]{padding-bottom:.5rem}
+body[data-device="mobile"] .total{margin-top:.38rem; padding-top:.32rem}
+/* on the phone the third channel is the least valuable pixel on screen; the tablet keeps all three */
+body[data-device="mobile"] .chans .chan:nth-child(3){display:none}
+body[data-device="mobile"] .total{margin-top:.45rem; padding-top:.4rem}
+
+/* ---- M6: return + money ---- */
+.inb{display:flex; flex-direction:column; gap:.3rem; margin-bottom:.9rem}
+.inrow{display:grid; grid-template-columns:24px minmax(0,1fr) auto; gap:.5rem; align-items:center; background:var(--app-surface); border:1px solid var(--app-line); border-radius:8px; padding:.4rem .55rem; font-size:.8rem; font-weight:700}
+.inrow.sub{border-color:var(--teal-line); background:#f2fafb}
+.inrow .ico{font-size:.95rem; text-align:center}
+.inrow .meta{font-family:var(--mono); font-size:.64rem; font-weight:500; color:var(--app-muted); white-space:nowrap}
+.subtag{grid-column:1/-1; font-size:.64rem; font-weight:600; color:var(--app-accent); font-family:var(--mono)}
+body[data-device="tablet"] .inrow{padding:.55rem .75rem; font-size:.92rem; border-radius:10px}
+body[data-device="tablet"] .inrow .meta{font-size:.74rem}
+body[data-device="tablet"] .subtag{font-size:.74rem}
+
+.money{border:1px solid var(--app-line); background:var(--app-surface); border-radius:10px; padding:.7rem .8rem}
+.mrow{display:flex; align-items:baseline; justify-content:space-between; gap:.6rem; margin-bottom:.28rem}
+.mrow span{font-size:.76rem; color:var(--app-muted); font-weight:600}
+.mrow b{font-family:var(--mono); font-size:1.05rem; font-weight:600; letter-spacing:-.02em}
+.mrow b.good{color:var(--green)}
+.mrow b.bad{color:var(--red)}
+.bar{height:7px; border-radius:4px; background:var(--app-surface-2); overflow:hidden; margin:.45rem 0 .3rem; display:flex}
+.bar i{display:block; height:100%; background:var(--red); width:0; transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
+.money.is-live .bar i{width:18%}
+.mnote{font-size:.72rem; color:var(--app-muted); line-height:1.35}
+.mnote b{color:var(--green); font-weight:700}
+body[data-device="tablet"] .mrow b{font-size:1.3rem}
+body[data-device="tablet"] .mrow span{font-size:.86rem}
+body[data-device="tablet"] .mnote{font-size:.82rem}
+
+/* ---- overlays ---- */
+.zero{
+  position:absolute; inset:auto 0 0 0; z-index:8; padding:1.6rem 1.15rem 1.4rem;
+  background:linear-gradient(to top, var(--app-bg) 58%, #f4f7f600);
+  display:flex; flex-direction:column; gap:.55rem; align-items:center;
+  opacity:0; transform:translateY(16px); transition:opacity .6s ease, transform .6s cubic-bezier(.2,.8,.2,1); pointer-events:none;
+}
+.zero.is-in{opacity:1; transform:none}
+.zero-row{display:flex; gap:.4rem}
+.zero-n{font-family:var(--mono); font-size:.7rem; color:var(--teal); letter-spacing:.03em; border:1px solid var(--teal-line); border-radius:4px; padding:.32rem .55rem; background:#fff}
+.zero-c{font-size:.9rem; color:var(--app-ink); font-weight:700; letter-spacing:-.01em; text-align:center; line-height:1.35}
+body[data-device="tablet"] .zero-n{font-size:.82rem; padding:.4rem .7rem}
+body[data-device="tablet"] .zero-c{font-size:1.1rem}
+
+/* final loop card */
+.loopstats{inset:0; justify-content:center; gap:.5rem; padding:2rem 1.3rem; background:var(--app-bg)}
+.loop-h{font-family:var(--mono); font-size:.6rem; letter-spacing:.14em; text-transform:uppercase; color:var(--app-muted); margin-bottom:.5rem}
+.lrow{display:grid; grid-template-columns:7.2rem minmax(0,1fr); gap:.7rem; align-items:baseline; width:100%; max-width:24rem}
+.lrow b{font-family:var(--mono); font-size:1.35rem; font-weight:600; color:var(--app-accent); text-align:right; letter-spacing:-.03em}
+.lrow span{font-size:.75rem; color:var(--app-muted); font-weight:600; line-height:1.25}
+.invgrid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.55rem; width:100%; max-width:23rem; margin:.15rem 0 .2rem}
+.invcell{display:flex; flex-direction:column; align-items:center; gap:.4rem; padding:.75rem .35rem .6rem; border:1px solid var(--app-line); border-radius:11px; background:var(--app-surface)}
+.invico{position:relative; width:42px; height:42px; border-radius:11px; display:grid; place-items:center; background:var(--app-surface-2)}
+.invico .gi{width:22px; height:22px; fill:var(--app-accent)}
+.invbadge{position:absolute; right:-10px; top:-9px; min-width:1.5rem; padding:.05rem .3rem; border:1.5px solid var(--app-accent); border-radius:6px; background:var(--app-bg); font-family:var(--mono); font-size:.72rem; font-weight:700; line-height:1.4; color:var(--app-accent); text-align:center}
+.invname{font-size:.7rem; font-weight:700; color:var(--app-ink); text-align:center; line-height:1.2}
+.invsub{font-size:.6rem; color:var(--app-muted); text-align:center; line-height:1.25}
+body[data-device="tablet"] .invgrid{max-width:27rem; gap:.7rem}
+body[data-device="tablet"] .invico{width:54px; height:54px; border-radius:14px}
+body[data-device="tablet"] .invico .gi{width:28px; height:28px}
+body[data-device="tablet"] .invbadge{font-size:.85rem; min-width:1.7rem}
+body[data-device="tablet"] .invname{font-size:.82rem}
+body[data-device="tablet"] .invsub{font-size:.7rem}
+.loopflow{margin-top:.6rem; font-family:var(--mono); font-size:.6rem; letter-spacing:.05em; color:var(--app-accent); text-align:center; line-height:1.6}
+body[data-device="tablet"] .lrow{grid-template-columns:8.4rem minmax(0,1fr)}
+body[data-device="tablet"] .lrow b{font-size:1.8rem}
+body[data-device="tablet"] .lrow span{font-size:.88rem}
+body[data-device="tablet"] .loopflow{font-size:.72rem}
+
+.voice{
+  position:absolute; inset:auto 0 0 0; z-index:9; padding:1.1rem 1.05rem 1.3rem;
+  background:linear-gradient(to top,#062026fa 55%,#06202600);
+  display:flex; flex-direction:column; align-items:center; gap:.7rem;
+  opacity:0; transform:translateY(20px); transition:opacity .5s ease, transform .5s cubic-bezier(.2,.8,.2,1); pointer-events:none;
+}
+.voice.is-in{opacity:1; transform:none}
+.wave{display:flex; align-items:center; gap:3px; height:34px}
+.wave i{display:block; width:3px; height:6px; border-radius:2px; background:#4fd1e0; animation:wv 1s ease-in-out infinite}
+@keyframes wv{0%,100%{height:5px;opacity:.5}50%{height:26px;opacity:1}}
+.mic-label{font-family:var(--mono); font-size:.62rem; letter-spacing:.14em; text-transform:uppercase; color:#4fd1e0}
+.transcript{font-size:.98rem; font-weight:600; line-height:1.35; text-align:center; color:#eaf5f5; letter-spacing:-.01em; min-height:2.6em; max-width:26rem}
+.transcript .w{opacity:0; transition:opacity .18s ease}
+.transcript .w.is-in{opacity:1}
+body[data-device="tablet"] .wave{height:44px; gap:4px}
+body[data-device="tablet"] .wave i{width:4px}
+body[data-device="tablet"] .transcript{font-size:1.3rem; min-height:2.4em}
+body[data-device="tablet"] .voice{padding:1.6rem 2rem 1.9rem; gap:.9rem}
+
+.tapdot{position:absolute; z-index:14; width:40px; height:40px; margin:-20px 0 0 -20px; border-radius:50%; border:2px solid var(--app-accent); background:#0a6a7726; opacity:0; pointer-events:none}
+.tapdot.go{animation:tapring .85s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes tapring{0%{opacity:0; transform:scale(.35)}22%{opacity:1; transform:scale(.72)}100%{opacity:0; transform:scale(1.9)}}
+.is-pressed{transform:scale(.975)}
+
+/* ---------- rail ---------- */
+.rail{height:100%; min-height:0; display:flex; flex-direction:column; gap:.6rem; border-left:1px solid var(--stage-line); padding-left:1.5rem}
+@media (max-width:1120px){ .rail{border-left:0; padding-left:0; border-top:1px solid var(--stage-line); padding-top:1.2rem; height:auto} }
+
+.rail-h{font-size:.62rem; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--chrome-faint); display:flex; align-items:center; gap:.5rem}
+.rail-h::after{content:""; flex:1; height:1px; background:var(--stage-line)}
+
+.pipe{display:flex; flex-direction:column}
+.node{display:grid; grid-template-columns:22px minmax(0,1fr); gap:.6rem; align-items:center; padding:.19rem 0; position:relative}
+.node::before{content:""; position:absolute; left:10.5px; top:0; bottom:0; width:1px; background:var(--stage-line)}
+.node:first-child::before{top:50%}
+.node:last-child::before{bottom:50%}
+.dot{position:relative; z-index:1; width:22px;height:22px;border-radius:50%; border:1px solid var(--stage-line-2); background:#fff; display:grid; place-items:center; font-family:var(--mono); font-size:.6rem; color:var(--chrome-faint); transition:all .45s ease}
+.node-l{font-size:.79rem; font-weight:600; color:var(--chrome-faint); letter-spacing:-.01em; transition:color .45s ease}
+.node-n{font-size:.65rem; color:var(--chrome-faint); opacity:0; transition:opacity .45s ease; font-family:var(--mono)}
+.node.is-on .dot{border-color:var(--teal); color:#fff; background:var(--teal); box-shadow:0 0 0 4px #0a6a771f}
+.node.is-on .node-l{color:var(--chrome-ink)}
+.node.is-on .node-n{opacity:1; color:var(--chrome-muted)}
+.node.is-sys.is-on .dot{border-color:var(--green); background:var(--green); box-shadow:0 0 0 4px #2d7a531f}
+.node.is-tap.is-on .dot{border-color:var(--amber); background:var(--amber); box-shadow:0 0 0 4px #9a5a061f}
+.node.is-skip .node-l{color:var(--chrome-faint); text-decoration:line-through}
+.node.is-skip .node-n{opacity:1; color:var(--chrome-faint)}
+
+.legend{display:flex; flex-wrap:wrap; gap:.15rem .7rem; font-family:var(--mono); font-size:.58rem; color:var(--chrome-faint); letter-spacing:.05em; text-transform:uppercase}
+.legend span{display:inline-flex; align-items:center; gap:.28rem}
+.lg{width:7px;height:7px;border-radius:50%; display:inline-block}
+.lg.ctx{background:var(--chrome-faint)}
+.lg.ia{background:var(--teal)}
+.lg.tap{background:var(--amber)}
+.lg.sys{background:var(--green)}
+
+.log{position:relative; flex:1; min-height:4rem; overflow-y:auto; display:flex; flex-direction:column; gap:.3rem; padding-right:.4rem; scrollbar-width:thin; scrollbar-color:var(--stage-line-2) transparent;
+  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 14px); mask-image:linear-gradient(180deg,transparent 0,#000 14px)}
+.log::-webkit-scrollbar{width:5px}
+.log::-webkit-scrollbar-thumb{background:var(--stage-line-2); border-radius:3px}
+.li{display:grid; grid-template-columns:5.2rem minmax(0,1fr); gap:.55rem; align-items:baseline; opacity:0; transform:translateX(-6px); transition:opacity .45s ease, transform .45s cubic-bezier(.2,.8,.2,1)}
+.li.is-in{opacity:1; transform:none}
+.li-k{font-family:var(--mono); font-size:.57rem; letter-spacing:.09em; text-transform:uppercase; padding:.12rem 0; text-align:right}
+.li-v{font-size:.78rem; line-height:1.36; color:var(--chrome-ink)}
+.li-v em{font-style:normal; color:var(--chrome-muted)}
+.li.k-ctx .li-k{color:var(--chrome-faint)}
+.li.k-ctx .li-v{color:var(--chrome-muted)}
+.li.k-ai  .li-k{color:var(--teal)}
+.li.k-tap .li-k{color:var(--amber)}
+.li.k-tap .li-v{color:var(--chrome-muted); font-style:italic}
+.li.k-sys .li-k{color:var(--green)}
+.li.k-sys .li-v{font-weight:600}
+.li-v mark{background:var(--red-soft); color:var(--red); font-weight:600; padding:0 .2em; border-radius:2px}
+.li-v ins{background:var(--green-soft); color:var(--green); text-decoration:none; font-weight:600; padding:0 .2em; border-radius:2px}
+
+.intent{display:flex; flex-wrap:wrap; gap:.28rem; margin-top:.25rem}
+.ic{font-family:var(--mono); font-size:.65rem; padding:.18rem .4rem; border-radius:4px; border:1px solid var(--teal-line); color:var(--teal); background:var(--teal-soft); opacity:0; transform:translateY(4px); transition:opacity .35s ease, transform .35s ease}
+.ic.is-in{opacity:1; transform:none}
+
+.swap{flex:none}
+.truth{border:1px solid var(--stage-line); border-radius:6px; padding:.58rem .7rem; font-size:.73rem; line-height:1.45; color:var(--chrome-muted); background:#fff}
+.truth b{color:var(--green); font-weight:700}
+.truth i{font-style:normal; color:var(--teal); font-weight:700}
+.truth.is-off{display:none}
+
+.filters{display:none; border:1px solid var(--stage-line); border-radius:6px; background:#fff; padding:.58rem .7rem}
+.filters.is-on{display:block}
+.filters-h{font-family:var(--mono); font-size:.59rem; letter-spacing:.09em; text-transform:uppercase; color:var(--amber); margin-bottom:.42rem; display:flex; justify-content:space-between; gap:.5rem}
+.filters-h span{color:var(--chrome-faint)}
+.ff{display:flex; align-items:center; justify-content:space-between; gap:.6rem; font-size:.71rem; color:var(--chrome-muted); border:1px solid var(--stage-line); border-radius:4px; padding:.22rem .4rem; margin-bottom:.2rem; background:#fafcfc; overflow:hidden; opacity:0; transform:translateY(4px); max-height:2.2rem; transition:opacity .3s ease, transform .3s ease, max-height .45s ease, padding .45s ease, margin .45s ease, border-color .45s ease}
+.ff.is-in{opacity:1; transform:none}
+.ff i{font-style:normal; font-family:var(--mono); font-size:.65rem; color:var(--chrome-faint)}
+.filters.is-collapsed .ff{max-height:0; opacity:0; padding-top:0; padding-bottom:0; margin-bottom:0; border-color:transparent}
+.ff-result{max-height:0; opacity:0; overflow:hidden; transition:max-height .5s ease .25s, opacity .5s ease .25s; font-size:.81rem; line-height:1.4; color:var(--chrome-ink); font-weight:600}
+.filters.is-collapsed .ff-result{max-height:10rem; opacity:1}
+.ff-result small{display:block; font-family:var(--mono); font-size:.62rem; font-weight:400; color:var(--teal); margin-top:.3rem; letter-spacing:.03em}
+
+.bound{display:none; border:1px solid var(--stage-line); border-radius:6px; background:#fff; padding:.58rem .7rem}
+.bound.is-on{display:block}
+.bound-h{font-family:var(--mono); font-size:.59rem; letter-spacing:.09em; text-transform:uppercase; color:var(--chrome-faint); margin-bottom:.45rem}
+.brow{display:grid; grid-template-columns:4.6rem minmax(0,1fr); gap:.55rem; align-items:baseline; font-size:.74rem; line-height:1.35; margin-bottom:.28rem; opacity:0; transform:translateY(4px); transition:opacity .35s ease, transform .35s ease}
+.brow.is-in{opacity:1; transform:none}
+.brow b{font-family:var(--mono); font-size:.6rem; letter-spacing:.07em; text-transform:uppercase; text-align:right; font-weight:500}
+.brow.ia b{color:var(--teal)}
+.brow.tap b{color:var(--amber)}
+.brow.sys b{color:var(--green)}
+.brow span{color:var(--chrome-muted)}
+.brow.sys span{color:var(--chrome-ink); font-weight:600}
+
+/* ---------- footer ---------- */
+/* filmstrip: one segment per beat, grouped by moment — the choreography made visible */
+.timeline{display:flex; align-items:stretch; gap:2px; height:5px; padding:0 1.6rem; background:#ffffffcc}
+.timeline i{flex:1; background:var(--stage-line); border-radius:1px; cursor:pointer; transition:background .35s ease, transform .2s ease}
+.timeline i:hover{transform:scaleY(1.9)}
+.timeline i.gapstart{margin-left:9px}
+.timeline i.done{background:var(--teal-line)}
+.timeline i.now{background:var(--teal)}
+
+.footer{border-top:1px solid var(--stage-line); background:#ffffffcc}
+.beatbar{height:2px; background:var(--stage-line); position:relative; overflow:hidden}
+.beatbar i{display:block; height:100%; width:100%; background:linear-gradient(90deg,#12909f,var(--teal)); transform-origin:left; transform:scaleX(0)}
+.beatbar i.run{animation:fill linear forwards}
+@keyframes fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+.narrate{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:1.5rem; align-items:center; padding:.8rem 1.6rem .95rem}
+.caption{font-size:1.1rem; line-height:1.45; letter-spacing:-.015em; min-height:2.9em; color:var(--chrome-ink); max-width:62rem}
+.caption .w{opacity:0; transition:opacity .2s ease}
+.caption .w.is-in{opacity:1}
+.caption b{color:var(--teal); font-weight:700}
+
+.transport{display:flex; align-items:center; gap:.45rem}
+.btn{font-family:var(--mono); font-size:.7rem; letter-spacing:.05em; color:var(--chrome-muted); background:#fff; border:1px solid var(--stage-line-2); border-radius:4px; padding:.42rem .7rem; cursor:pointer; transition:all .2s ease; white-space:nowrap}
+.btn:hover{color:var(--teal); border-color:var(--teal-line); background:var(--teal-soft)}
+.btn.primary{color:#fff; background:var(--teal); border-color:var(--teal); font-weight:500}
+.btn.primary:hover{background:#0b7d8c; color:#fff}
+.hint{font-family:var(--mono); font-size:.62rem; color:var(--chrome-faint); letter-spacing:.04em; margin-left:.4rem}
+.btn.toggle.is-on{color:var(--teal); border-color:var(--teal-line); background:var(--teal-soft)}
+.clock-el{font-family:var(--mono); font-size:.62rem; color:var(--chrome-faint); letter-spacing:.04em; min-width:3.2rem; text-align:right}
+
+@media (max-width:1400px){ .hint{display:none} }
+
+:focus-visible{outline:2px solid var(--teal); outline-offset:2px}
+
+
+/* short screens (1366x768 projectors): keep the whole rail on screen without scrolling it */
+@media (max-height:830px){
+  .rail{gap:.45rem}
+  .node{padding:.1rem 0}
+  .node-n{font-size:.61rem}
+  .legend{display:none}
+  .log{min-height:2.2rem; gap:.26rem}
+  .li-v{font-size:.75rem; line-height:1.32}
+  .ff{padding:.15rem .4rem; max-height:1.85rem; margin-bottom:.15rem}
+  .filters-h{margin-bottom:.32rem}
+  .brow{margin-bottom:.22rem}
+  .truth,.filters,.bound{padding:.5rem .62rem}
+  .caption{font-size:1rem; min-height:2.9em}
+}
+@media (max-height:760px){
+  .node-n{display:none}
+  .node{padding:.06rem 0}
+  .ff{max-height:1.7rem; padding:.1rem .38rem}
+  .log{gap:.22rem}
+  .caption{font-size:.95rem; min-height:2.9em}
+}
+
+/* Detalle del contenido de cada zona: qué hay y cuánto, producto por producto. */
+.invdetail{justify-content:center; gap:.5rem; padding:1.3rem 1.05rem 1.1rem}
+.zonegrid{display:flex; flex-direction:column; gap:.45rem; width:100%; max-width:23rem}
+.zone{border:1px solid var(--app-line); border-radius:11px; background:var(--app-surface); padding:.45rem .6rem .4rem}
+.zone-h{display:flex; align-items:center; gap:.38rem; padding-bottom:.28rem; border-bottom:1px solid var(--app-line)}
+.zone-h .gi{width:14px; height:14px; fill:var(--app-accent); flex:none}
+.zone-t{flex:1; min-width:0; font-size:.68rem; font-weight:700; color:var(--app-ink); line-height:1.2}
+.zone-t i{display:block; font-style:normal; font-size:.55rem; font-weight:600; color:var(--app-muted); letter-spacing:0}
+.zone-n{flex:none; font-family:var(--mono); font-size:.62rem; font-weight:700; color:var(--app-accent)}
+.itrow{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:.45rem; align-items:baseline; padding:.17rem 0; font-size:.69rem; font-weight:600; color:var(--app-ink); line-height:1.25; border-bottom:1px solid var(--app-line)}
+.itrow:last-of-type{border-bottom:0}
+.itrow .tag{margin-left:.28rem; font-size:.53rem; padding:.08rem .26rem}
+.itrow em{font-style:normal; font-family:var(--mono); font-size:.65rem; font-weight:600; color:var(--app-accent); white-space:nowrap}
+.zone-f{padding-top:.28rem; font-family:var(--mono); font-size:.56rem; color:var(--app-muted); letter-spacing:.03em}
+body[data-device="tablet"] .zonegrid{gap:.6rem; max-width:29rem}
+body[data-device="tablet"] .zone{padding:.55rem .8rem .45rem}
+body[data-device="tablet"] .zone-t{font-size:.84rem}
+body[data-device="tablet"] .zone-t i{font-size:.68rem}
+body[data-device="tablet"] .zone-n{font-size:.76rem}
+body[data-device="tablet"] .itrow{font-size:.8rem; padding:.2rem 0}
+body[data-device="tablet"] .itrow em{font-size:.76rem}
+body[data-device="tablet"] .itrow .tag{font-size:.62rem; padding:.1rem .3rem}
+body[data-device="tablet"] .zone-f{font-size:.66rem}
+@media (max-height:760px){
+  .invdetail{padding:1.1rem 1.05rem .9rem}
+  .zone{padding:.35rem .55rem .3rem}
+  .itrow{padding:.11rem 0}
+}
+
+/* Ficha técnica completa: escandallo por porción, elaboración y puntos críticos.
+   Reutiliza .itrow del detalle de inventario para que las cantidades se lean igual en las dos
+   pantallas: lo que aquí dice por porción es lo que M4 descuenta por cubierto servido. */
+.recipecard{justify-content:center; gap:.4rem; padding:1.15rem 1.05rem 1rem}
+.rc-head{width:100%; max-width:23rem}
+.rc-t{font-size:1.02rem; font-weight:800; letter-spacing:-.02em; color:var(--app-ink); line-height:1.15}
+.rc-meta{display:flex; flex-wrap:wrap; gap:.28rem; margin-top:.3rem}
+.rc-meta span{font-family:var(--mono); font-size:.55rem; letter-spacing:.03em; color:var(--app-accent); background:var(--app-accent-quiet); border-radius:4px; padding:.14rem .34rem}
+.rc-body{display:flex; flex-direction:column; gap:.45rem; width:100%; max-width:23rem; min-height:0}
+.rc-block{border:1px solid var(--app-line); border-radius:11px; background:var(--app-surface); padding:.4rem .6rem .38rem}
+.rc-sub{font-family:var(--mono); font-size:.53rem; letter-spacing:.12em; text-transform:uppercase; color:var(--app-muted); padding-bottom:.24rem; border-bottom:1px solid var(--app-line); margin-bottom:.1rem}
+.rc-steps{list-style:none; margin:0; padding:0; counter-reset:st}
+.rc-steps li{counter-increment:st; display:grid; grid-template-columns:1.05rem minmax(0,1fr) auto; gap:.4rem; align-items:baseline; padding:.19rem 0; font-size:.66rem; font-weight:600; color:var(--app-ink); line-height:1.3; border-bottom:1px solid var(--app-line)}
+.rc-steps li:last-child{border-bottom:0}
+.rc-steps li::before{content:counter(st); font-family:var(--mono); font-size:.6rem; font-weight:700; color:var(--app-accent)}
+.rc-steps em{font-style:normal; font-family:var(--mono); font-size:.58rem; font-weight:600; color:var(--app-muted); white-space:nowrap}
+.rc-ccp{display:flex; flex-wrap:wrap; gap:.26rem; padding-top:.24rem}
+.rc-ccp span{font-family:var(--mono); font-size:.55rem; letter-spacing:.02em; color:var(--app-warn); background:var(--app-warn-quiet); border-radius:4px; padding:.14rem .34rem}
+.rc-foot{display:flex; align-items:center; gap:.55rem; width:100%; max-width:23rem; margin-top:.1rem}
+.rc-note{flex:1; min-width:0; font-size:.6rem; font-weight:600; line-height:1.25; color:var(--app-muted)}
+.rc-note b{color:var(--app-accent)}
+.rc-foot .cookbtn{width:auto; flex:none; font-size:.78rem; padding:.5rem .8rem}
+.tag.swap{background:var(--app-accent-quiet); color:var(--app-accent)}
+body[data-device="tablet"] .rc-head,body[data-device="tablet"] .rc-body,body[data-device="tablet"] .rc-foot{max-width:29rem}
+body[data-device="tablet"] .rc-t{font-size:1.35rem}
+body[data-device="tablet"] .rc-meta span{font-size:.66rem; padding:.18rem .42rem}
+body[data-device="tablet"] .rc-sub{font-size:.62rem}
+body[data-device="tablet"] .rc-block{padding:.55rem .8rem .5rem}
+body[data-device="tablet"] .rc-steps li{font-size:.78rem; padding:.24rem 0}
+body[data-device="tablet"] .rc-steps em{font-size:.68rem}
+body[data-device="tablet"] .rc-ccp span{font-size:.66rem; padding:.18rem .42rem}
+body[data-device="tablet"] .rc-note{font-size:.72rem}
+body[data-device="tablet"] .rc-foot .cookbtn{font-size:.92rem; padding:.6rem 1rem}
+@media (max-height:760px){
+  .recipecard{padding:.95rem 1.05rem .85rem; gap:.32rem}
+  .rc-steps li{padding:.13rem 0}
+  .rc-block{padding:.32rem .55rem .3rem}
+}
+
+body.paused *{animation-play-state:paused !important}
+/* ---------- ajustes propios de la versión B2B ---------- */
+/* M6 lleva una fila más de dinero y el consolidado del grupo: en móvil hay que apretarlo */
+body[data-device="mobile"] .view[data-view="m6"] .inb{gap:.22rem; margin-bottom:.5rem}
+body[data-device="mobile"] .view[data-view="m6"] .inrow{padding:.32rem .5rem}
+body[data-device="mobile"] .view[data-view="m6"] .money{padding:.55rem .7rem}
+body[data-device="mobile"] .view[data-view="m6"] .mrow{margin-bottom:.2rem}
+body[data-device="mobile"] .view[data-view="m6"] .mnote{font-size:.7rem; line-height:1.3}
+body[data-device="mobile"] .view[data-view="m6"] .disclose{margin-top:.4rem; padding:.34rem .5rem; font-size:.66rem}
+/* el panel de campos del ERP tiene 8 filas, una más que la versión de hogar: hay que
+   apretarlas y dejar que la traza ceda un poco de piso en pantallas de 1280 */
+.ff{padding:.12rem .4rem; margin-bottom:.12rem; font-size:.68rem}
+.filters{padding:.45rem .62rem}
+.filters-h{margin-bottom:.3rem}
+.ff-result{font-size:.76rem}
+/* en pantallas bajas el panel de 8 campos no cabe: el rail cede aire, no contenido */
+@media (max-height:740px){
+  .rail{gap:.35rem}
+  .node{padding:.1rem 0}
+  .log{min-height:2rem}
+  .ff{padding:.05rem .4rem; margin-bottom:.07rem}
+  .filters{padding:.35rem .55rem}
+  .filters-h{margin-bottom:.2rem}
+  .brow{margin-bottom:.18rem}
+  .bound-h{margin-bottom:.3rem}
+}
+/* M6 en móvil: el banner y las etiquetas pierden aire antes que la vista se recorte */
+body[data-device="mobile"] .view[data-view="m6"] .banner{margin-bottom:.7rem}
+body[data-device="mobile"] .view[data-view="m6"] .sec-label{margin-bottom:.4rem}
+
+
+/* ===== Checkpoint 9 · el dinero del día, y las existencias editables ===== */
+
+/* La pantalla del día: barras comparadas, no una lista de cifras. */
+.pnl{display:flex; flex-direction:column; gap:.55rem; width:100%; max-width:23rem}
+.pnl-h{font-family:var(--mono); font-size:.6rem; letter-spacing:.14em; text-transform:uppercase; color:var(--app-muted); text-align:center; margin-bottom:.1rem}
+.pbar-l{display:flex; align-items:baseline; justify-content:space-between; gap:.5rem; margin-bottom:.18rem}
+.pbar-l span{font-size:.72rem; color:var(--app-muted); font-weight:600; line-height:1.2}
+.pbar-l b{font-family:var(--mono); font-size:.95rem; font-weight:600; letter-spacing:-.02em; color:var(--app-ink); white-space:nowrap}
+.pbar{height:14px; border-radius:5px; background:var(--app-surface-2); overflow:hidden}
+.pbar i{display:block; height:100%; width:0; border-radius:5px; transition:width 1.15s cubic-bezier(.2,.8,.2,1)}
+.pnl.is-live .pbar i{width:var(--w)}
+.pbar.sale i{background:var(--app-accent)}
+.pbar.cost i{background:var(--app-ink); opacity:.55}
+.pbar.alt i{background:var(--app-muted); opacity:.75}
+.pbar.waste i{background:var(--red)}
+.pbar.save i{background:var(--green)}
+.pnl-b b.good{color:var(--green)}
+.pnl-b b.bad{color:var(--red)}
+.pnl-foot{margin-top:.35rem; border-top:1px dashed var(--app-line); padding-top:.45rem; display:flex; flex-direction:column; gap:.28rem}
+.pfrow{display:flex; align-items:baseline; justify-content:space-between; gap:.6rem; font-size:.72rem; color:var(--app-muted); font-weight:600; line-height:1.25}
+.pfrow b{font-family:var(--mono); font-size:.85rem; font-weight:600; letter-spacing:-.02em; white-space:nowrap}
+.pfrow b.good{color:var(--green)}
+.pfrow b.bad{color:var(--red)}
+.pnl-note{font-size:.66rem; color:var(--app-muted); line-height:1.35; text-align:center; margin-top:.15rem}
+.pnl-note b{color:var(--green); font-weight:700}
+body[data-device="tablet"] .pnl{max-width:30rem; gap:.7rem}
+body[data-device="tablet"] .pnl-h{font-size:.7rem}
+body[data-device="tablet"] .pbar-l span{font-size:.85rem}
+body[data-device="tablet"] .pbar-l b{font-size:1.15rem}
+body[data-device="tablet"] .pbar{height:17px}
+body[data-device="tablet"] .pfrow{font-size:.82rem}
+body[data-device="tablet"] .pfrow b{font-size:.98rem}
+body[data-device="tablet"] .pnl-note{font-size:.76rem}
+@media (max-height:760px){
+  .pnl{gap:.4rem}
+  .pbar{height:12px}
+}
+
+/* Existencias a la vista y editables: lo que registra la persona es el dato bueno. */
+.onhand{margin-top:.45rem; border:1px solid var(--app-line); background:var(--app-surface); border-radius:10px; padding:.5rem .6rem; display:flex; flex-direction:column; gap:.3rem}
+.onhand-h{display:flex; align-items:baseline; justify-content:space-between; gap:.5rem}
+.onhand-h span{font-family:var(--mono); font-size:.55rem; letter-spacing:.11em; text-transform:uppercase; color:var(--app-muted)}
+.onhand-h button{font-family:var(--sans); font-size:.66rem; font-weight:700; border-radius:6px; padding:.22rem .45rem; border:1px solid var(--teal-line); background:var(--app-accent-quiet); color:var(--app-accent); cursor:default}
+.onhandrow{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:.5rem; align-items:baseline; font-size:.78rem; font-weight:600; padding:.2rem 0; border-bottom:1px solid var(--app-line)}
+.onhandrow:last-of-type{border-bottom:0}
+.onhandrow em{font-style:normal; font-family:var(--mono); font-size:.74rem; font-weight:600; color:var(--app-ink); border-bottom:1px dashed var(--teal-line); padding-bottom:1px}
+.onhand-note{font-size:.63rem; color:var(--app-muted); line-height:1.3; border-top:1px dashed var(--teal-line); padding-top:.3rem}
+.onhand-note b{color:var(--app-accent)}
+body[data-device="tablet"] .onhand{padding:.65rem .8rem; border-radius:12px}
+body[data-device="tablet"] .onhand-h span{font-size:.63rem}
+body[data-device="tablet"] .onhand-h button{font-size:.75rem; padding:.26rem .55rem}
+body[data-device="tablet"] .onhandrow{font-size:.88rem}
+body[data-device="tablet"] .onhandrow em{font-size:.84rem}
+body[data-device="tablet"] .onhand-note{font-size:.72rem}
+
+/* ===== Checkpoint 7 · sugerencia explícita + gestión de inventario ===== */
+
+@media (max-height:760px){
+}
+/* M4 carga una tarjeta más que las otras vistas: la confirmación. La caja del
+   dispositivo es de tamaño fijo y se escala, así que el recorte de aire no puede
+   depender del alto de la ventana; va sin media query. */
+.view[data-view="m4"] .closer{padding:.45rem .65rem; margin-top:.4rem}
+.view[data-view="m4"] .closer-n{font-size:1.5rem}
+.view[data-view="m4"] .closer-t{font-size:.68rem}
+.view[data-view="m4"] .closer-w{font-size:.72rem; margin-top:.3rem; padding-top:.28rem}
+.view[data-view="m4"] .stkline{margin-top:.3rem; padding:.34rem .5rem}
+.view[data-view="m4"] .onhand{margin-top:.3rem; padding:.42rem .55rem; gap:.18rem}
+.view[data-view="m4"] .onhandrow{padding:.14rem 0}
+.view[data-view="m4"] .onhand-note{padding-top:.26rem}
+.view[data-view="m4"] .adds{margin-bottom:.42rem}
+
+body[data-device="mobile"] .view[data-view="m4"] .deltas{gap:.26rem; margin-bottom:.45rem}
+body[data-device="mobile"] .view[data-view="m4"] .adds{gap:.26rem; margin-bottom:.4rem}
+body[data-device="mobile"] .view[data-view="m4"] .dl,
+body[data-device="mobile"] .view[data-view="m4"] .add{padding:.31rem .5rem}
+body[data-device="mobile"] .view[data-view="m4"] .sec-label{margin:.15rem 0 .35rem}
+body[data-device="mobile"] .view[data-view="m4"] .onhand{margin-top:.3rem; padding:.4rem .55rem; gap:.18rem}
+body[data-device="mobile"] .view[data-view="m4"] .onhandrow{font-size:.74rem; padding:.13rem 0}
+body[data-device="mobile"] .view[data-view="m4"] .onhandrow em{font-size:.7rem}
+body[data-device="mobile"] .view[data-view="m4"] .onhand-h button{font-size:.62rem; padding:.18rem .4rem}
+body[data-device="mobile"] .view[data-view="m4"] .onhand-note{font-size:.6rem; padding-top:.24rem}
+body[data-device="mobile"] .view[data-view="m4"] .stkline{display:none}
+body[data-device="mobile"] .view[data-view="m4"] .adds{margin-bottom:.32rem}
+body[data-device="mobile"] .view[data-view="m4"] .add{padding:.28rem .5rem}
+
+body[data-device="tablet"] .view[data-view="m4"] .adds{gap:.35rem; margin-bottom:.5rem}
+body[data-device="tablet"] .view[data-view="m4"] .add{padding:.4rem .6rem}
+body[data-device="tablet"] .view[data-view="m4"] .stkline{padding:.4rem .6rem}
+
+/* el panel de gestión tiene cuatro filas: en pantallas bajas cede interlínea */
+@media (max-height:760px){
+  #stock .brow{margin-bottom:.12rem; font-size:.69rem; line-height:1.26}
+  #stock .bound-h{margin-bottom:.22rem}
+  #stock{padding:.45rem .6rem}
+}
+
+
+/* La acción que la app sugiere, dentro de la tarjeta del lote. */
+.card-a{display:flex; align-items:baseline; gap:.3rem; margin-top:.18rem; font-size:.68rem; font-weight:600; color:var(--app-accent); line-height:1.25}
+.card-a::before{content:"\2192"; font-family:var(--mono); font-weight:400; opacity:.8}
+body[data-device="tablet"] .card-a{font-size:.8rem; margin-top:.24rem}
+
+/* El plato que la app manda producir primero. */
+.rec.top{border-color:var(--teal-line); background:var(--app-accent-quiet)}
+.rec-pick{font-family:var(--mono); font-size:.55rem; letter-spacing:.09em; text-transform:uppercase; color:var(--app-accent); display:block; margin-bottom:.12rem}
+body[data-device="tablet"] .rec-pick{font-size:.63rem}
+
+/* Cobertura de existencias tras el cierre: qué quedó bajo el par. */
+.stkline{display:flex; align-items:baseline; justify-content:space-between; gap:.5rem; flex-wrap:wrap; margin-top:.4rem; padding:.4rem .55rem; border:1px dashed var(--teal-line); border-radius:8px; background:var(--app-accent-quiet); font-size:.7rem; font-weight:600; color:var(--app-accent); line-height:1.3}
+.stkline span{flex:1 1 8rem; min-width:0}
+.stkline i{flex:0 0 auto; font-style:normal; font-family:var(--mono); font-size:.62rem; font-weight:400; color:var(--app-muted); white-space:nowrap}
+body[data-device="tablet"] .stkline{font-size:.8rem; padding:.5rem .7rem}
+body[data-device="tablet"] .stkline i{font-size:.72rem}
+
+/* Resumen de gestión, debajo del inventario por cámaras. */
+.invmanage{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.5rem; width:100%; max-width:23rem; margin:.5rem 0 .1rem}
+.imcell{text-align:center; padding:.4rem .3rem; border:1px solid var(--app-line); border-radius:9px; background:var(--app-surface-2)}
+.imcell b{display:block; font-family:var(--mono); font-size:1.05rem; font-weight:500; color:var(--app-accent); line-height:1.1}
+.imcell span{display:block; font-size:.55rem; color:var(--app-muted); line-height:1.25; margin-top:.15rem}
+body[data-device="tablet"] .invmanage{max-width:30rem}
+body[data-device="tablet"] .imcell b{font-size:1.3rem}
+body[data-device="tablet"] .imcell span{font-size:.68rem}
+@media (max-height:760px){
+  .invmanage{margin:.35rem 0 0}
+  .imcell{padding:.3rem .25rem}
+  .imcell b{font-size:.95rem}
+}
+/* M1 en móvil: la línea de acción cabe recortando aire, no texto */
+body[data-device="mobile"] .view[data-view="m1"] .cards{gap:.3rem; margin-bottom:.7rem}
+body[data-device="mobile"] .view[data-view="m1"] .card{padding:.42rem .55rem}
+body[data-device="mobile"] .view[data-view="m1"] .card-a{font-size:.62rem; margin-top:.12rem; line-height:1.2}
+body[data-device="mobile"] .view[data-view="m1"] .recipes{gap:.28rem}
+body[data-device="mobile"] .view[data-view="m1"] .rec{padding:.45rem .6rem}
+body[data-device="mobile"] .view[data-view="m1"] .rec-pick{font-size:.52rem; margin-bottom:.08rem}
+</style>
+</head>
+<body data-device="tablet">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="i-pollo" viewBox="0 0 24 24"><circle cx="15.6" cy="8.4" r="6.2"/><circle cx="11.8" cy="12.2" r="4.6"/><rect x="5.19" y="13.7" width="6.22" height="4" rx="2" transform="rotate(-45 8.3 15.7)"/><circle cx="7.3" cy="19.1" r="2.35"/><circle cx="4.9" cy="16.7" r="2.35"/></symbol>
+  <symbol id="i-verde" viewBox="0 0 24 24"><path d="M20.5 3.4C11.8 3 4.6 7.3 4.6 14.2c0 2 .6 3.7 1.6 5L4 21.6l1.9 1.4 2.2-2.4c1.3.8 2.9 1.2 4.6 1.2 5.4 0 7.8-6.6 7.8-18.4Z"/></symbol>
+  <symbol id="i-lacteo" viewBox="0 0 24 24"><path d="M9 1.5h6l3 3.6v15.4a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5.1L9 1.5Z"/><path d="M6.4 6.4h11.2" stroke="#fff" stroke-width="1.4" fill="none"/></symbol>
+  <symbol id="i-lata" viewBox="0 0 24 24"><ellipse cx="12" cy="4.6" rx="7" ry="2.8"/><path d="M5 4.6v14.8c0 1.6 3.1 2.8 7 2.8s7-1.2 7-2.8V4.6c0 1.6-3.1 2.8-7 2.8s-7-1.2-7-2.8Z"/></symbol>
+  <symbol id="i-bulbo" viewBox="0 0 24 24"><path d="M12 2.4c1 1.6 1 3 .4 4.2 3.4.8 5.9 3.9 5.9 7.6 0 4.3-3.3 7.4-6.3 7.4s-6.3-3.1-6.3-7.4c0-3.7 2.5-6.8 5.9-7.6-.6-1.2-.6-2.6.4-4.2Z"/></symbol>
+  <symbol id="i-grano" viewBox="0 0 24 24"><ellipse cx="7.2" cy="8.4" rx="2.5" ry="4" transform="rotate(-24 7.2 8.4)"/><ellipse cx="16.6" cy="9.6" rx="2.5" ry="4" transform="rotate(22 16.6 9.6)"/><ellipse cx="11.6" cy="16.6" rx="2.5" ry="4" transform="rotate(-8 11.6 16.6)"/></symbol>
+  <symbol id="i-pescado" viewBox="0 0 24 24"><path d="M2.4 12c2.7-3.7 6.1-5.6 9.6-5.6 3.4 0 6.4 1.9 8.7 5.6-2.3 3.7-5.3 5.6-8.7 5.6-3.5 0-6.9-1.9-9.6-5.6Z"/><path d="M20.7 12 23.6 7.8v8.4L20.7 12Z"/><circle cx="8.2" cy="10.6" r=".95" fill="#fff"/></symbol>
+  <symbol id="i-huevo" viewBox="0 0 24 24"><path d="M12 2.2c3.8 0 7 5.6 7 10.2 0 5-3.1 9-7 9s-7-4-7-9c0-4.6 3.2-10.2 7-10.2Z"/></symbol>
+  <symbol id="i-nevera" viewBox="0 0 24 24"><rect x="4.4" y="1.6" width="15.2" height="20.8" rx="2.6"/><path d="M4.4 9h15.2" stroke="#fff" stroke-width="1.5" fill="none"/><path d="M7.6 5v2.6M7.6 11.4v3.4" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></symbol>
+  <symbol id="i-congelador" viewBox="0 0 24 24"><rect x="11" y="1.6" width="2" height="20.8" rx="1"/><rect x="11" y="1.6" width="2" height="20.8" rx="1" transform="rotate(60 12 12)"/><rect x="11" y="1.6" width="2" height="20.8" rx="1" transform="rotate(-60 12 12)"/><circle cx="12" cy="12" r="3.1"/></symbol>
+  <symbol id="i-despensa" viewBox="0 0 24 24"><rect x="2.4" y="3" width="19.2" height="18" rx="2.4"/><path d="M2.4 9.6h19.2M2.4 15.2h19.2M12 3v18" stroke="#fff" stroke-width="1.5" fill="none"/></symbol>
+</defs></svg>
+
+
+<div class="stage">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">F</div>
+      <div>
+        <div class="brand-name">Freezai</div>
+        <div class="brand-sub">Pro · grupos de restaurantes y hoteles</div>
+      </div>
+    </div>
+
+    <div class="moments">
+      <span class="moment" data-m="1">M1 · El turno ya sabe</span>
+      <span class="moment" data-m="2">M2 · Una frase</span>
+      <span class="moment" data-m="3">M3 · IA / Sistema</span>
+      <span class="moment" data-m="4">M4 · Cierra el ciclo</span>
+      <span class="moment" data-m="5">M5 · Al proveedor</span>
+      <span class="moment" data-m="6">M6 · El costo</span>
+    </div>
+
+    <div class="topright">
+      <div class="devsel" id="devsel">
+        <button data-dev="mobile">Móvil</button>
+        <button data-dev="tablet" class="is-on">Tablet</button>
+      </div>
+      <div class="ckpt">VERSIÓN B2B</div>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <div class="device-wrap" id="deviceWrap">
+      <div class="device" id="device">
+        <div class="screen" id="screen">
+
+          <div class="sleep" id="sleep">
+            <div class="sleep-time">6:40</div>
+            <div class="sleep-date">martes, 4 de septiembre</div>
+            <div class="sleep-note">SIN NOTIFICACIONES</div>
+          </div>
+
+          <div class="statusbar">
+            <span id="clock">6:40</span>
+            <span class="sb-right">
+              <span class="sb-bar" style="height:5px"></span>
+              <span class="sb-bar" style="height:7px"></span>
+              <span class="sb-bar" style="height:9px"></span>
+              <span style="margin-left:.35rem">86%</span>
+            </span>
+          </div>
+
+          <div class="app">
+
+            <!-- ===== M1 ===== -->
+            <div class="view" data-view="m1">
+              <div class="app-head">
+                <div class="app-greet rev" data-r="1">Apertura · sede Centro, servicio de almuerzo</div>
+                <h2 class="app-title rev" data-r="1">Qué sacar hoy,<span class="brk"> </span>y en qué plato</h2>
+                <div class="ctx-chips rev" data-r="2">
+                  <span class="chip">312 lotes en 3 cámaras</span>
+                  <span class="chip">sede 1 de 4</span>
+                  <span class="chip n">3 vencen hoy · 7 bajo par</span>
+                </div>
+              </div>
+              <div class="app-cols">
+                <div class="col">
+                  <div class="sec-label rev" data-r="3">La app te indica · FEFO</div>
+                  <div class="cards">
+                    <div class="card rev" data-r="3">
+                      <div class="card-ico"><svg class="gi"><use href="#i-pescado"/></svg></div>
+                      <div><div class="card-t">Merluza fresca</div><div class="card-s">lote L-2291 · 6,4 kg · cámara 2 · $89.60</div><div class="card-a">Sácalo completo hoy: mañana ya es merma</div></div>
+                      <span class="tag hot">vence hoy</span>
+                    </div>
+                    <div class="card rev" data-r="4">
+                      <div class="card-ico"><svg class="gi"><use href="#i-verde"/></svg></div>
+                      <div><div class="card-t">Espinaca</div><div class="card-s">3 cajas · cámara 1 · $48.00</div><div class="card-a">Al menú del día: agotas las 3 cajas</div></div>
+                      <span class="tag hot">2 días</span>
+                    </div>
+                    <div class="card rev" data-r="5">
+                      <div class="card-ico"><svg class="gi"><use href="#i-lacteo"/></svg></div>
+                      <div><div class="card-t">Crema de leche</div><div class="card-s">4 L abiertos el domingo · cámara 3</div><div class="card-a">Envase abierto: consúmelo antes del jueves</div></div>
+                      <span class="tag soon">3 días</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="sec-label rev" data-r="6">Dónde ponerlos en la carta</div>
+                  <div class="recipes">
+                    <div class="rec top rev" data-r="6">
+                      <div><span class="rec-pick">Producir primero</span><div class="rec-t">Merluza a la plancha</div><div class="rec-s">plato 4 · 180 g · saca 3,9 de los 6,4 kg</div></div>
+                      <div class="rec-m">22 porc.</div>
+                    </div>
+                    <div class="rec rev" data-r="7">
+                      <div><div class="rec-t">Merluza en salsa de crema</div><div class="rec-s">carta fija · plato 7 · usa merluza y crema</div></div>
+                      <div class="rec-m">12 porc.</div>
+                    </div>
+                    <div class="rec rev" data-r="8">
+                      <div><div class="rec-t">Crema de espinaca</div><div class="rec-s">menú del día · entrada 2 · agota las 3 cajas</div></div>
+                      <div class="rec-m">30 porc.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ===== M2 ===== -->
+            <div class="view" data-view="m2">
+              <div class="app-head">
+                <div class="app-greet rev" data-q="1">Producción del almuerzo · 80 cubiertos</div>
+                <h2 class="app-title rev" data-q="1">Con un cocinero<span class="brk"> </span>menos</h2>
+              </div>
+              <div class="app-cols">
+                <div class="col">
+                  <div class="sec-label rev" data-q="2">Lo que condiciona el turno</div>
+                  <div class="diners">
+                    <div class="diner rev" data-q="2"><span class="av">R</span><div><div class="dn">Reserva 1:30 p.m.</div><div class="dr alert">mesa de 8 · gluten declarado</div></div></div>
+                    <div class="diner rev" data-q="2"><span class="av">P</span><div><div class="dn">Partida caliente</div><div class="dr">1 cocinero menos</div></div></div>
+                    <div class="diner rev" data-q="2"><span class="av you">C</span><div><div class="dn">Cámara 2</div><div class="dr">merluza vence hoy · 6,4 kg</div></div></div>
+                  </div>
+                  <div class="sec-label rev" data-q="3">Filtro aplicado</div>
+                  <div class="fchips">
+                    <span class="fchip rev" data-q="3">sin gluten</span>
+                    <span class="fchip rev" data-q="3">80 cubiertos</span>
+                    <span class="fchip rev" data-q="3">máx. 2 al fuego</span>
+                    <span class="fchip rev" data-q="3">agotar lote L-2291</span>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="sec-label rev" data-q="4">2 de los 12 platos de la carta entran hoy</div>
+                  <div class="recipes">
+                    <div class="rec2 ok rev" data-q="4">
+                      <div class="rec2-h">
+                        <div><div class="rec-t">Merluza a la plancha</div><div class="rec-s">22 porciones · 3,9 kg</div></div>
+                        <span class="mark ok">✓</span>
+                      </div>
+                      <div class="why">sin gluten · agota el lote que vence hoy</div>
+                    </div>
+                    <div class="rec2 ok rev" data-q="5">
+                      <div class="rec2-h">
+                        <div><div class="rec-t">Crema de espinaca</div><div class="rec-s">30 porciones · 3 cajas</div></div>
+                        <span class="mark ok">✓</span>
+                      </div>
+                      <div class="why">sin gluten · cubre la reserva de la 1:30</div>
+                    </div>
+                    <div class="rec2 no rev" data-q="6" id="blockedCard">
+                      <div class="rec2-h">
+                        <div><div class="rec-t">Merluza en salsa de crema</div><div class="rec-s">12 porciones · 2,2 kg</div></div>
+                        <span class="mark no">✕</span>
+                      </div>
+                      <div class="why bad">bloqueado por la reserva de la 1:30 · lleva harina de trigo</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ===== M3 ===== -->
+            <div class="view" data-view="m3" id="viewM3">
+              <div class="app-head">
+                <div class="app-greet rev" data-s="1">Carta · plato 7 · ficha técnica v3</div>
+                <h2 class="app-title rev" data-s="1">Merluza en salsa<span class="brk"> </span>de crema</h2>
+              </div>
+
+              <div class="banner rev" data-s="1" id="banner">
+                <span class="bmark">✕</span>
+                <div class="btxt"><b>Bloqueado por la reserva de la 1:30</b><span class="bsub">lleva harina de trigo · gluten declarado</span></div>
+              </div>
+
+              <div class="app-cols">
+                <div class="col">
+                  <div class="sec-label rev" data-s="2">Ingredientes por porción</div>
+                  <div class="ings">
+                    <div class="ing rev" data-s="2"><span class="ick ok">✓</span>Merluza fresca<i>180 g · lote L-2291</i></div>
+                    <div class="ing bad rev" data-s="2" id="ingSwap"><span class="ick no" id="ingMark">✕</span><span id="ingName">Harina de trigo</span><i id="ingNote">15 g · gluten declarado</i></div>
+                    <div class="ing rev" data-s="3"><span class="ick ok">✓</span>Crema de leche<i>60 ml · cámara 3</i></div>
+                    <div class="ing rev" data-s="3"><span class="ick ok">✓</span>Mantequilla<i>20 g · cámara 3</i></div>
+                  </div>
+                </div>
+
+                <div class="col">
+                  <div class="sec-label rev" data-s="4">Sugerencia</div>
+                  <div class="propose rev" data-s="4" id="propose">
+                    <div class="ptag" id="ptag">IA · propuesta</div>
+                    <div class="ptitle">Cambiar harina de trigo por almidón de maíz</div>
+                    <div class="pwhy">Hay 4 kg en despensa, sin abrir. El plato sube $0.18 por porción: el costo de alimentos pasa de 31,2% a 31,4%.</div>
+                    <div class="pacts">
+                      <button class="pbtn primary" id="btnAccept">Aceptar cambio</button>
+                      <button class="pbtn">Ver otra opción</button>
+                    </div>
+                  </div>
+                  <div class="cookbar rev" data-s="6">
+                    <button class="cookbtn" id="btnCook">Cerrar producción</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ===== M4 ===== -->
+            <div class="view" data-view="m4">
+              <div class="app-head">
+                <div class="app-greet rev" data-t="1">Cierre del servicio · 2:40 p.m.</div>
+                <h2 class="app-title rev" data-t="1">Se sirvieron<span class="brk"> </span>78 cubiertos</h2>
+              </div>
+              <div class="app-cols">
+                <div class="col">
+                  <div class="sec-label rev" data-t="2">Descontado por ficha técnica</div>
+                  <div class="deltas">
+                    <div class="dl rev" data-t="2"><span class="ico"><svg class="gi"><use href="#i-pescado"/></svg></span>Merluza fresca<span class="qty"><s>6,4 kg</s> → <b class="out">0</b></span></div>
+                    <div class="dl rev" data-t="3"><span class="ico"><svg class="gi"><use href="#i-verde"/></svg></span>Espinaca<span class="qty"><s>3 cajas</s> → <b class="out">0</b></span></div>
+                    <div class="dl rev" data-t="3"><span class="ico"><svg class="gi"><use href="#i-lacteo"/></svg></span>Crema de leche<span class="qty"><s>4 L</s> → <b>1,3 L</b></span></div>
+                    <div class="dl rev" data-t="4"><span class="ico"><svg class="gi"><use href="#i-grano"/></svg></span>Almidón de maíz<span class="qty"><s>4 kg</s> → <b>3,9 kg</b></span></div>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="sec-label rev" data-t="5">Merma del turno · motivo y responsable</div>
+                  <div class="adds">
+                    <div class="add rev" data-t="5">Recortes de merluza <i>1,4 kg · $19.60</i></div>
+                    <div class="add rev" data-t="5">Plato devuelto <i>0,4 kg · $5.60</i></div>
+                    <div class="add rev" data-t="5">Caducado en cámara <i>0,3 kg · $4.10</i></div>
+                  </div>
+                  <div class="stkline rev" data-t="5"><span>4 insumos quedaron bajo el par</span> <i>cobertura 0,7 servicios</i></div>
+                  <div class="onhand rev" data-t="6" id="onhand">
+                    <div class="onhand-h"><span>En cámara 3 ahora</span><button>Actualizar</button></div>
+                    <div class="onhandrow">Crema de leche<em>1,3 L</em></div>
+                    <div class="onhandrow">Mantequilla<em>2,4 kg</em></div>
+                    <div class="onhandrow">Almidón de maíz<em>3,9 kg</em></div>
+                    <div class="onhand-note">Cámbialas cuando quieras: <b>la cantidad que registras es la buena</b>, queda firmada con hora y todo se recalcula desde ahí.</div>
+                  </div>
+                  <div class="closer rev" data-t="7">
+                    <div class="closer-n">$89.60</div>
+                    <div class="closer-t">del lote que vencía hoy, servido completo</div>
+                    <div class="closer-w">Merma del turno $29.30, toda con motivo y responsable</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ===== M5 ===== -->
+            <div class="view" data-view="m5" id="viewM5">
+              <div class="app-head">
+                <div class="app-greet rev" data-u="1">Orden viva · 5 insumos, 3 proveedores</div>
+                <h2 class="app-title rev" data-u="1">Lo que falta<span class="brk"> </span>para mañana</h2>
+              </div>
+              <div class="app-cols">
+                <div class="col">
+                  <div class="sec-label rev" data-u="2">Una orden por proveedor</div>
+                  <div class="rev" data-u="2">
+                    <div class="aisle">Pescadería del Puerto</div>
+                    <div class="litem">Merluza fresca <span class="lq">8 kg</span><span class="lr">par 8 kg · quedó en 0 · corte 4 p.m., entrega 6 a.m.</span></div>
+                  </div>
+                  <div class="rev" data-u="3">
+                    <div class="aisle">Verduras La Ceja</div>
+                    <div class="litem">Espinaca <span class="lq">4 cajas</span><span class="lr">se agotó hoy · entrega diaria</span></div>
+                    <div class="litem">Cebolla <span class="lq">10 kg</span><span class="lr">par 12 kg · quedan 2 kg</span></div>
+                  </div>
+                  <div class="rev" data-u="4">
+                    <div class="aisle">Distribuidora Central</div>
+                    <div class="litem">Crema de leche <span class="lq">6 L</span><span class="lr">par 7 L · quedan 1,3 L, medio servicio · pedido semanal</span></div>
+                    <div class="litem">Almidón de maíz <span class="lq">2 kg</span><span class="lr star">★ sube a 3 kg y se alcanza el mínimo del proveedor</span></div>
+                  </div>
+                  <div class="total rev" data-u="4"><span>Total · último precio de cada proveedor</span><b>$211.80</b></div>
+                </div>
+
+                <div class="col">
+                  <div class="sec-label rev" data-u="5">Cómo sale la orden</div>
+                  <div class="chans">
+                    <button class="chan primary rev" data-u="5" id="btnChannel"><b>Enviar orden de compra</b><span>3 proveedores · entrega 6:00 a.m.</span></button>
+                    <button class="chan rev" data-u="5"><b>Enviar por mensaje al proveedor</b><span>en la unidad de compra que él factura</span></button>
+                    <button class="chan rev" data-u="5"><b>Exportar al ERP</b><span>en el formato que ya usan</span></button>
+                  </div>
+                  <div class="disclose rev" data-u="6">
+                    <b>Freezai Pro se cobra por sede, no por pedido.</b> No hay comisión de proveedor: la orden es tuya y el precio que negociaste no cambia.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ===== M6 ===== -->
+            <div class="view" data-view="m6">
+              <div class="app-head">
+                <div class="app-greet rev" data-v="1">Miércoles 6:10 a.m. · recepción</div>
+                <h2 class="app-title rev" data-v="1">Todo entró<span class="brk"> </span>con su lote</h2>
+              </div>
+
+              <div class="banner info rev" data-v="2">
+                <span class="bmark">↻</span>
+                <div class="btxt"><b>El proveedor cambió 1 línea</b><span class="bsub">otra marca y $0.40 más cara por litro · ya está aplicado</span></div>
+              </div>
+
+              <div class="app-cols">
+                <div class="col">
+                  <div class="sec-label rev" data-v="3">Entraron 5 lotes</div>
+                  <div class="inb">
+                    <div class="inrow sub rev" data-v="3"><span class="ico"><svg class="gi"><use href="#i-pescado"/></svg></span>Merluza fresca<span class="meta">L-2317 · cámara 2 · 3 días</span><span class="subtag">recibida a 3 °C · dentro de rango · firmado 6:12 a.m.</span></div>
+                    <div class="inrow rev" data-v="3"><span class="ico"><svg class="gi"><use href="#i-verde"/></svg></span>Espinaca<span class="meta">cámara 1 · 4 días</span></div>
+                    <div class="inrow sub rev" data-v="4"><span class="ico"><svg class="gi"><use href="#i-lacteo"/></svg></span>Crema de leche<span class="meta">cámara 3 · 12 días</span><span class="subtag">línea cambiada por el proveedor · 6 L, otra marca · +$2.40 en la línea</span></div>
+                    <div class="inrow rev" data-v="4"><span class="ico"><svg class="gi"><use href="#i-bulbo"/></svg></span>Cebolla<span class="meta">despensa · 3 semanas</span></div>
+                    <div class="inrow rev" data-v="4"><span class="ico"><svg class="gi"><use href="#i-grano"/></svg></span>Almidón de maíz<span class="meta">despensa · 1 año</span></div>
+                  </div>
+                </div>
+
+                <div class="col">
+                  <div class="sec-label rev" data-v="5">Ayer · sede Centro</div>
+                  <div class="money rev" data-v="5" id="money">
+                    <div class="mrow"><span>Recaudado en el día</span><b class="good">$4,182.50</b></div>
+                    <div class="mrow"><span>Ahorrado usando en fresco</span><b class="good">$186.40</b></div>
+                    <div class="mrow"><span>Perdido por caducidad</span><b class="bad">$41.90</b></div>
+                    <div class="bar"><i></i></div>
+                    <div class="mnote">El mismo miércoles de hace un mes se perdieron $118.70: <b>$76.80 más.</b></div>
+                  </div>
+                  <div class="disclose rev" data-v="6">
+                    <b>Grupo · 4 sedes.</b> Merma del mes: Centro $1,240.60 · Norte $1,610.20 · Aeropuerto $1,884.50 · Sur $1,395.80. HACCP 31/31.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="zero loopstats" id="zero">
+            <div class="loop-h">El plan del turno</div>
+            <div class="lrow"><b>3</b><span>lotes que hay que sacar en este servicio</span></div>
+            <div class="lrow"><b>$152.80</b><span>en riesgo si no salen hoy</span></div>
+            <div class="lrow"><b>1</b><span>plato para producir primero</span></div>
+            <div class="loopflow">MARTES, 6:40 A.M. · APERTURA, SEDE CENTRO</div>
+          </div>
+
+          <div class="zero loopstats" id="loop">
+            <div class="pnl" id="pnl">
+              <div class="pnl-h">El día de la sede, en dinero</div>
+
+              <div>
+                <div class="pbar-l"><span>Recaudado en el día</span><b>$4,182.50</b></div>
+                <div class="pbar sale" style="--w:100%"><i></i></div>
+              </div>
+
+              <div>
+                <div class="pbar-l"><span>Insumos consumidos · 29,3% de la venta</span><b>$1,225.50</b></div>
+                <div class="pbar cost" style="--w:29.3%"><i></i></div>
+              </div>
+
+              <div>
+                <div class="pbar-l"><span>Desperdiciado · 1,0% de la venta</span><b class="bad">$41.90</b></div>
+                <div class="pbar waste" style="--w:1%"><i></i></div>
+              </div>
+
+              <div class="pnl-foot">
+                <div class="pfrow"><span>Margen sobre insumos</span><b class="good">$2,957.00</b></div>
+                <div class="pfrow"><span>Ahorrado hoy por servir el lote en fresco</span><b class="good">$186.40</b></div>
+                <div class="pfrow"><span>Costo de alimentos · mes anterior 31,4%</span><b>29,3%</b></div>
+              </div>
+
+              <div class="pnl-note">Este mismo miércoles hace un mes se desperdiciaron $118.70; hoy, $41.90. <b>En el mes van $727.70 ahorrados</b> por sacar cada lote antes de que venciera.</div>
+            </div>
+          </div>
+
+          <div class="zero loopstats" id="inv">
+            <div class="loop-h">El inventario de la sede, vivo</div>
+            <div class="invgrid">
+              <div class="invcell">
+                <div class="invico"><svg class="gi"><use href="#i-nevera"/></svg><span class="invbadge">128</span></div>
+                <div class="invname">Cámaras 1 y 2</div>
+                <div class="invsub">frío · 3 en sus últimas horas</div>
+              </div>
+              <div class="invcell">
+                <div class="invico"><svg class="gi"><use href="#i-congelador"/></svg><span class="invbadge">74</span></div>
+                <div class="invname">Cámara 3</div>
+                <div class="invsub">congelación · con fecha de congelado</div>
+              </div>
+              <div class="invcell">
+                <div class="invico"><svg class="gi"><use href="#i-despensa"/></svg><span class="invbadge">110</span></div>
+                <div class="invname">Seco y despensa</div>
+                <div class="invsub">rotación semanal</div>
+              </div>
+            </div>
+            <div class="invmanage">
+              <div class="imcell"><b>3</b><span>vencen hoy<br>ya tienen plato asignado</span></div>
+              <div class="imcell"><b>7</b><span>bajo el par<br>ya están en la orden</span></div>
+              <div class="imcell"><b>1,8</b><span>días de cobertura<br>al ritmo de esta semana</span></div>
+            </div>
+            <div class="loopflow">312 LOTES · CADUCIDAD Y CÁMARA EN CADA UNO</div>
+          </div>
+
+          <div class="zero loopstats recipecard" id="recipe">
+            <div class="rc-head">
+              <div class="rc-t">Merluza en salsa de crema</div>
+              <div class="rc-meta"><span>FICHA TÉCNICA V4</span><span>1 PORCIÓN</span><span>PASE 12 MIN</span><span>SIN GLUTEN</span></div>
+            </div>
+            <div class="rc-body">
+              <div class="rc-block">
+                <div class="rc-sub">Escandallo por porción</div>
+                <div class="itrow"><span>Merluza fresca <span class="tag hot">lote L-2291</span></span><em>180 g</em></div>
+                <div class="itrow"><span>Almidón de maíz <span class="tag swap">cambiado</span></span><em>15 g</em></div>
+                <div class="itrow"><span>Crema de leche</span><em>60 ml</em></div>
+                <div class="itrow"><span>Mantequilla</span><em>20 g</em></div>
+                <div class="itrow"><span>Espinaca</span><em>40 g</em></div>
+              </div>
+              <div class="rc-block">
+                <div class="rc-sub">Elaboración</div>
+                <ol class="rc-steps">
+                  <li><span>Porciona la merluza del lote L-2291 y sécala.</span><em>2 min</em></li>
+                  <li><span>Pásala por almidón de maíz, sin excedente.</span><em>1 min</em></li>
+                  <li><span>Sella a la plancha, dos minutos por lado.</span><em>4 min</em></li>
+                  <li><span>Reduce la crema con la mantequilla hasta napar.</span><em>3 min</em></li>
+                  <li><span>Saltea la espinaca y monta el plato.</span><em>2 min</em></li>
+                </ol>
+                <div class="rc-ccp"><span>NÚCLEO 63 °C</span><span>SALSA EN MESA CALIENTE ≥ 65 °C</span><span>ALÉRGENOS: LÁCTEOS, PESCADO</span></div>
+              </div>
+            </div>
+            <div class="rc-foot">
+              <div class="rc-note">Estas cantidades son <b>las que se descuentan por cubierto</b> al cerrar la producción.</div>
+              <button class="cookbtn" id="btnCookR">Cerrar producción</button>
+            </div>
+          </div>
+
+          <div class="zero loopstats invdetail" id="invdet">
+            <div class="loop-h">Qué hay en cada cámara, y cuánto</div>
+            <div class="zonegrid">
+
+              <div class="zone">
+                <div class="zone-h">
+                  <svg class="gi"><use href="#i-nevera"/></svg>
+                  <div class="zone-t">Cámaras 1 y 2<i>frío · 3 en sus últimas horas</i></div>
+                  <div class="zone-n">128</div>
+                </div>
+                <div class="itrow"><span>Merluza fresca · L-2291 <span class="tag hot">vence hoy</span></span><em>6,4 kg</em></div>
+                <div class="itrow"><span>Espinaca · L-2288 <span class="tag hot">2 días</span></span><em>3 cajas · 12 kg</em></div>
+                <div class="itrow"><span>Pechuga de pollo · L-2304</span><em>18 kg</em></div>
+                <div class="itrow"><span>Lomo de res · L-2299</span><em>14 kg</em></div>
+                <div class="itrow"><span>Tomate <span class="tag soon">bajo el par</span></span><em>9 kg</em></div>
+                <div class="zone-f">+ 123 LOTES MÁS</div>
+              </div>
+
+              <div class="zone">
+                <div class="zone-h">
+                  <svg class="gi"><use href="#i-congelador"/></svg>
+                  <div class="zone-t">Cámara 3<i>congelado y lácteos</i></div>
+                  <div class="zone-n">74</div>
+                </div>
+                <div class="itrow"><span>Crema de leche <span class="tag soon">abierta</span></span><em>4 L</em></div>
+                <div class="itrow"><span>Mantequilla</span><em>2,4 kg</em></div>
+                <div class="itrow"><span>Camarón congelado · L-2201</span><em>9 kg</em></div>
+                <div class="itrow"><span>Papa prefrita</span><em>20 kg</em></div>
+                <div class="itrow"><span>Fondo de pescado</span><em>6 L</em></div>
+                <div class="zone-f">+ 69 LOTES MÁS</div>
+              </div>
+
+              <div class="zone">
+                <div class="zone-h">
+                  <svg class="gi"><use href="#i-despensa"/></svg>
+                  <div class="zone-t">Seco y despensa<i>rotación semanal</i></div>
+                  <div class="zone-n">110</div>
+                </div>
+                <div class="itrow"><span>Arroz</span><em>45 kg</em></div>
+                <div class="itrow"><span>Harina</span><em>25 kg</em></div>
+                <div class="itrow"><span>Aceite de oliva <span class="tag soon">bajo el par</span></span><em>18 L</em></div>
+                <div class="itrow"><span>Almidón de maíz</span><em>4 kg</em></div>
+                <div class="itrow"><span>Sal gruesa</span><em>12 kg</em></div>
+                <div class="zone-f">+ 105 LOTES MÁS</div>
+              </div>
+
+            </div>
+            <div class="loopflow">CADA LOTE CON SU CANTIDAD Y SU CÁMARA · SIN CONTEO A MANO</div>
+          </div>
+
+          <div class="voice" id="voice">
+            <div class="wave" id="wave"></div>
+            <div class="mic-label">Escuchando</div>
+            <div class="transcript" id="transcript"></div>
+          </div>
+
+          <div class="tapdot" id="tapdot"></div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== RAIL ===== -->
+    <div class="rail">
+
+      <div class="rail-h">Motor del producto</div>
+      <div class="pipe">
+        <div class="node" data-n="ctx"><div class="dot">1</div><div><div class="node-l">Contexto</div><div class="node-n">lo que ya sabe</div></div></div>
+        <div class="node" data-n="voz"><div class="dot">2</div><div><div class="node-l">Habla</div><div class="node-n">intención en una frase</div></div></div>
+        <div class="node" data-n="ia"><div class="dot">3</div><div><div class="node-l">Entiende</div><div class="node-n">IA interpreta y propone</div></div></div>
+        <div class="node is-sys" data-n="dec"><div class="dot">4</div><div><div class="node-l">Decide</div><div class="node-n">sistema determinista</div></div></div>
+        <div class="node is-sys" data-n="exe"><div class="dot">5</div><div><div class="node-l">Ejecuta</div><div class="node-n">acción real</div></div></div>
+        <div class="node is-tap" data-n="cfm"><div class="dot">6</div><div><div class="node-l">Confirma</div><div class="node-n">la persona toca</div></div></div>
+      </div>
+
+      <div class="rail-h">Traza</div>
+      <div class="legend">
+        <span><i class="lg ctx"></i>Contexto</span>
+        <span><i class="lg ia"></i>IA</span>
+        <span><i class="lg tap"></i>Toque</span>
+        <span><i class="lg sys"></i>Sistema</span>
+      </div>
+
+      <div class="log" id="log">
+        <div class="li k-ctx" data-l="1"><div class="li-k">Contexto</div><div class="li-v">Hora local · <em>martes 6:40 a.m., apertura del turno</em></div></div>
+        <div class="li k-ctx" data-l="2"><div class="li-k">Contexto</div><div class="li-v">Inventario · <em>312 lotes en 3 cámaras, con par por insumo · sede Centro, 1 de 4</em></div></div>
+        <div class="li k-ctx" data-l="3"><div class="li-k">Contexto</div><div class="li-v">Bitácora de anoche · <em>3 cámaras, 0 excursiones de temperatura</em></div></div>
+        <div class="li k-ctx" data-l="4"><div class="li-k">Contexto</div><div class="li-v">Carta del día · <em>12 platos con ficha técnica y mezcla de venta</em></div></div>
+        <div class="li k-sys" data-l="5"><div class="li-k">Sistema</div><div class="li-v">FEFO ordena 312 lotes por caducidad real</div></div>
+        <div class="li k-sys" data-l="6"><div class="li-k">Sistema</div><div class="li-v">3 lotes en sus últimas horas · <mark>$152.80 en riesgo</mark> · propone acción para cada uno</div></div>
+        <div class="li k-sys" data-l="7"><div class="li-k">Sistema</div><div class="li-v">5 platos de la carta consumen esos 3 lotes · <ins>1 a producir primero</ins></div></div>
+
+        <div class="li k-ai" data-l="8"><div class="li-k">IA</div><div class="li-v">Transcribe el audio · <em>1 frase, 12 palabras</em></div></div>
+        <div class="li k-ai" data-l="9"><div class="li-k">IA</div><div class="li-v">Extrae la intención<div class="intent">
+          <span class="ic" data-i="1">servicio = almuerzo</span>
+          <span class="ic" data-i="2">cubiertos = 80</span>
+          <span class="ic" data-i="3">dotación = −1 cocinero</span>
+          <span class="ic" data-i="4">usar = lo que vence</span>
+        </div></div></div>
+        <div class="li k-ctx" data-l="10"><div class="li-k">Contexto</div><div class="li-v">Reserva 1:30 p.m. · <em>gluten declarado en la reserva, no inferido</em></div></div>
+        <div class="li k-ctx" data-l="11"><div class="li-k">Contexto</div><div class="li-v">Dotación · <em>partida caliente con 1 cocinero menos</em></div></div>
+        <div class="li k-sys" data-l="12"><div class="li-k">Sistema</div><div class="li-v">Ficha técnica × 80 cubiertos con la mezcla de venta</div></div>
+        <div class="li k-sys" data-l="13"><div class="li-k">Sistema</div><div class="li-v">Filtro duro sobre 12 platos → 2 entran hoy</div></div>
+        <div class="li k-sys" data-l="14"><div class="li-k">Sistema</div><div class="li-v">1 plato bloqueado · <mark>harina de trigo → reserva celíaca</mark></div></div>
+
+        <div class="li k-tap" data-l="15"><div class="li-k">Toque</div><div class="li-v">Abre el plato bloqueado</div></div>
+        <div class="li k-sys" data-l="16"><div class="li-k">Sistema</div><div class="li-v">Bloqueo activo · nombra el ingrediente y la reserva afectada</div></div>
+        <div class="li k-ai"  data-l="17"><div class="li-k">IA</div><div class="li-v">Propone sustitución · <em>harina de trigo → almidón de maíz</em></div></div>
+        <div class="li k-ctx" data-l="18"><div class="li-k">Contexto</div><div class="li-v">Almidón de maíz · <em>4 kg en despensa, sin abrir</em></div></div>
+        <div class="li k-tap" data-l="19"><div class="li-k">Toque</div><div class="li-v">La chef acepta el cambio</div></div>
+        <div class="li k-sys" data-l="20"><div class="li-k">Sistema</div><div class="li-v">Recalcula ficha y costo · <ins>apto · 31,2% → 31,4%</ins> · firmado 6:52 a.m.</div></div>
+
+        <div class="li k-tap" data-l="21"><div class="li-k">Toque</div><div class="li-v">"Cerrar producción"</div></div>
+        <div class="li k-sys" data-l="22"><div class="li-k">Sistema</div><div class="li-v">Descuenta 9 insumos por ficha técnica · 78 cubiertos servidos</div></div>
+        <div class="li k-sys" data-l="23"><div class="li-k">Sistema</div><div class="li-v">Merma 2,1 kg · $29.30 con responsable · <ins>4 insumos bajo el par</ins></div></div>
+        <div class="li k-sys" data-l="24"><div class="li-k">Sistema</div><div class="li-v">Existencias a la vista · <em>editables, el dato de la persona manda</em></div></div>
+        <div class="li k-sys" data-l="25"><div class="li-k">Sistema</div><div class="li-v">Lote L-2291 agotado antes de vencer · <ins>$89.60 no se botaron</ins></div></div>
+
+        <div class="li k-ai"  data-l="26"><div class="li-k">IA</div><div class="li-v">Transcribe · <em>"pide lo que falta para mañana"</em></div></div>
+        <div class="li k-ai"  data-l="27"><div class="li-k">IA</div><div class="li-v">Intención = reponer · <em>alcance: servicio de mañana</em></div></div>
+        <div class="li k-sys" data-l="28"><div class="li-k">Sistema</div><div class="li-v">Orden viva · 2 agotados + 3 bajo el par, calculada sobre consumo medido</div></div>
+        <div class="li k-sys" data-l="29"><div class="li-k">Sistema</div><div class="li-v">Agrupa por proveedor · 3 proveedores, 2 calendarios de entrega</div></div>
+        <div class="li k-sys" data-l="30"><div class="li-k">Sistema</div><div class="li-v">Unidad de compra y último precio de cada proveedor · avisa el mínimo</div></div>
+        <div class="li k-tap" data-l="31"><div class="li-k">Toque</div><div class="li-v">La chef envía la orden</div></div>
+        <div class="li k-sys" data-l="32"><div class="li-k">Sistema</div><div class="li-v">5 líneas con cantidad, unidad y fecha · <ins>orden de compra armada</ins></div></div>
+        <div class="li k-sys" data-l="33"><div class="li-k">Sistema</div><div class="li-v">Sin comisión de proveedor · el precio negociado no cambia</div></div>
+
+        <div class="li k-ctx" data-l="34"><div class="li-k">Contexto</div><div class="li-v">Recepción · <em>miércoles 6:10 a.m., factura del proveedor</em></div></div>
+        <div class="li k-ai"  data-l="35"><div class="li-k">IA</div><div class="li-v">Lee la factura · <em>5 líneas</em></div></div>
+        <div class="li k-ai"  data-l="36"><div class="li-k">IA</div><div class="li-v">Detecta 1 línea cambiada y <mark>1 alza de $0.40 por litro</mark></div></div>
+        <div class="li k-sys" data-l="37"><div class="li-k">Sistema</div><div class="li-v">Da de alta 5 lotes con cámara, caducidad y temperatura de recepción</div></div>
+        <div class="li k-sys" data-l="38"><div class="li-k">Sistema</div><div class="li-v">Inventario · <ins>312 → 317 lotes</ins></div></div>
+        <div class="li k-sys" data-l="39"><div class="li-k">Sistema</div><div class="li-v">Sede Centro · recaudado $4,182.50 · perdido por caducidad $41.90</div></div>
+        <div class="li k-sys" data-l="40"><div class="li-k">Sistema</div><div class="li-v">Grupo · <ins>4 sedes consolidadas</ins> · merma <ins>$727.70 menos</ins> · HACCP 31/31</div></div>
+      </div>
+
+      <div class="swap">
+        <div class="truth" id="truth">
+          <b>El sistema decide la verdad.</b> La <i>IA interpreta</i> lo que se dice.
+          Lotes, caducidades, alérgenos, temperaturas y dinero nunca son una inferencia,
+          y cada movimiento queda con responsable y hora.
+        </div>
+
+        <div class="filters" id="filters">
+          <div class="filters-h"><span id="filtersCount">8 campos · 5 pantallas</span>Sin voz, esto sería así</div>
+          <div class="ff" data-f="1">Sede <i>Centro ▾</i></div>
+          <div class="ff" data-f="2">Servicio <i>Almuerzo ▾</i></div>
+          <div class="ff" data-f="3">Cubiertos previstos <i>80 ▾</i></div>
+          <div class="ff" data-f="4">Mezcla de venta <i>Últimos 30 días ▾</i></div>
+          <div class="ff" data-f="5">Excluir alérgeno <i>Gluten ▾</i></div>
+          <div class="ff" data-f="6">Cámara <i>Todas ▾</i></div>
+          <div class="ff" data-f="7">Dotación <i>−1 cocinero ▾</i></div>
+          <div class="ff" data-f="8">Ordenar por <i>Caducidad ▾</i></div>
+          <div class="ff-result">“¿Qué saco para el almuerzo? Vienen 80 cubiertos y me falta un cocinero.”<small>1 FRASE · 4 SEGUNDOS · 0 CAMPOS</small></div>
+        </div>
+
+        <div class="bound" id="bound">
+          <div class="bound-h">Quién hace qué en un alérgeno declarado</div>
+          <div class="brow ia"  data-b="1"><b>IA</b><span>Propone una salida y dice qué le hace al costo. No la aplica.</span></div>
+          <div class="brow tap" data-b="2"><b>Chef</b><span>Acepta o rechaza con un toque. Su nombre queda en el registro.</span></div>
+          <div class="brow sys" data-b="3"><b>Sistema</b><span>Recalcula la restricción, la ficha y el costo, y levanta el bloqueo. Solo él puede.</span></div>
+        </div>
+
+        <div class="bound" id="stock">
+          <div class="bound-h">Cómo se mantiene el inventario solo</div>
+          <div class="brow ia"  data-e="1"><b>Entra</b><span>La factura de recepción ingresa lote, cámara, caducidad y temperatura firmada.</span></div>
+          <div class="brow tap" data-e="2"><b>Sale</b><span>El cierre descuenta por ficha técnica sobre los cubiertos reales del servicio.</span></div>
+          <div class="brow sys" data-e="3"><b>Repone</b><span>Cada insumo tiene un par y un consumo medido. Al bajar del par, entra solo a la orden de su proveedor.</span></div>
+          <div class="brow tap" data-e="4"><b>Corrige</b><span>Las cantidades se pueden cambiar en cualquier momento. La que registra la cocina es la buena, firmada con hora.</span></div>
+        </div>
+
+        <div class="bound" id="biz">
+          <div class="bound-h">De dónde sale el ingreso</div>
+          <div class="brow ia"  data-c="1"><b>Sede</b><span>Suscripción mensual por sede. Se paga con una fracción de la merma evitada.</span></div>
+          <div class="brow tap" data-c="2"><b>Implantación</b><span>Fichas técnicas y diccionario de insumos, cargados una vez. Ahí está el foso.</span></div>
+          <div class="brow sys" data-c="3"><b>Freezai</b><span>Sin comisión de proveedor: el cliente no tiene por qué sospechar del precio que ve.</span></div>
+        </div>
+        <div class="bound" id="next">
+          <div class="bound-h">Lo que sigue · integraciones</div>
+          <div class="brow sys" data-d="1"><b>Hoy</b><span>Orden por mensaje al proveedor y exportación al ERP, en el formato que ya usan. No depende del permiso de nadie.</span></div>
+          <div class="brow tap" data-d="2"><b>v2</b><span>Rappi y Uber Eats por el lado de la oferta, que es donde sí hay API: los pedidos de domicilio entran solos al pronóstico y al inventario.</span></div>
+          <div class="brow ia"  data-d="3"><b>Después</b><span>Punto de venta y compras del grupo: una sola ficha técnica y un solo costo para las cuatro sedes.</span></div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <div class="timeline" id="timeline"></div>
+  <div class="footer">
+    <div class="beatbar"><i id="beatbar"></i></div>
+    <div class="narrate">
+      <div class="caption" id="caption"></div>
+      <div class="transport">
+        <button class="btn primary" id="btnPlay">▶ Reproducir</button>
+        <button class="btn" id="btnNext">Siguiente ›</button>
+        <button class="btn" id="btnRestart">↻ Reiniciar</button>
+        <button class="btn toggle" id="btnLoop">⟳ Bucle</button>
+        <button class="btn" id="btnFull">⛶ Pantalla</button>
+        <span class="clock-el" id="elapsed">0:00 / 3:00</span>
+        <span class="hint">espacio · ← → · R · L · F · M/T</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  const $  = s => document.querySelector(s);
+  const $$ = s => Array.from(document.querySelectorAll(s));
+
+  const deviceWrap = $('#deviceWrap');
+  const device     = $('#device');
+  const screenEl   = $('#screen');
+  const sleep      = $('#sleep');
+  const zero       = $('#zero');
+  const loop       = $('#loop');
+  const inv        = $('#inv');
+  const invdet     = $('#invdet');
+  const recipe     = $('#recipe');
+  const voice      = $('#voice');
+  const wave       = $('#wave');
+  const transcript = $('#transcript');
+  const caption    = $('#caption');
+  const beatbar    = $('#beatbar');
+  const log        = $('#log');
+  const truth      = $('#truth');
+  const filters    = $('#filters');
+  const bound      = $('#bound');
+  const biz        = $('#biz');
+  const stockp     = $('#stock');
+  const nextp      = $('#next');
+  const tapdot     = $('#tapdot');
+  const clock      = $('#clock');
+  const timelineEl = $('#timeline');
+  const elapsedEl  = $('#elapsed');
+  const viewM3     = $('#viewM3');
+  const viewM5     = $('#viewM5');
+  const m3Html     = viewM3.innerHTML;   // pristine copies, restored on restart
+  const m5Html     = viewM5.innerHTML;
+
+  for (let i=0;i<28;i++){
+    const b = document.createElement('i');
+    b.style.animationDelay = (i*0.055).toFixed(2)+'s';
+    b.style.animationDuration = (0.75 + (i%5)*0.11).toFixed(2)+'s';
+    wave.appendChild(b);
+  }
+
+  /* ---------- device fit ---------- */
+  function fitDevice(){
+    device.style.transform = 'none';
+    const availW = deviceWrap.clientWidth  - 16;
+    const availH = deviceWrap.clientHeight - 16;
+    const w = device.offsetWidth, h = device.offsetHeight;
+    if (!w || !h || availW <= 0 || availH <= 0) return;
+    const k  = Math.min(1.35, availW/w, availH/h);
+    const dy = Math.max(0, (deviceWrap.clientHeight - h*k) / 2);   // the grid cannot centre it, so we do
+    device.style.transform = 'translateY(' + dy.toFixed(1) + 'px) scale(' + k.toFixed(4) + ')';
+  }
+  window.addEventListener('resize', refit);
+  /* the wrapper's height settles late — web fonts land, the top bar rewraps, the footer
+     grows a caption line — so re-fit whenever it actually changes instead of guessing */
+  function refit(){ fitDevice(); syncLog(); }
+  if (window.ResizeObserver) new ResizeObserver(refit).observe(deviceWrap);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(refit);
+
+  /* ---------- scene helpers ---------- */
+  function revealUpTo(attr, n){
+    $$('['+attr+']').forEach(el => el.classList.toggle('is-in', +el.getAttribute(attr) <= n));
+  }
+  function setView(name){ $$('.view').forEach(v => v.classList.toggle('is-on', v.dataset.view === name)); }
+  function node(name, state){
+    const el = document.querySelector('.node[data-n="'+name+'"]');
+    if (!el) return;
+    el.classList.remove('is-on','is-skip');
+    if (state) el.classList.add(state);
+  }
+  function allNodesOn(){ $$('.node').forEach(el => { el.classList.remove('is-skip'); el.classList.add('is-on'); }); }
+  function clearNodes(){ $$('.node').forEach(el => el.classList.remove('is-on','is-skip')); }
+  function setMoment(n){
+    $$('.moment').forEach(el=>{
+      const m = +el.dataset.m;
+      el.classList.toggle('is-active', m === n);
+      el.classList.toggle('is-done', n !== null && m < n);
+    });
+  }
+
+  /* touch indicator, anchored to a real element and corrected for the device scale */
+  function tapOn(selector){
+    const el = document.querySelector(selector);
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const s = screenEl.getBoundingClientRect();
+    const scale = s.width / (screenEl.offsetWidth || 1);
+    if (!r.width) return;
+    tapdot.style.left = ((r.left + r.width/2  - s.left) / scale) + 'px';
+    tapdot.style.top  = ((r.top  + r.height/2 - s.top ) / scale) + 'px';
+    tapdot.classList.remove('go'); void tapdot.offsetWidth; tapdot.classList.add('go');
+    el.classList.add('is-pressed');
+    later(()=> el.classList.remove('is-pressed'), 260);
+  }
+
+  /* deferred scene actions: cancelled on beat change, flushed on pause
+     (pausing must leave a COMPLETE frame, never a half-revealed one) */
+  let pending = [];
+  function later(fn, ms){
+    const id = setTimeout(()=>{ pending = pending.filter(p => p.id !== id); fn(); }, ms);
+    pending.push({ id, fn });
+  }
+  function killPending(){ pending.forEach(p => clearTimeout(p.id)); pending = []; }
+  function flushPending(){ const q = pending; pending = []; q.forEach(p => { clearTimeout(p.id); p.fn(); }); }
+
+  /* maxStep sets the cadence: captions land fast so the room can read ahead (90ms), the
+     voice transcript is slowed down (260ms) so it reads like someone actually talking. */
+  function speak(el, text, span, maxStep){
+    el.innerHTML = '';
+    if (!text) return;
+    /* the caption can carry <b> across several words, so the words get wrapped INSIDE the
+       markup instead of splitting the raw string: splitting it left the tag open on the first
+       word and dangling on the rest, and only the first word came out highlighted */
+    const src = document.createElement('div');
+    src.innerHTML = text;
+    (function wrap(from, to){
+      Array.from(from.childNodes).forEach(n => {
+        if (n.nodeType === 3){
+          n.textContent.split(/(\s+)/).forEach(part => {
+            if (!part) return;
+            if (/^\s+$/.test(part)){ to.appendChild(document.createTextNode(' ')); return; }
+            const s = document.createElement('span');
+            s.className = 'w';
+            s.textContent = part;
+            to.appendChild(s);
+          });
+        } else {
+          const copy = n.cloneNode(false);
+          to.appendChild(copy);
+          wrap(n, copy);
+        }
+      });
+    })(src, el);
+    const words = el.querySelectorAll('.w');
+    const step = Math.max(28, Math.min(maxStep || 90, (span*0.55)/words.length));
+    words.forEach((s,i)=> later(()=> s.classList.add('is-in'), 120 + i*step));
+  }
+
+  /* the newest revealed trace line has to stay in view, and stay there when the rail is
+     later resized (web fonts landing, fullscreen, a device switch) */
+  let lastLine = null;
+  function syncLog(){
+    if (!lastLine || !lastLine.classList.contains('is-in')) return;
+    log.scrollTop = Math.max(0, lastLine.offsetTop + lastLine.offsetHeight - log.clientHeight + 8);
+  }
+
+  function stagger(attr, nums, gap){
+    nums.forEach((n,i)=> later(()=>{
+      $$('['+attr+'="'+n+'"]').forEach(el=>{
+        el.classList.add('is-in');
+        if (el.classList.contains('li')){ lastLine = el; syncLog(); }
+      });
+    }, i*gap));
+  }
+
+  /* Content that arrives in one block pops; content that arrives in rhythm reads.
+     Everything below `from` is set at once, the new levels land one after the other. */
+  function revealSeq(attr, from, to, gap){
+    revealUpTo(attr, from - 1);
+    const nums = [];
+    for (let n = from; n <= to; n++) nums.push(n);
+    stagger(attr, nums, gap);
+  }
+
+  function railPanel(which){
+    truth.classList.toggle('is-off', which !== 'truth');
+    filters.classList.toggle('is-on', which === 'filters');
+    bound.classList.toggle('is-on', which === 'bound');
+    biz.classList.toggle('is-on', which === 'biz');
+    stockp.classList.toggle('is-on', which === 'stock');
+    nextp.classList.toggle('is-on', which === 'next');
+    if (which !== 'filters') filters.classList.remove('is-collapsed');
+  }
+
+  /* M3: the substitution is applied by the SYSTEM, only after the chef accepts —
+     and in a kitchen it also has to re-price the dish and sign who approved it */
+  function m3Unlock(){
+    const b = $('#banner');
+    b.classList.add('okstate');
+    b.querySelector('.bmark').textContent = '✓';
+    b.querySelector('.btxt b').textContent = 'Apto para la reserva de la 1:30';
+    b.querySelector('.bsub').textContent = 'sin gluten · costo del plato $4.18 por porción · aplicado por Marcela, 6:52 a.m.';
+
+    const ing = $('#ingSwap');
+    ing.classList.remove('bad');
+    ing.classList.add('swapped');
+    const mk = $('#ingMark');
+    mk.className = 'ick ok'; mk.textContent = '✓';
+    $('#ingName').textContent = 'Almidón de maíz';
+    $('#ingNote').textContent = '12 g · despensa';
+
+    $('#propose').classList.add('accepted');
+    $('#ptag').textContent = 'Cambio aceptado · ficha v4';
+    $('#btnAccept').textContent = '✓ Aplicado';
+  }
+
+  /* M5: the order leaves as a real purchase order */
+  function m5Sent(){
+    const c = $('#btnChannel');
+    c.classList.remove('primary');
+    c.classList.add('sent');
+    c.querySelector('b').textContent = '✓ Orden enviada · 5 líneas, 3 proveedores';
+    c.querySelector('span').textContent = 'confirmada · entrega 6:00 a.m.';
+  }
+
+  /* ---------- choreography ---------- */
+  const beats = [
+
+    /* ===== M1 ===== */
+    { id:'intro', dur:3200, moment:null,
+      say:'Martes, 6:40 de la mañana. La cocina abre. Nadie ha tocado la tablet todavía.',
+      enter(){ resetScene(); } },
+
+    { id:'m1-ctx', dur:5800, moment:1,
+      say:'Antes de preguntar nada, el producto ya sabe <b>cuatro cosas</b> de esta cocina.',
+      enter(){ node('ctx','is-on'); node('voz','is-skip'); node('ia','is-skip'); stagger('data-l',[1,2,3,4],1150); } },
+
+    { id:'m1-wake', dur:3000, moment:1,
+      say:'La app abre directo en lo que hay que sacar hoy.',
+      enter(){ sleep.classList.add('is-hidden'); setView('m1'); revealSeq('data-r',1,2,420); } },
+
+    { id:'m1-fefo', dur:4600, moment:1,
+      say:'Un sistema determinista ordena los 312 lotes por caducidad real. <b>No es una opinión de la IA.</b>',
+      enter(){ node('dec','is-on'); stagger('data-l',[5,6],1500); } },
+
+    { id:'m1-cards', dur:4800, moment:1,
+      say:'Tres lotes en sus últimas horas. Y la app no los lista: <b>dice qué hacer con cada uno.</b>',
+      enter(){ node('exe','is-on'); revealSeq('data-r',3,5,640); } },
+
+    { id:'m1-recipes', dur:4800, moment:1,
+      say:'Y en qué plato de la carta ya fijada ponerlos, empezando por uno. <b>Aquí nadie inventa recetas.</b>',
+      enter(){ stagger('data-l',[7],300); revealSeq('data-r',6,8,560); } },
+
+    { id:'m1-inv', dur:5200, moment:1,
+      say:'Detrás hay un inventario vivo: los 312 lotes, qué vence, <b>qué está bajo el par</b> y cuántos días de cobertura quedan.',
+      enter(){ inv.classList.add('is-in'); } },
+
+    { id:'m1-invdet', dur:5600, moment:1,
+      say:'Y dentro de cada cámara, <b>qué lote hay y cuánto queda</b>: cantidad real por insumo, no un conteo de memoria.',
+      enter(){ inv.classList.remove('is-in'); invdet.classList.add('is-in'); } },
+
+    { id:'m1-zero', dur:5400, moment:1,
+      say:'Todo esto está en pantalla cuando la cocina abre. <b>El turno arranca con la instrucción puesta.</b>',
+      enter(){ node('cfm','is-on'); inv.classList.remove('is-in'); invdet.classList.remove('is-in'); zero.classList.add('is-in'); } },
+
+    /* ===== M2 ===== */
+    { id:'m2-listen', dur:2800, moment:2,
+      say:'Pero hoy el turno no es el de siempre.',
+      enter(){
+        zero.classList.remove('is-in');
+        clearNodes(); node('ctx','is-on');
+        voice.classList.add('is-in'); speak(transcript,'',0);
+      } },
+
+    { id:'m2-speak', dur:5400, moment:2,
+      say:'La chef no abre el módulo de producción. Habla.',
+      enter(){
+        node('voz','is-on');
+        speak(transcript,'“¿Qué saco para el almuerzo? Vienen 80 cubiertos y me falta un cocinero.”',4400,220);
+        stagger('data-l',[8],1600);
+      } },
+
+    { id:'m2-parse', dur:4800, moment:2,
+      say:'La IA extrae <b>cuatro variables</b> de una sola frase.',
+      enter(){ node('ia','is-on'); stagger('data-l',[9],150); stagger('data-i',[1,2,3,4],760); } },
+
+    { id:'m2-know', dur:4600, moment:2,
+      say:'Y dos cosas que nadie tuvo que decir, porque ya estaban declaradas.',
+      enter(){ node('ctx','is-on'); stagger('data-l',[10,11],1600); } },
+
+    { id:'m2-union', dur:5200, moment:2,
+      say:'El sistema multiplica la ficha técnica por 80 cubiertos y cruza las restricciones. <b>Eso no lo decide la IA.</b>',
+      enter(){
+        voice.classList.remove('is-in');
+        node('dec','is-on'); setView('m2'); revealSeq('data-q',1,3,520);
+        stagger('data-l',[12],700);
+      } },
+
+    { id:'m2-results', dur:4800, moment:2,
+      say:'Dos platos de doce entran hoy. Cada uno dice <b>qué lote agota</b> y para quién sirve.',
+      enter(){ node('exe','is-on'); revealSeq('data-q',4,5,700); stagger('data-l',[13],500); } },
+
+    { id:'m2-blocked', dur:5000, moment:2,
+      say:'Y el que no entra también se ve, con el motivo. <b>Un alérgeno no se descubre en la mesa.</b>',
+      enter(){ node('cfm','is-on'); revealUpTo('data-q',6); stagger('data-l',[14],400); } },
+
+    { id:'m2-filters', dur:6200, moment:2,
+      say:'Esto es lo que la chef tendría que llenar hoy en el sistema que ya tiene.',
+      enter(){ railPanel('filters'); stagger('data-f',[1,2,3,4,5,6,7,8],560); } },
+
+    { id:'m2-collapse', dur:5000, moment:2,
+      say:'Una frase. Cuatro segundos. <b>Y los ocho campos desaparecen.</b>',
+      enter(){ filters.classList.add('is-collapsed'); $('#filtersCount').textContent = '8 campos → 1 frase'; } },
+
+    /* ===== M3 ===== */
+    { id:'m3-tap', dur:3800, moment:3,
+      say:'Pero ese plato es el que termina de agotar el lote. La chef lo abre.',
+      enter(){
+        railPanel('truth'); clearNodes(); node('cfm','is-on');
+        tapOn('#blockedCard'); stagger('data-l',[15],900);
+      } },
+
+    { id:'m3-detail', dur:5000, moment:3,
+      say:'El sistema no dice “no se puede”. Dice <b>qué</b> lo bloquea y <b>a qué reserva</b> afecta.',
+      enter(){ setView('m3'); revealSeq('data-s',1,3,520); node('dec','is-on'); stagger('data-l',[16],700); } },
+
+    { id:'m3-propose', dur:5400, moment:3,
+      say:'La IA propone una salida con lo que ya hay en despensa — y dice qué le hace al costo del plato.',
+      enter(){
+        node('ia','is-on'); revealUpTo('data-s',4);
+        railPanel('bound'); stagger('data-b',[1],200);
+        stagger('data-l',[17,18],1500);
+      } },
+
+    { id:'m3-confirm', dur:3800, moment:3,
+      say:'La chef decide. Un toque, con su nombre detrás.',
+      enter(){ node('cfm','is-on'); tapOn('#btnAccept'); stagger('data-b',[2],200); stagger('data-l',[19],700); } },
+
+    { id:'m3-unlock', dur:5400, moment:3,
+      say:'Y solo entonces el sistema levanta el bloqueo y <b>vuelve a costear el plato</b>. Un alérgeno nunca se resuelve con una inferencia.',
+      enter(){
+        node('dec','is-on'); m3Unlock(); revealUpTo('data-s',6);
+        stagger('data-b',[3],300); stagger('data-l',[20],900);
+      } },
+
+    { id:'m3-recipe', dur:6600, moment:3,
+      say:'Y la ficha técnica entera, recosteada y sin gluten. <b>Los gramos que ve la cocina son los que se descuentan.</b>',
+      enter(){ node('exe','is-on'); recipe.classList.add('is-in'); } },
+
+    /* ===== M4 ===== */
+    { id:'m4-cook', dur:4000, moment:4,
+      say:'Termina el servicio. Y aquí pasa lo único que ningún inventario de cocina ha logrado sostener.',
+      enter(){
+        railPanel('stock'); stagger('data-e',[1],300);
+        clearNodes(); node('cfm','is-on');
+        clock.textContent = '2:40';
+        recipe.classList.add('is-in');
+        tapOn('#btnCookR'); stagger('data-l',[21],1000);
+      } },
+
+    { id:'m4-deltas', dur:5200, moment:4,
+      say:'Un toque descuenta nueve insumos por ficha técnica, sobre los 78 cubiertos reales.',
+      enter(){ node('dec','is-on'); node('exe','is-on'); recipe.classList.remove('is-in'); setView('m4'); revealSeq('data-t',1,4,600); stagger('data-l',[22],600); stagger('data-e',[2],900); } },
+
+    { id:'m4-list', dur:4800, moment:4,
+      say:'La merma queda con motivo, hora y responsable — y cuatro insumos quedan bajo el par. <b>La app lo dice antes de que falten.</b>',
+      enter(){ revealUpTo('data-t',5); stagger('data-l',[23],500); stagger('data-e',[3],900); } },
+
+    { id:'m4-stock', dur:5200, moment:4,
+      say:'Y las cantidades están siempre ahí, editables. <b>La que registra la cocina es la buena</b>, firmada con hora, y todo se recalcula desde ella.',
+      enter(){ revealUpTo('data-t',6); stagger('data-e',[4],700); stagger('data-l',[24],1500); } },
+
+    { id:'m4-close', dur:5400, moment:4,
+      say:'El inventario quedó al día y cada movimiento firmado. <b>Sin que nadie lo mantuviera.</b>',
+      enter(){ revealUpTo('data-t',7); stagger('data-l',[25],700); } },
+
+    /* ===== M5 — de la intención a la orden de compra ===== */
+    { id:'m5-voice', dur:4600, moment:5,
+      say:'Segunda frase del turno. La única otra.',
+      enter(){
+        clearNodes(); node('ctx','is-on'); node('voz','is-on');
+        clock.textContent = '3:10';
+        voice.classList.add('is-in');
+        speak(transcript,'“Pide lo que falta para mañana.”',3200,280);
+        stagger('data-l',[26],1800);
+      } },
+
+    { id:'m5-list', dur:4800, moment:5,
+      say:'La orden ya estaba armada sola desde el par de cada insumo, partida en tres: <b>una por proveedor</b>.',
+      enter(){
+        voice.classList.remove('is-in');
+        node('ia','is-on'); node('dec','is-on');
+        setView('m5'); revealSeq('data-u',1,3,620);
+        stagger('data-l',[27,28],1400);
+      } },
+
+    { id:'m5-total', dur:4600, moment:5,
+      say:'En la unidad que cada proveedor factura, a su último precio, y avisando cuándo falta poco para su mínimo.',
+      enter(){ node('exe','is-on'); revealUpTo('data-u',4); stagger('data-l',[29,30],1100); } },
+
+    { id:'m5-channel', dur:5000, moment:5,
+      say:'Y aquí está el momento de negocio. <b>La conversación termina en una orden de compra real.</b>',
+      enter(){
+        node('cfm','is-on'); revealUpTo('data-u',5);
+        railPanel('biz'); stagger('data-c',[1,2],700);
+        later(()=> tapOn('#btnChannel'), 800);   // the button has to be on screen before it is touched
+        stagger('data-l',[31],1500);
+      } },
+
+    { id:'m5-sent', dur:5200, moment:5,
+      say:'El proveedor no recibe un chat a medianoche: recibe <b>una orden</b>, con cantidad, unidad y fecha de entrega.',
+      enter(){
+        m5Sent(); revealUpTo('data-u',6);
+        stagger('data-c',[3],300); stagger('data-l',[32,33],1300);
+      } },
+
+    /* ===== M6 — vuelve solo, y se ve el costo ===== */
+    { id:'m6-arrive', dur:4200, moment:6,
+      say:'A la mañana siguiente llega el pedido. Y el proveedor cambió una línea.',
+      enter(){
+        railPanel('truth'); clearNodes(); node('ctx','is-on');
+        clock.textContent = '6:10';
+        stagger('data-l',[34],900);
+      } },
+
+    { id:'m6-parse', dur:5400, moment:6,
+      say:'La IA lee la factura y detecta el cambio de línea y el alza de $0.40 por litro.',
+      enter(){ node('ia','is-on'); setView('m6'); revealSeq('data-v',1,2,520); stagger('data-l',[35,36],1500); } },
+
+    { id:'m6-inventory', dur:5600, moment:6,
+      say:'Cinco lotes entran con cámara, caducidad y temperatura de recepción, <b>firmados por quien recibió.</b>',
+      enter(){
+        node('dec','is-on'); node('exe','is-on');
+        revealSeq('data-v',3,4,700); stagger('data-l',[37,38],1200);
+      } },
+
+    { id:'m6-money', dur:6000, moment:6,
+      say:'Y solo al final aparece el dinero, por sede y consolidado. <b>En dólares del día: lo que entró, lo que se salvó y lo que se perdió.</b>',
+      enter(){
+        revealSeq('data-v',5,6,1700);   // the venue first, the group as the consequence
+        later(()=> $('#money').classList.add('is-live'), 700);
+        stagger('data-l',[39,40],1400);
+      } },
+
+    { id:'m6-loop', dur:6000, moment:6,
+      say:'El turno cerrado y la bitácora lista para la inspección — y las integraciones entrando por peldaños.',
+      enter(){
+        allNodesOn(); loop.classList.add('is-in'); stagger('data-c',[1,2,3],1);
+        later(()=> $('#pnl').classList.add('is-live'), 650);
+        railPanel('next'); stagger('data-d',[1,2,3],1100);
+      } }
+
+  ];
+
+  /* ---------- timeline ---------- */
+  const TOTAL   = beats.reduce((a,b)=>a+b.dur, 0);
+  const OFFSETS = beats.reduce((acc,b)=>{ acc.push((acc[acc.length-1]||0) + b.dur); return acc; }, [0]).slice(0,-1);
+
+  function mmss(ms){
+    const t = Math.max(0, Math.round(ms/1000));
+    return Math.floor(t/60) + ':' + String(t%60).padStart(2,'0');
+  }
+
+  beats.forEach((b,i)=>{
+    const seg = document.createElement('i');
+    seg.title = (b.moment ? 'M'+b.moment+' · ' : '') + b.id;
+    if (i && beats[i-1].moment !== b.moment) seg.classList.add('gapstart');
+    seg.onclick = () => { playing = true; document.body.classList.remove('paused'); goto(i); };
+    timelineEl.appendChild(seg);
+  });
+  const segs = Array.from(timelineEl.children);
+
+  function paintTimeline(){
+    segs.forEach((el,i)=>{
+      el.classList.toggle('done', i < idx);
+      el.classList.toggle('now',  i === idx);
+    });
+  }
+
+  function paintElapsed(){
+    if (idx < 0){ elapsedEl.textContent = '0:00 / ' + mmss(TOTAL); return; }
+    const within = beats[idx].dur - tRemain + (playing ? performance.now() - tStart : 0);
+    elapsedEl.textContent = mmss(OFFSETS[idx] + Math.min(within, beats[idx].dur)) + ' / ' + mmss(TOTAL);
+  }
+  setInterval(paintElapsed, 400);
+
+  /* first beat index of a given moment, for the M1..M6 jump menu */
+  function beatOfMoment(m){
+    const i = beats.findIndex(b => b.moment === m);
+    return i < 0 ? 0 : i;
+  }
+
+  /* ---------- engine ---------- */
+  let idx = -1, timer = null, tStart = 0, tRemain = 0, playing = false, finished = false;
+  let loopOn = false, loopTimer = null;
+
+  function resetScene(){
+    killPending();
+    viewM3.innerHTML = m3Html;      // undo M3 / M5 mutations
+    viewM5.innerHTML = m5Html;
+    sleep.classList.remove('is-hidden');
+    zero.classList.remove('is-in');
+    loop.classList.remove('is-in');
+    $('#pnl').classList.remove('is-live');
+    inv.classList.remove('is-in');
+    invdet.classList.remove('is-in');
+    recipe.classList.remove('is-in');
+    voice.classList.remove('is-in');
+    tapdot.classList.remove('go');
+    transcript.innerHTML = '';
+    clock.textContent = '6:40';
+    setView(null);
+    railPanel('truth');
+    $('#filtersCount').textContent = '8 campos · 5 pantallas';
+    $('#money').classList.remove('is-live');
+    $$('.rev').forEach(el=>el.classList.remove('is-in'));
+    $$('.li').forEach(el=>el.classList.remove('is-in'));
+    $$('.ic').forEach(el=>el.classList.remove('is-in'));
+    $$('.ff').forEach(el=>el.classList.remove('is-in'));
+    $$('.brow').forEach(el=>el.classList.remove('is-in'));
+    lastLine = null;
+    log.scrollTop = 0;
+    clearNodes();
+    setMoment(null);
+  }
+
+  function runBeat(i){
+    killPending();
+    idx = i; finished = false;
+    const b = beats[i];
+    if (b.moment !== undefined) setMoment(b.moment);
+    b.enter && b.enter();
+    speak(caption, b.say, b.dur);
+    schedule(b.dur);
+    paintTimeline();
+    paintElapsed();
+  }
+
+  function schedule(ms){
+    clearTimeout(timer);
+    tRemain = ms; tStart = performance.now();
+    beatbar.classList.remove('run');
+    void beatbar.offsetWidth;
+    beatbar.style.animationDuration = ms + 'ms';
+    beatbar.classList.add('run');
+    if (!playing) return;
+    timer = setTimeout(()=>{
+      if (idx < beats.length - 1) runBeat(idx + 1);
+      else stop();
+    }, ms);
+  }
+
+  function play(){
+    if (finished) return restart();
+    playing = true;
+    document.body.classList.remove('paused');
+    $('#btnPlay').textContent = '❚❚ Pausa';
+    if (idx < 0) { runBeat(0); return; }
+    schedule(Math.max(350, tRemain));
+  }
+
+  function pause(){
+    playing = false;
+    document.body.classList.add('paused');
+    $('#btnPlay').textContent = '▶ Reproducir';
+    clearTimeout(timer);
+    flushPending();   // finish this beat's reveals so the frozen frame reads complete
+    tRemain = Math.max(400, tRemain - (performance.now() - tStart));
+  }
+
+  function stop(){
+    playing = false; finished = true;
+    $('#btnPlay').textContent = '▶ Reproducir';
+    if (loopOn){ clearTimeout(loopTimer); loopTimer = setTimeout(restart, 22000); }
+  }
+
+  function next(){ clearTimeout(timer); if (idx < beats.length - 1) runBeat(idx + 1); }
+  function prev(){ clearTimeout(timer); if (idx > 0) goto(idx - 1); }
+
+  /* jump to any beat: replay every earlier beat's state instantly, then play this one.
+     enter() functions only set state, so applying them in order rebuilds the scene exactly. */
+  function goto(i){
+    i = Math.max(0, Math.min(beats.length - 1, i));
+    clearTimeout(timer); clearTimeout(loopTimer); killPending();
+    resetScene();
+    for (let k = 0; k < i; k++){
+      beats[k].enter && beats[k].enter();
+      flushPending();
+    }
+    runBeat(i);
+  }
+
+  function restart(){
+    clearTimeout(timer); clearTimeout(loopTimer);
+    resetScene();
+    idx = -1; tRemain = 0;
+    playing = true;
+    document.body.classList.remove('paused');
+    $('#btnPlay').textContent = '❚❚ Pausa';
+    runBeat(0);
+  }
+
+  /* ---------- device switch ---------- */
+  function setDevice(d){
+    if (document.body.dataset.device === d) return;
+    document.body.dataset.device = d;
+    $$('#devsel button').forEach(b => b.classList.toggle('is-on', b.dataset.dev === d));
+    fitDevice();
+    restart();   // layout changes between devices, so replay from the top
+  }
+  $$('#devsel button').forEach(b => b.onclick = () => setDevice(b.dataset.dev));
+
+  /* ---------- controls ---------- */
+  $('#btnPlay').onclick    = () => playing ? pause() : play();
+  $('#btnNext').onclick    = () => { playing = true; document.body.classList.remove('paused'); next(); };
+  $('#btnRestart').onclick = restart;
+
+  function toggleLoop(){
+    loopOn = !loopOn;
+    $('#btnLoop').classList.toggle('is-on', loopOn);
+    if (!loopOn) clearTimeout(loopTimer);
+    else if (!playing && idx >= beats.length - 1){ clearTimeout(loopTimer); loopTimer = setTimeout(restart, 22000); }
+  }
+  $('#btnLoop').onclick = toggleLoop;
+
+  function toggleFull(){
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen().catch(()=>{});
+  }
+  $('#btnFull').onclick = toggleFull;
+  document.addEventListener('fullscreenchange', () => later(refit, 120));
+
+  /* the M1..M6 chips are a jump menu — indispensable when the CEO asks to see one again */
+  $$('.moment').forEach(el => {
+    el.onclick = () => { playing = true; document.body.classList.remove('paused'); goto(beatOfMoment(+el.dataset.m)); };
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.code === 'Space'){ e.preventDefault(); playing ? pause() : play(); }
+    if (e.code === 'ArrowRight'){ e.preventDefault(); playing = true; document.body.classList.remove('paused'); next(); }
+    if (e.code === 'ArrowLeft'){ e.preventDefault(); playing = true; document.body.classList.remove('paused'); prev(); }
+    if (e.key >= '1' && e.key <= '6'){ playing = true; document.body.classList.remove('paused'); goto(beatOfMoment(+e.key)); }
+    if (e.key === 'l' || e.key === 'L'){ toggleLoop(); }
+    if (e.key === 'f' || e.key === 'F'){ toggleFull(); }
+    if (e.key === 'r' || e.key === 'R'){ restart(); }
+    if (e.key === 'm' || e.key === 'M'){ setDevice('mobile'); }
+    if (e.key === 't' || e.key === 'T'){ setDevice('tablet'); }
+  });
+
+  window.Demo = { play, pause, restart, next, prev, goto, setDevice, toggleLoop,
+                  count: beats.length, ids: beats.map(b=>b.id), total: TOTAL };
+
+  fitDevice();
+  resetScene();
+  paintTimeline();
+  paintElapsed();
+
+  /* deep link for rehearsal: index.html#b20 opens paused on that beat */
+  const deep = location.hash.match(/^#b(\d+)$/);
+  if (deep){
+    goto(+deep[1]);
+    pause();
+  } else {
+    speak(caption, 'Presiona <b>reproducir</b>. La demo se cuenta sola.', 2000);
+  }
+
+})();
+</script>
+</body>
+</html>

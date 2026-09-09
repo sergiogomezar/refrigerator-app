@@ -1,0 +1,657 @@
+<title>Cómo funciona Freezai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:ital,wght@0,400;0,600;1,400&display=swap">
+
+<style>
+:root{
+  --ground:#F6F8F7;
+  --surface:#FFFFFF;
+  --surface-2:#EBF0EE;
+  --ink:#10201C;
+  --muted:#5A6B65;
+  --line:#D6DFDB;
+  --line-soft:#E5EBE8;
+  --accent:#10695A;
+  --accent-soft:#E0EFEA;
+  --warn:#8F5407;
+  --warn-soft:#F6EBDB;
+  --bad:#9C3620;
+  --bad-soft:#F7E6E1;
+  --shadow:0 1px 2px rgba(16,32,28,.06);
+
+  --f-display:"Bricolage Grotesque","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Public Sans","Helvetica Neue",Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0D1412;
+    --surface:#141C19;
+    --surface-2:#1C2623;
+    --ink:#E3EAE7;
+    --muted:#93A39D;
+    --line:#26322E;
+    --line-soft:#1E2925;
+    --accent:#55C2A9;
+    --accent-soft:#15302A;
+    --warn:#D69B52;
+    --warn-soft:#2C2418;
+    --bad:#E08268;
+    --bad-soft:#2E1D19;
+    --shadow:0 1px 2px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0D1412;
+  --surface:#141C19;
+  --surface-2:#1C2623;
+  --ink:#E3EAE7;
+  --muted:#93A39D;
+  --line:#26322E;
+  --line-soft:#1E2925;
+  --accent:#55C2A9;
+  --accent-soft:#15302A;
+  --warn:#D69B52;
+  --warn-soft:#2C2418;
+  --bad:#E08268;
+  --bad-soft:#2E1D19;
+  --shadow:0 1px 2px rgba(0,0,0,.4);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--f-body);
+  font-size:17px;
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 1.5rem 6rem}
+
+/* ---------- encabezado ---------- */
+.masthead{padding:3.5rem 0 2.25rem;border-bottom:1px solid var(--line)}
+.eyebrow{
+  font-family:var(--f-mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent);margin:0 0 1rem;
+}
+h1{
+  font-family:var(--f-display);font-weight:700;font-size:clamp(2.3rem,5.2vw,3.5rem);
+  line-height:1.04;letter-spacing:-.025em;margin:0 0 1rem;text-wrap:balance;max-width:16ch;
+}
+.standfirst{font-size:1.14rem;line-height:1.55;color:var(--muted);max-width:56ch;margin:0}
+.standfirst strong{color:var(--ink);font-weight:600}
+.masthead-meta{
+  display:flex;flex-wrap:wrap;gap:.4rem 1.4rem;margin-top:1.75rem;
+  font-family:var(--f-mono);font-size:.74rem;color:var(--muted);
+}
+.masthead-meta span{white-space:nowrap}
+
+/* ---------- rejilla ---------- */
+.grid{display:block}
+@media (min-width:1080px){
+  .grid{display:grid;grid-template-columns:14rem minmax(0,1fr);gap:4rem;align-items:start}
+  .toc{position:sticky;top:2rem}
+}
+.toc{padding-top:2.75rem}
+.toc h2{
+  font-family:var(--f-mono);font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--muted);font-weight:400;margin:0 0 .85rem;
+}
+.toc ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.5rem;counter-reset:t}
+.toc a{
+  color:var(--muted);text-decoration:none;font-size:.86rem;line-height:1.35;
+  display:block;border-left:2px solid var(--line);padding-left:.7rem;
+}
+.toc a:hover,.toc a:focus-visible{color:var(--accent);border-left-color:var(--accent)}
+@media (max-width:1079px){
+  .toc{display:none}
+}
+
+main{padding-top:2.75rem;min-width:0}
+section{margin-bottom:3.5rem;scroll-margin-top:1.5rem}
+h2{
+  font-family:var(--f-display);font-weight:700;font-size:1.72rem;line-height:1.15;
+  letter-spacing:-.018em;margin:0 0 .3rem;text-wrap:balance;
+}
+h2 + .dek{color:var(--muted);font-size:1rem;margin:0 0 1.4rem;max-width:60ch}
+h3{
+  font-family:var(--f-display);font-weight:600;font-size:1.08rem;letter-spacing:-.008em;
+  margin:2rem 0 .5rem;
+}
+p{margin:0 0 1.1rem;max-width:66ch}
+p:last-child{margin-bottom:0}
+a{color:var(--accent)}
+strong{font-weight:600}
+code{
+  font-family:var(--f-mono);font-size:.86em;background:var(--surface-2);
+  padding:.1em .38em;border-radius:3px;
+}
+
+/* ---------- destacados ---------- */
+.rule{
+  border-left:3px solid var(--accent);background:var(--accent-soft);
+  padding:1.05rem 1.3rem;margin:1.6rem 0;border-radius:0 6px 6px 0;max-width:64ch;
+}
+.rule p{margin:0;font-size:1.04rem}
+.rule .rule-k{
+  display:block;font-family:var(--f-mono);font-size:.68rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--accent);margin-bottom:.4rem;
+}
+
+.stats{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:1.6rem 0;
+}
+.stat{background:var(--surface);padding:1.05rem 1.15rem}
+.stat b{
+  display:block;font-family:var(--f-mono);font-weight:500;font-size:1.5rem;
+  letter-spacing:-.03em;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1.1;
+}
+.stat span{display:block;font-size:.82rem;color:var(--muted);line-height:1.35;margin-top:.3rem}
+
+/* ---------- pasos del ciclo ---------- */
+.steps{display:flex;flex-direction:column;gap:.9rem;margin:1.5rem 0;counter-reset:s}
+.step{
+  display:grid;grid-template-columns:2.1rem minmax(0,1fr);gap:1rem;align-items:start;
+  padding-bottom:.9rem;border-bottom:1px solid var(--line-soft);
+}
+.step:last-child{border-bottom:0;padding-bottom:0}
+.step::before{
+  counter-increment:s;content:counter(s);
+  font-family:var(--f-mono);font-size:.78rem;color:var(--accent);
+  border:1px solid var(--line);border-radius:50%;width:2.1rem;height:2.1rem;
+  display:grid;place-items:center;background:var(--surface);
+}
+.step h4{
+  font-family:var(--f-display);font-weight:600;font-size:1rem;margin:.25rem 0 .3rem;
+}
+.step p{margin:0;font-size:.95rem;color:var(--muted);max-width:58ch}
+.step p strong{color:var(--ink)}
+
+/* ---------- tablas ---------- */
+.tw{overflow-x:auto;margin:1.5rem 0;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:32rem}
+th,td{text-align:left;padding:.65rem .9rem;border-bottom:1px solid var(--line-soft);vertical-align:top}
+thead th{
+  font-family:var(--f-mono);font-size:.68rem;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--muted);font-weight:400;background:var(--surface-2);border-bottom:1px solid var(--line);
+}
+tbody tr:last-child td{border-bottom:0}
+td:first-child{font-weight:600}
+.mono{font-family:var(--f-mono);font-size:.84rem;font-variant-numeric:tabular-nums;color:var(--muted)}
+
+.pill{
+  display:inline-block;font-family:var(--f-mono);font-size:.66rem;letter-spacing:.07em;
+  text-transform:uppercase;padding:.16rem .45rem;border-radius:3px;white-space:nowrap;
+}
+.pill.v1{background:var(--accent-soft);color:var(--accent)}
+.pill.v2{background:var(--warn-soft);color:var(--warn)}
+.pill.fu{background:var(--surface-2);color:var(--muted)}
+
+/* ---------- figuras ---------- */
+figure{margin:2rem 0;padding:0}
+figure svg{display:block;width:100%;max-width:100%;height:auto;color:var(--muted)}
+.figbox{
+  border:1px solid var(--line);border-radius:8px;background:var(--surface);
+  padding:1.4rem 1.2rem 1.1rem;overflow-x:auto;
+}
+figcaption{
+  font-size:.85rem;color:var(--muted);margin-top:.9rem;line-height:1.45;max-width:62ch;
+}
+figcaption b{color:var(--ink);font-weight:600}
+
+/* ---------- lista de definiciones ---------- */
+.defs{display:flex;flex-direction:column;gap:.75rem;margin:1.4rem 0}
+.def{display:grid;grid-template-columns:9.5rem minmax(0,1fr);gap:1rem}
+@media (max-width:600px){.def{grid-template-columns:1fr;gap:.15rem}}
+.def dt{
+  font-family:var(--f-mono);font-size:.78rem;color:var(--accent);
+  letter-spacing:.03em;padding-top:.18rem;
+}
+.def dd{margin:0;font-size:.95rem;color:var(--muted)}
+.def dd strong{color:var(--ink);font-weight:600}
+
+.open{
+  border:1px dashed var(--line);border-radius:8px;padding:1.2rem 1.35rem;
+  background:var(--surface);margin:1.5rem 0;
+}
+.open h3{margin-top:0}
+.open ul{margin:0;padding-left:1.15rem;display:flex;flex-direction:column;gap:.55rem}
+.open li{font-size:.95rem;color:var(--muted);max-width:60ch}
+.open li strong{color:var(--ink);font-weight:600}
+
+footer{
+  border-top:1px solid var(--line);margin-top:1rem;padding-top:1.5rem;
+  font-size:.85rem;color:var(--muted);
+}
+footer p{max-width:66ch}
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Freezai · Documento de producto</p>
+    <h1>Cómo funciona Freezai</h1>
+    <p class="standfirst">Una app que sabe qué comida hay en la casa, cuánto le queda de vida y qué conviene hacer con ella hoy. <strong>Esta es la explicación larga:</strong> qué problema resuelve, por dónde entra y sale cada dato, y qué decide la máquina frente a qué decide la persona.</p>
+    <div class="masthead-meta">
+      <span>Para leer completo · 12 min</span>
+      <span>Alcance: 73 features en 11 áreas</span>
+      <span>51 de ellas en la versión 1</span>
+    </div>
+  </header>
+
+  <div class="grid">
+
+    <nav class="toc" aria-label="Índice">
+      <h2>En esta página</h2>
+      <ol>
+        <li><a href="#problema">El problema</a></li>
+        <li><a href="#trampa">Por qué mueren las apps de despensa</a></li>
+        <li><a href="#ciclo">El ciclo del inventario</a></li>
+        <li><a href="#entra">Cómo entra la comida</a></li>
+        <li><a href="#ficha">Qué guarda de cada producto</a></li>
+        <li><a href="#sale">Cómo sale</a></li>
+        <li><a href="#propone">Qué te propone hacer</a></li>
+        <li><a href="#perfiles">Una cena para varios</a></li>
+        <li><a href="#regla">Quién decide qué</a></li>
+        <li><a href="#compra">De la lista a la compra</a></li>
+        <li><a href="#negocio">Cómo gana dinero</a></li>
+        <li><a href="#fases">Qué hay en v1 y qué no</a></li>
+        <li><a href="#abierto">Lo que no está resuelto</a></li>
+      </ol>
+    </nav>
+
+    <main>
+
+      <section id="problema">
+        <h2>El problema</h2>
+        <p class="dek">No es un problema de organización. Es un problema de dinero, y está medido.</p>
+        <div class="stats">
+          <div class="stat"><b>USD 3 000</b><span>lo que una familia de cuatro tira a la basura en comida cada año</span></div>
+          <div class="stat"><b>17 %</b><span>de todo lo que compra el hogar termina sin comerse</span></div>
+          <div class="stat"><b>EPA · 2025</b><span>fuente del cálculo, abril de 2025</span></div>
+        </div>
+        <p>La comida no se desperdicia porque a la gente le dé igual. Se desperdicia porque nadie tiene en la cabeza el estado completo de su nevera: qué hay al fondo, desde cuándo está abierto ese envase, qué se vence primero. Cuando llega la hora de decidir la cena, la decisión se toma con la puerta abierta y sin información, y lo que estaba al fondo se pierde.</p>
+        <p>Freezai existe para que esa decisión se tome con el estado completo a la vista, y para que el estado se mantenga solo.</p>
+      </section>
+
+      <section id="trampa">
+        <h2>Por qué mueren las apps de despensa</h2>
+        <p class="dek">Esta es la parte que hay que entender antes que ninguna otra, porque explica casi todas las decisiones de diseño del producto.</p>
+        <p>Hay decenas de apps de inventario de cocina y casi todas fracasan en el mismo punto. No es la captura inicial: meter la compra al sistema está resuelto desde hace años con una foto del ticket o con dictado por voz. El problema es la <strong>salida</strong>.</p>
+        <p>Nadie abre una app para registrar que se comió media cebolla. Al tercer día el inventario que muestra la pantalla ya no es el de la cocina, y a partir de ahí todo lo demás se cae: las alertas de caducidad avisan de cosas que ya no están, las recetas proponen platos con ingredientes inexistentes y la lista de compras pide lo que sobra. La app pide más trabajo del que ahorra, y se desinstala.</p>
+        <div class="rule">
+          <span class="rule-k">La apuesta del producto</span>
+          <p>Si registrar lo que se consume es el punto donde todo se rompe, entonces ese registro tiene que ser un subproducto de algo que la persona ya quería hacer. Nadie va a registrar consumo. Todo el mundo quiere saber qué cocinar.</p>
+        </div>
+        <p>De ahí sale la pieza central: <strong>«cociné esto»</strong>. Un toque sobre la receta que se acaba de preparar descuenta del inventario los ingredientes de esa receta, en las cantidades de esa receta, escaladas a las porciones que se sirvieron. La persona buscaba qué cenar; el efecto secundario es que el inventario queda al día.</p>
+        <p>Por eso las recetas no son un adorno de esta app: son el motor del inventario.</p>
+      </section>
+
+      <section id="ciclo">
+        <h2>El ciclo del inventario</h2>
+        <p class="dek">Cuatro caminos por los que cambia el estado de la cocina. Tres son automáticos; el cuarto es la persona, y su dato manda sobre todos los demás.</p>
+
+        <figure>
+          <div class="figbox">
+            <svg viewBox="0 0 780 400" role="img" aria-label="Ciclo del inventario: la compra entra por comprobante, la cocina descuenta por receta, lo agotado cae en la lista de compras y la lista vuelve a la compra. La persona corrige cantidades directamente sobre el inventario.">
+              <defs>
+                <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"></path>
+                </marker>
+                <marker id="ahA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--accent)"></path>
+                </marker>
+              </defs>
+
+              <!-- Compra -->
+              <rect x="20" y="40" width="150" height="58" rx="7" fill="var(--surface-2)" stroke="currentColor" stroke-width="1"></rect>
+              <text x="95" y="66" text-anchor="middle" font-family="var(--f-display)" font-size="14" font-weight="600" fill="var(--ink)">Compra</text>
+              <text x="95" y="84" text-anchor="middle" font-size="11" fill="currentColor">súper, domicilio, tendero</text>
+
+              <!-- Inventario -->
+              <rect x="300" y="30" width="180" height="78" rx="7" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"></rect>
+              <text x="390" y="60" text-anchor="middle" font-family="var(--f-display)" font-size="15" font-weight="700" fill="var(--accent)">Inventario</text>
+              <text x="390" y="79" text-anchor="middle" font-size="11" fill="currentColor">nevera · congelador · despensa</text>
+              <text x="390" y="95" text-anchor="middle" font-size="11" fill="currentColor">cantidad y fecha por producto</text>
+
+              <!-- Cocina -->
+              <rect x="610" y="40" width="150" height="58" rx="7" fill="var(--surface-2)" stroke="currentColor" stroke-width="1"></rect>
+              <text x="685" y="66" text-anchor="middle" font-family="var(--f-display)" font-size="14" font-weight="600" fill="var(--ink)">Cocina</text>
+              <text x="685" y="84" text-anchor="middle" font-size="11" fill="currentColor">«cociné esto»</text>
+
+              <!-- Lista -->
+              <rect x="300" y="300" width="180" height="58" rx="7" fill="var(--surface-2)" stroke="currentColor" stroke-width="1"></rect>
+              <text x="390" y="326" text-anchor="middle" font-family="var(--f-display)" font-size="14" font-weight="600" fill="var(--ink)">Lista de compras</text>
+              <text x="390" y="344" text-anchor="middle" font-size="11" fill="currentColor">viva, ordenada por pasillo</text>
+
+              <!-- Persona -->
+              <rect x="610" y="180" width="150" height="58" rx="7" fill="var(--surface)" stroke="var(--accent)" stroke-width="1" stroke-dasharray="4 3"></rect>
+              <text x="685" y="206" text-anchor="middle" font-family="var(--f-display)" font-size="14" font-weight="600" fill="var(--accent)">La persona</text>
+              <text x="685" y="224" text-anchor="middle" font-size="11" fill="currentColor">edita una cantidad</text>
+
+              <!-- Compra -> Inventario -->
+              <line x1="170" y1="69" x2="294" y2="69" stroke="currentColor" stroke-width="1.4" marker-end="url(#ah)"></line>
+              <text x="232" y="58" text-anchor="middle" font-size="11" fill="currentColor">comprobante</text>
+              <text x="232" y="88" text-anchor="middle" font-family="var(--f-mono)" font-size="10" fill="currentColor">+ zona y fecha</text>
+
+              <!-- Inventario -> Cocina -->
+              <line x1="480" y1="69" x2="604" y2="69" stroke="currentColor" stroke-width="1.4" marker-end="url(#ah)"></line>
+              <text x="542" y="58" text-anchor="middle" font-size="11" fill="currentColor">se cocina</text>
+              <text x="542" y="88" text-anchor="middle" font-family="var(--f-mono)" font-size="10" fill="currentColor">− por receta</text>
+
+              <!-- Cocina -> Lista (bajando por la derecha y a la izquierda) -->
+              <path d="M 685 98 L 685 150 L 530 150 L 530 329 L 486 329" fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#ah)"></path>
+              <text x="600" y="142" text-anchor="middle" font-size="11" fill="currentColor">se agotó o bajó del mínimo</text>
+
+              <!-- Lista -> Compra -->
+              <path d="M 300 329 L 95 329 L 95 104" fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#ah)"></path>
+              <text x="200" y="320" text-anchor="middle" font-size="11" fill="currentColor">pedido armado</text>
+
+              <!-- Persona -> Inventario -->
+              <path d="M 640 180 L 570 130 L 470 112" fill="none" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#ahA)"></path>
+              <text x="702" y="162" text-anchor="middle" font-family="var(--f-mono)" font-size="10" fill="var(--accent)">su cantidad manda</text>
+
+              <!-- FEFO nota -->
+              <text x="390" y="132" text-anchor="middle" font-family="var(--f-mono)" font-size="10" fill="currentColor">orden FEFO: lo que vence primero, sale primero</text>
+            </svg>
+          </div>
+          <figcaption><b>El inventario se mantiene por tres vías automáticas y una manual.</b> Entra con el comprobante de la compra, sale al cocinar, y lo agotado vuelve a la lista sin que nadie lo escriba. La flecha en color es la única que una persona acciona a mano — y es la que gana: lo que ella registra se toma como cierto y el sistema recalcula desde ahí.</figcaption>
+        </figure>
+
+        <p>Dicho en una frase: el camino por defecto no exige tocar nada, y cuando la persona sí quiere tocar algo, no tiene que pelear con el sistema para hacerlo.</p>
+      </section>
+
+      <section id="entra">
+        <h2>Cómo entra la comida</h2>
+        <p class="dek">Cinco vías, todas diseñadas para que nadie llene un formulario. La entrada manual existe, pero es la última, no la primera.</p>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Vía</th><th>Cómo se usa</th><th>Para qué sirve</th></tr></thead>
+            <tbody>
+              <tr><td>Voz</td><td>«Guardé medio kilo de pechuga y una bolsa de espinaca»</td><td>El caso del día a día: dos o tres cosas al volver del súper</td></tr>
+              <tr><td>Foto del ticket</td><td>Una foto y toda la compra entra como borrador editable</td><td>La compra grande de la semana, treinta líneas de una vez</td></tr>
+              <tr><td>Código de barras</td><td>Escanear un producto puntual</td><td>Trae la ficha completa del producto envasado</td></tr>
+              <tr><td>Comprobante en línea</td><td>Se comparte el correo del pedido a domicilio</td><td>Entra solo, y con las sustituciones que hizo el repartidor ya aplicadas</td></tr>
+              <tr><td>Manual</td><td>Escribir producto y cantidad</td><td>Siempre disponible, nunca promovida en la interfaz</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Detrás de las tres primeras hay una pieza que importa a mediano plazo: <strong>un diccionario que aprende</strong>. Los tickets latinoamericanos abrevian los nombres de forma imposible de adivinar, y cada corrección que hace un usuario mejora el reconocimiento para todos. Es lo que hace que la captura funcione mejor el mes seis que el mes uno, y es difícil de copiar rápido.</p>
+      </section>
+
+      <section id="ficha">
+        <h2>Qué guarda de cada producto</h2>
+        <p class="dek">No es una lista de nombres. Cada producto tiene una ficha, y de esa ficha sale todo lo demás.</p>
+        <dl class="defs">
+          <div class="def"><dt>Cantidad</dt><dd>En la unidad real del producto: <strong>500 g</strong>, <strong>2 L</strong>, <strong>1 bolsa</strong>. Saber si <em>hay</em> algo no basta; hay que saber si alcanza para la receta.</dd></div>
+          <div class="def"><dt>Zona</dt><dd>Nevera, congelador o despensa. <strong>Cada zona tiene su propia vida útil</strong> para el mismo producto: la misma pechuga dura tres días en una y tres meses en otra.</dd></div>
+          <div class="def"><dt>Fecha impresa</dt><dd>La del envase, cuando existe.</dd></div>
+          <div class="def"><dt>Vida útil estimada</dt><dd>Para los frescos sin fecha impresa — verduras, frutas, huevos — calculada por producto y zona. <strong>Es una estimación y se presenta como tal</strong>, nunca como una garantía de inocuidad.</dd></div>
+          <div class="def"><dt>Fecha de apertura</dt><dd>Marcar «abierto hoy» recalcula la estimación. Un envase cerrado y uno abierto son dos productos distintos.</dd></div>
+          <div class="def"><dt>Estado declarado</dt><dd>Tres opciones de un toque: <strong>está bien</strong>, <strong>dudoso</strong>, <strong>ya no</strong>. Es la forma más barata de corregir una estimación equivocada sin abrir nada.</dd></div>
+        </dl>
+        <p>Dos casos particulares que la ficha resuelve y que suelen quedarse fuera en otras apps: las <strong>sobras</strong> se registran como un producto propio, con caducidad automática de tres días; y el <strong>congelador</strong> guarda fecha de congelación, no de compra, y avisa con un «úsalo antes de».</p>
+        <p>El inventario es compartido: todos los miembros de la casa ven y editan el mismo estado, y funciona con señal intermitente porque una cocina no siempre tiene buena cobertura.</p>
+      </section>
+
+      <section id="sale">
+        <h2>Cómo sale</h2>
+        <p class="dek">Tres salidas, y solo una de ellas es la que sostiene el producto.</p>
+        <div class="steps">
+          <div class="step">
+            <div>
+              <h4>Cociné esto</h4>
+              <p><strong>La salida principal.</strong> Un toque sobre la receta descuenta sus ingredientes en las cantidades correspondientes, ajustadas a las porciones que se sirvieron. Es el 90 % del consumo de una casa y no cuesta nada registrarlo.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <h4>Tiré esto</h4>
+              <p>Dos toques, con el motivo. No es un castigo: es el dato que alimenta el contador de desperdicio y el reporte mensual, que es lo que después demuestra que el producto sirvió.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div>
+              <h4>La corrección directa</h4>
+              <p>Las cantidades están siempre a la vista y se pueden editar. <strong>Lo que la persona registra se toma como cierto</strong> y el sistema recalcula desde ese número. La app no le pide que confirme cálculos ajenos.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="propone">
+        <h2>Qué te propone hacer</h2>
+        <p class="dek">La app no devuelve una lista de lo que tienes. Devuelve qué hacer con ello hoy.</p>
+        <p>La pantalla de inicio abre con lo del día: los tres productos que están en su momento crítico, cada uno con la acción que corresponde — cocínalo hoy, congélalo y dura dos meses, ya está abierto y hay que usarlo antes del jueves — y tres cosas que se pueden preparar con ellos sin salir a comprar.</p>
+        <p>El orden lo fija <strong>FEFO</strong>: <em>first expired, first out</em>, lo que vence primero se propone primero. Es un cálculo determinista sobre fechas reales, no una preferencia del modelo.</p>
+        <h3>Los tres niveles de disponibilidad</h3>
+        <p>Cada receta se clasifica según lo que hay en casa, y esa clasificación es la que conecta el recetario con la lista de compras:</p>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Nivel</th><th>Qué significa</th><th>Qué hace la app</th></tr></thead>
+            <tbody>
+              <tr><td>Cocinable ya</td><td>Están todos los ingredientes, en cantidad suficiente</td><td>Se propone primero, sobre todo si consume algo que apura</td></tr>
+              <tr><td>Falta 1–2</td><td>Están los principales, faltan secundarios</td><td>Los faltantes se pueden mandar a la lista con un toque</td></tr>
+              <tr><td>Falta lo principal</td><td>No está el ingrediente que define el plato</td><td>Se muestra abajo; no se propone para hoy</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>El recetario es propio y de clásicos de todos los días, con cantidades pensadas para una casa, y se complementa con enlaces a blogs y sitios de cocina con crédito visible. Las porciones se escalan según cuántos comen.</p>
+      </section>
+
+      <section id="perfiles">
+        <h2>Una cena para varios</h2>
+        <p class="dek">Esta es la parte con más detalle de diseño, porque una cena tiene que servirle a varias personas a la vez y una de ellas puede tener una alergia real.</p>
+        <p>Cada miembro de la casa tiene tres listas y unas notas libres:</p>
+        <div class="defs">
+          <div class="def"><dt>no puede</dt><dd><strong>Filtro duro.</strong> Excluye la receta por completo. Alergias e intolerancias viven aquí y nunca degradan el ranking: lo eliminan.</dd></div>
+          <div class="def"><dt>evita</dt><dd><strong>Filtro suave.</strong> Baja el puesto, pero la receta sigue visible. Es donde van los disgustos y las preferencias.</dd></div>
+          <div class="def"><dt>le encanta</dt><dd>Sube el puesto. Se ajusta solo con el tiempo, con un pulgar por miembro después de cocinar.</dd></div>
+        </div>
+        <p>Hay presets de un toque para no obligar a nadie a construir su lista desde cero — vegetariano, vegano, sin cerdo, halal, kosher, sin lácteos, sin gluten, sin frutos secos, sin mariscos, sin picante — y una <strong>jerarquía de ingredientes</strong> detrás, que es lo que evita el error clásico: marcar «sin lácteos» tiene que arrastrar mantequilla, crema, queso y suero, no solo la leche.</p>
+        <p>A la hora de decidir la cena se eligen los comensales, y el filtro que se aplica es la <strong>unión de las restricciones de los presentes</strong>. Si comen Ana, que evita lácteos, y Sofía, que es alérgica al maní, la cena de esta noche es sin lácteos y sin maní. Las combinaciones habituales se guardan como escenas: cena familiar, solo adultos, los niños, solo yo, invitado temporal.</p>
+        <p>Cada resultado dice <strong>por qué</strong>: <em>sirve para Ana y Luis · no para Sofía (maní)</em>. Y antes de descartar un plato, la app propone la sustitución que lo salvaría — crema de leche por crema de coco, leche por bebida vegetal — si el reemplazo ya está en la casa.</p>
+        <div class="rule">
+          <span class="rule-k">Comportamiento ante datos incompletos</span>
+          <p>Si no se sabe con certeza si una receta contiene un alérgeno, la app <strong>no afirma que es segura</strong>. Un fallo en el filtro de alergias puede causar daño físico, así que el comportamiento por defecto es conservador y siempre acompaña el resultado con la indicación de verificar la etiqueta.</p>
+        </div>
+      </section>
+
+      <section id="regla">
+        <h2>Quién decide qué</h2>
+        <p class="dek">La regla que atraviesa todo el producto, y la que hay que respetar si algún día se agrega una función nueva.</p>
+
+        <figure>
+          <div class="figbox">
+            <svg viewBox="0 0 800 320" role="img" aria-label="Dos caminos. Arriba: una frase pasa por la IA que extrae la intención, y luego por el sistema que aplica el filtro duro y produce el resultado. Abajo: ante una receta bloqueada la IA propone una sustitución, la persona la acepta y solo entonces el sistema levanta el bloqueo.">
+              <defs>
+                <marker id="d1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"></path>
+                </marker>
+                <marker id="d2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--accent)"></path>
+                </marker>
+              </defs>
+
+              <!-- leyenda -->
+              <line x1="20" y1="24" x2="60" y2="24" stroke="currentColor" stroke-width="1.4" stroke-dasharray="5 4"></line>
+              <text x="68" y="28" font-size="11" fill="currentColor">propone — no aplica nada</text>
+              <line x1="250" y1="24" x2="290" y2="24" stroke="var(--accent)" stroke-width="2"></line>
+              <text x="298" y="28" font-size="11" fill="var(--accent)">aplica — cambia el estado</text>
+
+              <!-- fila 1 -->
+              <text x="20" y="70" font-family="var(--f-mono)" font-size="10" letter-spacing="1.2" fill="currentColor">BUSCAR QUÉ COCINAR</text>
+
+              <rect x="20" y="82" width="140" height="52" rx="6" fill="var(--surface-2)" stroke="currentColor"></rect>
+              <text x="90" y="105" text-anchor="middle" font-size="12" fill="var(--ink)">«¿Qué hago</text>
+              <text x="90" y="121" text-anchor="middle" font-size="12" fill="var(--ink)">de cena?»</text>
+
+              <rect x="240" y="82" width="150" height="52" rx="6" fill="var(--surface)" stroke="currentColor" stroke-dasharray="4 3"></rect>
+              <text x="315" y="103" text-anchor="middle" font-size="12" font-weight="600" fill="var(--ink)">IA</text>
+              <text x="315" y="121" text-anchor="middle" font-size="11" fill="currentColor">extrae la intención</text>
+
+              <rect x="470" y="82" width="160" height="52" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"></rect>
+              <text x="550" y="103" text-anchor="middle" font-size="12" font-weight="600" fill="var(--accent)">Sistema</text>
+              <text x="550" y="121" text-anchor="middle" font-size="11" fill="currentColor">filtro duro</text>
+
+              <rect x="700" y="82" width="80" height="52" rx="6" fill="var(--surface-2)" stroke="currentColor"></rect>
+              <text x="740" y="105" text-anchor="middle" font-size="12" fill="var(--ink)">2 de 12</text>
+              <text x="740" y="121" text-anchor="middle" font-size="11" fill="currentColor">recetas</text>
+
+              <line x1="160" y1="108" x2="234" y2="108" stroke="currentColor" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#d1)"></line>
+              <line x1="390" y1="108" x2="464" y2="108" stroke="var(--accent)" stroke-width="2" marker-end="url(#d2)"></line>
+              <line x1="630" y1="108" x2="694" y2="108" stroke="var(--accent)" stroke-width="2" marker-end="url(#d2)"></line>
+              <text x="550" y="150" text-anchor="middle" font-family="var(--f-mono)" font-size="10" fill="currentColor">alergias, fechas y cantidades declaradas</text>
+
+              <!-- separador -->
+              <line x1="20" y1="180" x2="780" y2="180" stroke="currentColor" stroke-width="1" opacity=".25"></line>
+
+              <!-- fila 2 -->
+              <text x="20" y="208" font-family="var(--f-mono)" font-size="10" letter-spacing="1.2" fill="currentColor">SALVAR UNA RECETA BLOQUEADA</text>
+
+              <rect x="20" y="220" width="140" height="52" rx="6" fill="var(--bad-soft)" stroke="currentColor"></rect>
+              <text x="90" y="243" text-anchor="middle" font-size="12" fill="var(--ink)">Bloqueada</text>
+              <text x="90" y="259" text-anchor="middle" font-size="11" fill="currentColor">lleva crema</text>
+
+              <rect x="240" y="220" width="150" height="52" rx="6" fill="var(--surface)" stroke="currentColor" stroke-dasharray="4 3"></rect>
+              <text x="315" y="241" text-anchor="middle" font-size="12" font-weight="600" fill="var(--ink)">IA</text>
+              <text x="315" y="259" text-anchor="middle" font-size="11" fill="currentColor">propone coco</text>
+
+              <rect x="470" y="220" width="150" height="52" rx="6" fill="var(--surface)" stroke="currentColor" stroke-dasharray="4 3"></rect>
+              <text x="545" y="241" text-anchor="middle" font-size="12" font-weight="600" fill="var(--ink)">Persona</text>
+              <text x="545" y="259" text-anchor="middle" font-size="11" fill="currentColor">acepta</text>
+
+              <rect x="690" y="220" width="90" height="52" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"></rect>
+              <text x="735" y="241" text-anchor="middle" font-size="12" font-weight="600" fill="var(--accent)">Sistema</text>
+              <text x="735" y="259" text-anchor="middle" font-size="11" fill="currentColor">desbloquea</text>
+
+              <line x1="160" y1="246" x2="234" y2="246" stroke="currentColor" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#d1)"></line>
+              <line x1="390" y1="246" x2="464" y2="246" stroke="currentColor" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#d1)"></line>
+              <line x1="620" y1="246" x2="684" y2="246" stroke="var(--accent)" stroke-width="2" marker-end="url(#d2)"></line>
+              <text x="400" y="292" text-anchor="middle" font-family="var(--f-mono)" font-size="10" fill="currentColor">el bloqueo solo lo puede levantar el sistema, y solo después del toque</text>
+            </svg>
+          </div>
+          <figcaption><b>La IA nunca cambia el estado por su cuenta.</b> Interpreta lo que se dijo y propone salidas; las flechas punteadas no mueven nada. Las de color son las únicas que escriben, y siempre salen del sistema determinista — que a su vez solo actúa sobre datos declarados, nunca inferidos.</figcaption>
+        </figure>
+
+        <div class="rule">
+          <span class="rule-k">Regla invariable</span>
+          <p>La IA interpreta y propone. El sistema determinista decide la verdad. <strong>Fechas, cantidades, alergias y dinero nunca son una inferencia.</strong> Cualquier función nueva tiene que respetarlo.</p>
+        </div>
+        <p>No es purismo técnico. Es lo que permite poner el producto frente a una familia con una alergia real, y lo que evita que un modelo se invente que quedan doscientos gramos de arroz.</p>
+      </section>
+
+      <section id="compra">
+        <h2>De la lista a la compra</h2>
+        <p class="dek">La lista no se escribe: se llena sola desde cuatro fuentes distintas.</p>
+        <p>Entran en la lista los productos que se agotaron, los que bajaron del mínimo de la casa, los faltantes de una receta que alguien eligió cocinar, y lo que cualquier miembro agregue a mano. Cada ítem pasa por tres estados — <code>sugerido</code>, <code>confirmado</code>, <code>comprado</code> — y lo comprado entra al inventario.</p>
+        <p>Un par de detalles que salen de cómo se compra de verdad: la lista se agrupa <strong>por pasillo</strong> para recorrer el súper una sola vez; se comparte en tiempo real, así que quien está en el súper marca y el resto lo ve; y los <strong>imprescindibles</strong> llevan estrella — la leche que en esa casa nunca puede faltar — hasta que la app aprende sola de la recompra.</p>
+        <h3>Por dónde sale la compra</h3>
+        <p>Tres salidas en la versión 1, todas disponibles sin depender del permiso de nadie: abrir la plataforma de domicilio con los productos ya identificados, mandar la lista por WhatsApp al tendero del barrio o al grupo de la casa, o copiarla al portapapeles.</p>
+        <p>Y el cierre del ciclo: <strong>el retorno por comprobante</strong>. El correo o la pantalla del pedido entran al inventario con su fecha estimada, incluidas las sustituciones que hizo el repartidor. Nadie revisa la bolsa contra la lista.</p>
+        <div class="rule">
+          <span class="rule-k">Por qué la integración va por peldaños</span>
+          <p>Rappi y Uber Eats <strong>no tienen API del lado del comprador</strong>: no se puede armar un carrito ahí desde fuera, por mucho que se quiera. Instacart y Kroger sí la tienen y son de autoservicio. Por eso el diseño empieza por enlaces y mensajes, que funcionan hoy, y deja el carrito armado para cuando haya volumen de pedidos que mostrarle a un socio.</p>
+        </div>
+      </section>
+
+      <section id="negocio">
+        <h2>Cómo gana dinero</h2>
+        <p class="dek">El hogar no paga. Paga el canal por donde termina la compra.</p>
+        <p>Cuando la lista sale hacia una plataforma de domicilio o un retailer, ese enlace genera una <strong>comisión de afiliado por pedido</strong>. El precio para el usuario no cambia, y la relación comercial se declara en la misma pantalla donde ocurre, no en una nota al pie de los términos.</p>
+        <p>La razón para declararla es de producto, no legal: la app está proponiendo qué comprar, y si el usuario descubre después que había un incentivo detrás, se rompe la confianza sobre la que se apoya todo lo demás.</p>
+        <p>El mercado profesional — restaurantes y hoteles — es un producto distinto, con suscripción por sede y sin comisión de proveedor. No se construye a la vez que este.</p>
+      </section>
+
+      <section id="fases">
+        <h2>Qué hay en v1 y qué no</h2>
+        <p class="dek">De 73 features en 11 áreas, 51 entran en la primera entrega. Lo que queda fuera está fuera por una razón concreta, no por falta de tiempo.</p>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Área</th><th>En la versión 1</th><th>Después</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Captura</td>
+                <td>Voz, ticket, código de barras, comprobante en línea, manual</td>
+                <td><span class="pill v2">v2</span> Importación desde la cuenta de fidelidad del súper</td>
+              </tr>
+              <tr>
+                <td>Inventario</td>
+                <td>Ficha completa, tres zonas, sobras, congelador, compartido, sin conexión</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>Caducidad</td>
+                <td>FEFO, avisos, temperatura declarada por el usuario</td>
+                <td><span class="pill v2">v2</span> Sensor Bluetooth y alerta de corte de frío</td>
+              </tr>
+              <tr>
+                <td>Recetas</td>
+                <td>Tres niveles, «cociné esto», faltantes a la lista, porciones</td>
+                <td><span class="pill v2">v2</span> Plan semanal de comidas</td>
+              </tr>
+              <tr>
+                <td>Perfiles</td>
+                <td>Las tres listas, presets, jerarquía, comensales, escenas, sustituciones</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>Plan de alimentación</td>
+                <td>Plan declarado por el usuario, por miembro</td>
+                <td><span class="pill v2">v2</span> Macros · <span class="pill fu">Futuro</span> canal de nutricionistas</td>
+              </tr>
+              <tr>
+                <td>Lista de compras</td>
+                <td>Lista viva, estados, imprescindibles, pasillo, WhatsApp</td>
+                <td><span class="pill v2">v2</span> Presupuesto y comparación de precios</td>
+              </tr>
+              <tr>
+                <td>Compra</td>
+                <td>Salida a plataforma, tendero, portapapeles, retorno por comprobante, afiliados</td>
+                <td><span class="pill fu">Futuro</span> Carrito armado, retailer directo, middleware</td>
+              </tr>
+              <tr>
+                <td>Ahorro</td>
+                <td>«Tiré esto», contador de dinero, reporte mensual</td>
+                <td><span class="pill v2">v2</span> Meta de reducción · <span class="pill fu">Futuro</span> donación</td>
+              </tr>
+              <tr>
+                <td>Hardware</td>
+                <td>Ninguno. El producto no lo necesita</td>
+                <td><span class="pill v2">v2</span> Sensor, etiquetas NFC, báscula</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Sobre el hardware conviene ser explícito, porque es la pregunta que más se repite: <strong>la versión 1 no lleva hardware y no se fabrica nada</strong>. En la v2 se certifican dos modelos comerciales de sensor de temperatura, de 10 a 25 dólares, como compatibles. Nada de eso es necesario para usar el producto.</p>
+      </section>
+
+      <section id="abierto">
+        <h2>Lo que no está resuelto</h2>
+        <p class="dek">Lo honesto es decirlo con el resto, no dejarlo para cuando salga en una reunión.</p>
+        <div class="open">
+          <h3>Riesgos y preguntas abiertas</h3>
+          <ul>
+            <li><strong>El riesgo no es técnico, es de retención.</strong> Nada de lo descrito acá es difícil de construir en 2026. Lo difícil es que la gente siga usándolo el mes tres. Toda la apuesta está en que «cociné esto» sea suficiente.</li>
+            <li><strong>Los alérgenos ocultos son el punto más duro.</strong> Filtrar por el nombre del plato no alcanza; hace falta el detalle de ingredientes a nivel de producto. Es donde el producto puede fallar de la peor manera.</li>
+            <li><strong>Normalizar nombres de ingredientes.</strong> «Pechuga de pollo», «pollo» y «muslo» tienen que reconciliarse contra el inventario. Requiere taxonomía o embeddings, y es lo que decide si el match de recetas se siente mágico o roto.</li>
+            <li><strong>La fuente de recetas está sin decidir.</strong> Base propia curada, API externa o generación por modelo. Cada opción cambia el costo y el control de calidad.</li>
+            <li><strong>Los datos de salud.</strong> Peso, IMC y condiciones médicas son categoría especial bajo GDPR. La salida elegida es tratar el plan de alimentación como <em>preferencia declarada por el usuario</em>, sin campos clínicos y sin presentar consejo profesional: la app ejecuta en la cocina un plan que ya dio alguien más.</li>
+            <li><strong>El país está sin definir</strong>, y cambia canales de compra, nombres de producto, unidades y cifras.</li>
+          </ul>
+        </div>
+        <p>Y el siguiente paso no es construir. Es una <strong>prueba de conserje con diez familias durante dos semanas</strong>, operada a mano, para responder la única pregunta que decide si el producto existe: ¿la gente registra lo que consume?</p>
+      </section>
+
+      <footer>
+        <p>Este documento resume el análisis que está en <code>docs/</code>: la idea original, el análisis de viabilidad, el refinamiento feature por feature, el catálogo de integraciones de compra y la especificación de perfiles familiares. La versión animada de todo esto, en tres minutos, es la demo de <code>demo/index.html</code>.</p>
+      </footer>
+
+    </main>
+  </div>
+</div>

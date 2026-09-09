@@ -1,0 +1,60 @@
+<!DOCTYPE html><meta charset="utf-8"><title>probe</title>
+<style>html,body{margin:0}#f{width:100vw;height:100vh;border:0}#out{position:fixed;left:-9999px}</style>
+<iframe id="f" src="index.html"></iframe><pre id="out"></pre>
+<script>
+const out = document.getElementById('out');
+const raf = () => new Promise(r => setTimeout(r, 16));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+(async () => {
+ try{
+  const f = document.getElementById('f');
+  /* the iframe can finish loading before this listener is attached, so poll for the API
+     instead of waiting on 'load' */
+  let w = null, d = null, D = null;
+  for (let t = 0; t < 400 && !D; t++){
+    w = f.contentWindow; d = f.contentDocument;
+    D = w && w.Demo;
+    if (!D) await sleep(50);
+  }
+  if (!D) { out.textContent = 'RESULT ' + JSON.stringify({error:'no Demo'}); return; }
+  await sleep(300);
+
+  const rows = [];
+  for (const dev of ['mobile','tablet']){
+    d.body.dataset.device = dev;
+    w.dispatchEvent(new Event('resize'));
+    await sleep(40);
+    for (let i = 0; i < D.count; i++){
+      D.goto(i); D.pause();
+      await sleep(40);
+      const view = d.querySelector('.view.is-on');
+      const rail = d.querySelector('.rail');
+      const scr  = d.querySelector('.screen');
+      const r = {
+        dev, i, id: D.ids[i],
+        view: view ? view.dataset.view : null,
+        vOver: view ? view.scrollHeight - view.clientHeight : 0,
+        rOver: rail.scrollHeight - rail.clientHeight,
+        hOver: d.documentElement.scrollWidth - d.documentElement.clientWidth,
+        vOver2: d.body.scrollHeight - d.body.clientHeight,
+        li: d.querySelectorAll('.li.is-in').length, rev: d.querySelectorAll('.rev.is-in').length, ff: d.querySelectorAll('.ff.is-in').length, scrH: scr.clientHeight, vsh: view?view.scrollHeight:0, vch: view?view.clientHeight:0
+      };
+      if (dev==='mobile' && (i===15||i===33)){
+        const first = d.querySelector('.li.is-in');
+        const lg = d.querySelector('.log');
+        r.dbg = first ? {
+          op: w.getComputedStyle(first).opacity,
+          disp: w.getComputedStyle(first).display,
+          rect: JSON.stringify(first.getBoundingClientRect()),
+          logTop: lg.getBoundingClientRect().top, logH: lg.clientHeight,
+          logSH: lg.scrollHeight, logST: lg.scrollTop
+        } : 'none';
+      }
+      rows.push(r);
+    }
+  }
+  out.textContent = 'RESULT ' + JSON.stringify(rows);
+ }catch(e){ out.textContent = 'RESULT ' + JSON.stringify({error:String(e && e.stack || e)}); }
+})();
+</script>

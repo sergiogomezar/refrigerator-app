@@ -1,0 +1,789 @@
+<title>Dossier Freezai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+  :root {
+    --ground: #f1f4f4;
+    --surface: #ffffff;
+    --surface-2: #e6eded;
+    --ink: #0f1d1f;
+    --ink-muted: #53676a;
+    --line: #ccdad9;
+    --line-strong: #a5b9b8;
+    --accent: #14939f;
+    --accent-quiet: #dbebee;
+    --fresh: #2d7a53;
+    --warn: #9a5a06;
+    --crit: #a3372a;
+    --radius: 3px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0c1416;
+      --surface: #141e21;
+      --surface-2: #1b2729;
+      --ink: #e6edec;
+      --ink-muted: #90a3a3;
+      --line: #28383b;
+      --line-strong: #3b4f53;
+      --accent: #59c6d3;
+      --accent-quiet: #14313a;
+      --fresh: #72c598;
+      --warn: #dea74f;
+      --crit: #e5786b;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0c1416;
+    --surface: #141e21;
+    --surface-2: #1b2729;
+    --ink: #e6edec;
+    --ink-muted: #90a3a3;
+    --line: #28383b;
+    --line-strong: #3b4f53;
+    --accent: #59c6d3;
+    --accent-quiet: #14313a;
+    --fresh: #72c598;
+    --warn: #dea74f;
+    --crit: #e5786b;
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 16.5px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4, .eyebrow, .chip, .tag, th, .meta, .stat-n, nav, .steps, figcaption, .pillrow { font-family: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif; }
+  .mono, td.num, .stat-n, .code { font-family: "IBM Plex Mono", Consolas, monospace; }
+
+  .page { max-width: 76rem; margin: 0 auto; padding: 2.5rem 1.25rem 6rem; }
+
+  /* ---------- hero ---------- */
+  .hero { display: flex; flex-direction: column; gap: 1.1rem; padding-bottom: 2rem; border-bottom: 2px solid var(--line-strong); }
+  .eyebrow { font-size: .7rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin: 0; }
+  h1 { font-size: clamp(2.4rem, 7vw, 4.2rem); font-weight: 800; line-height: .98; letter-spacing: -.03em; margin: 0; }
+  .deck { font-size: 1.2rem; color: var(--ink-muted); margin: 0; max-width: 40rem; }
+  .deck strong { color: var(--ink); font-weight: 600; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: .5rem; }
+  .stat { background: var(--surface); padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: .2rem; }
+  .stat-n { font-size: 1.7rem; font-weight: 600; letter-spacing: -.02em; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .stat-l { font-size: .84rem; color: var(--ink-muted); line-height: 1.35; }
+  .meta { display: flex; flex-wrap: wrap; gap: 0 1.4rem; font-size: .74rem; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-muted); }
+
+  /* ---------- layout with nav ---------- */
+  .body-grid { display: grid; grid-template-columns: 1fr; gap: 2.5rem; margin-top: 2.5rem; }
+  @media (min-width: 62rem) {
+    .body-grid { grid-template-columns: 13rem minmax(0, 1fr); gap: 3.5rem; }
+    nav { position: sticky; top: 1.5rem; align-self: start; }
+  }
+  nav ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .35rem 1rem; font-size: .82rem; }
+  @media (min-width: 62rem) { nav ol { flex-direction: column; gap: .5rem; } }
+  nav a { color: var(--ink-muted); text-decoration: none; display: flex; gap: .5rem; }
+  nav a:hover { color: var(--accent); }
+  nav .n { font-family: "IBM Plex Mono", monospace; font-size: .72rem; color: var(--line-strong); }
+
+  main { display: flex; flex-direction: column; gap: 3.5rem; min-width: 0; }
+  section { display: flex; flex-direction: column; gap: 1.05rem; scroll-margin-top: 1.5rem; }
+  h2 { font-size: 1.6rem; font-weight: 700; letter-spacing: -.015em; margin: 0; display: flex; align-items: baseline; gap: .65rem; padding-bottom: .5rem; border-bottom: 2px solid var(--line-strong); }
+  h2 .n { font-family: "IBM Plex Mono", monospace; font-size: .8rem; font-weight: 600; color: var(--accent); }
+  h3 { font-size: 1.05rem; font-weight: 700; margin: .5rem 0 -.4rem; }
+  h4 { font-size: .74rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-muted); margin: .6rem 0 -.5rem; }
+  p { margin: 0; max-width: 44rem; }
+  a { color: var(--accent); text-underline-offset: 2px; }
+  ul { margin: 0; padding-left: 1.15rem; display: flex; flex-direction: column; gap: .45rem; max-width: 44rem; }
+  li::marker { color: var(--line-strong); }
+  strong { font-weight: 600; }
+
+  /* ---------- lead / verdict ---------- */
+  .lead { background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--accent); padding: 1.4rem 1.5rem; display: flex; flex-direction: column; gap: .85rem; }
+  .lead p { max-width: 46rem; }
+  .lead p:first-child { font-size: 1.06rem; }
+
+  /* ---------- meters ---------- */
+  .meters { display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--line); }
+  .meter-row { display: grid; grid-template-columns: minmax(8rem, 12rem) 6.5rem minmax(0, 1fr); align-items: center; gap: .4rem 1.1rem; padding: .6rem 0; border-bottom: 1px solid var(--line); }
+  .meter-row > .k { font-family: "Bricolage Grotesque", sans-serif; font-weight: 600; font-size: .93rem; }
+  .bar { height: 7px; background: var(--surface-2); border-radius: 1px; overflow: hidden; }
+  .bar > i { display: block; height: 100%; }
+  .bar > i.hi { background: var(--fresh); }
+  .bar > i.mid { background: var(--warn); }
+  .bar > i.lo { background: var(--crit); }
+  .meter-row > .note { font-size: .9rem; color: var(--ink-muted); }
+  @media (max-width: 44rem) { .meter-row { grid-template-columns: 1fr 5rem; } .meter-row > .note { grid-column: 1 / -1; } }
+
+  /* ---------- figures ---------- */
+  figure { margin: 0; display: flex; flex-direction: column; gap: .7rem; background: var(--surface); border: 1px solid var(--line); padding: 1.3rem; }
+  figure svg { max-width: 100%; height: auto; display: block; color: var(--ink); }
+  figcaption { font-size: .86rem; color: var(--ink-muted); max-width: 46rem; }
+
+  /* ---------- feature cards ---------- */
+  .fgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .fcard { background: var(--surface); padding: 1.1rem 1.15rem; display: flex; flex-direction: column; gap: .6rem; }
+  .fcard .code { font-family: "IBM Plex Mono", monospace; font-size: .72rem; font-weight: 600; letter-spacing: .08em; color: var(--accent); }
+  .fcard .t { font-family: "Bricolage Grotesque", sans-serif; font-weight: 700; font-size: 1.08rem; letter-spacing: -.01em; }
+  .fcard p { font-size: .93rem; }
+  .pillrow { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: auto; padding-top: .4rem; }
+  .chip { font-size: .66rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; padding: .15rem .42rem; border: 1px solid currentColor; border-radius: var(--radius); white-space: nowrap; }
+  .c-keep { color: var(--fresh); }
+  .c-cut { color: var(--crit); }
+  .c-swap { color: var(--warn); }
+  .c-add { color: var(--accent); }
+
+  /* ---------- two column compare ---------- */
+  .compare { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .col { background: var(--surface); padding: 1.1rem 1.15rem; display: flex; flex-direction: column; gap: .55rem; }
+  .col h3 { margin: 0; font-size: 1.05rem; }
+  .col .kv { display: grid; grid-template-columns: 7.5rem 1fr; gap: .3rem .7rem; font-size: .9rem; }
+  .col .kv dt { color: var(--ink-muted); }
+  .col .kv dd { margin: 0; }
+
+  /* ---------- tables ---------- */
+  .scroller { overflow-x: auto; border: 1px solid var(--line); background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; min-width: 30rem; font-size: .9rem; }
+  caption { caption-side: bottom; text-align: left; color: var(--ink-muted); font-size: .82rem; padding: .55rem .85rem; border-top: 1px solid var(--line); }
+  th { text-align: left; font-size: .68rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-muted); padding: .6rem .85rem; border-bottom: 1px solid var(--line-strong); background: var(--surface-2); white-space: nowrap; }
+  td { padding: .58rem .85rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  td.num { font-variant-numeric: tabular-nums; white-space: nowrap; font-size: .86rem; }
+  td.g { background: var(--surface-2); font-weight: 600; font-family: "Bricolage Grotesque", sans-serif; font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-muted); }
+
+  /* cost bar inside table */
+  .cost { display: flex; align-items: center; gap: .5rem; }
+  .cost .bar { width: 4.5rem; flex: none; }
+
+  /* ---------- steps (escalera) ---------- */
+  .steps { display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .step { background: var(--surface); display: grid; grid-template-columns: 3.2rem minmax(0, 1fr) 7rem; gap: .3rem 1rem; padding: .85rem 1rem; align-items: baseline; }
+  .step .lvl { font-family: "IBM Plex Mono", monospace; font-size: 1.1rem; font-weight: 600; color: var(--accent); }
+  .step .what { font-size: .93rem; }
+  .step .what b { font-family: "Bricolage Grotesque", sans-serif; font-size: 1rem; display: block; margin-bottom: .15rem; }
+  .step .acc { justify-self: start; }
+  .step.ready { border-left: 3px solid var(--fresh); }
+  .step.later { border-left: 3px solid var(--line-strong); }
+  @media (max-width: 42rem) { .step { grid-template-columns: 2.6rem 1fr; } .step .acc { grid-column: 2; } }
+
+  /* ---------- roadmap ---------- */
+  .road { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .phase { background: var(--surface); padding: 1rem 1.05rem; display: flex; flex-direction: column; gap: .5rem; }
+  .phase .h { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; border-bottom: 1px solid var(--line); padding-bottom: .45rem; }
+  .phase .h b { font-family: "IBM Plex Mono", monospace; font-size: .95rem; color: var(--accent); }
+  .phase .h span { font-size: .74rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-muted); font-family: "Bricolage Grotesque", sans-serif; }
+  .phase ul { padding-left: 0; list-style: none; gap: .35rem; font-size: .89rem; }
+  .phase li { padding-left: .85rem; position: relative; }
+  .phase li::before { content: ""; position: absolute; left: 0; top: .55em; width: 4px; height: 4px; background: var(--line-strong); }
+
+  /* ---------- rails ---------- */
+  .rail { border-left: 3px solid var(--warn); padding-left: 1.05rem; display: flex; flex-direction: column; gap: .5rem; }
+  .rail.key { border-left-color: var(--accent); }
+  .rail.bad { border-left-color: var(--crit); }
+  .rail > .label { font-family: "Bricolage Grotesque", sans-serif; font-size: .69rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--warn); }
+  .rail.key > .label { color: var(--accent); }
+  .rail.bad > .label { color: var(--crit); }
+  .rail p, .rail li { font-size: .94rem; }
+
+  /* ---------- big number callout ---------- */
+  .callout { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1.2rem; align-items: center; background: var(--accent-quiet); border: 1px solid var(--line); padding: 1.1rem 1.3rem; }
+  .callout .big { font-family: "IBM Plex Mono", monospace; font-size: 2.6rem; font-weight: 600; color: var(--accent); line-height: 1; }
+  .callout p { font-size: .96rem; }
+
+  footer { margin-top: 4rem; border-top: 2px solid var(--line-strong); padding-top: 1.3rem; color: var(--ink-muted); font-size: .88rem; display: flex; flex-direction: column; gap: .6rem; }
+  footer ul { padding-left: 1.1rem; }
+  code, .code { font-size: .88em; background: var(--surface-2); padding: .05em .3em; border-radius: 2px; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<div class="page">
+
+<div class="hero">
+  <p class="eyebrow">Dossier de producto · lluvia de ideas refinada</p>
+  <h1>Dossier Freezai</h1>
+  <p class="deck">Inventario de refrigerador para familias, con captura por voz y foto del ticket. <strong>Todo el análisis en un documento:</strong> viabilidad, mecanismo, seis features refinadas, mercado, integraciones de compra, hardware, legislación y hoja de ruta.</p>
+  <div class="stats">
+    <div class="stat"><span class="stat-n">USD 3 000</span><span class="stat-l">de comida al año que desperdicia una familia de cuatro (EPA, abril 2025)</span></div>
+    <div class="stat"><span class="stat-n">17 %</span><span class="stat-l">del consumo del hogar que termina en la basura</span></div>
+    <div class="stat"><span class="stat-n">6</span><span class="stat-l">features en la versión 1, de las 5 planteadas más una nueva</span></div>
+    <div class="stat"><span class="stat-n">3 / 30</span><span class="stat-l">plataformas de compra con vía técnica real para armar un carrito</span></div>
+  </div>
+  <p class="meta"><span>4 de septiembre de 2026</span><span>Sin decisiones de arquitectura</span><span>Hardware solo donde aporta</span></p>
+</div>
+
+<div class="body-grid">
+
+<nav aria-label="Contenido">
+  <ol>
+    <li><a href="#veredicto"><span class="n">01</span> Veredicto</a></li>
+    <li><a href="#mecanismo"><span class="n">02</span> El mecanismo</a></li>
+    <li><a href="#features"><span class="n">03</span> Las seis features</a></li>
+    <li><a href="#perfiles"><span class="n">04</span> Perfiles familiares</a></li>
+    <li><a href="#mercado"><span class="n">05</span> Mercado y competencia</a></li>
+    <li><a href="#compra"><span class="n">06</span> Integraciones de compra</a></li>
+    <li><a href="#hardware"><span class="n">07</span> Hardware</a></li>
+    <li><a href="#legal"><span class="n">08</span> Legislación</a></li>
+    <li><a href="#ruta"><span class="n">09</span> Versión 1 y ruta</a></li>
+    <li><a href="#siguiente"><span class="n">10</span> Siguiente paso</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<section id="veredicto">
+  <h2><span class="n">01</span> Veredicto</h2>
+  <div class="lead">
+    <p><strong>Vale prototiparla.</strong> El problema tiene tamaño verificable y nada de lo planteado es técnicamente difícil en 2026.</p>
+    <p>El riesgo no es técnico, es de retención. Las apps de inventario de cocina no mueren porque no funcionen: mueren porque el inventario se desactualiza. La idea resuelve bien la <em>entrada</em> de datos — voz y ticket — y no resolvía la <em>salida</em>: nadie registra por su cuenta que se comió medio pollo. Un inventario con 60% de exactitud vuelve inútiles la caducidad, las recetas y las compras al mismo tiempo, porque las tres leen del mismo estado.</p>
+    <p>La corrección está dentro de la propia lista de features, y es el eje de todo este documento: <strong>"cociné esto" con un toque descuenta los ingredientes de la receta.</strong> Las recetas dejan de ser un adorno y pasan a ser el motor que mantiene vivo el inventario.</p>
+  </div>
+  <div class="meters">
+    <div class="meter-row"><span class="k">Factibilidad técnica</span><span class="bar"><i class="hi" style="width:100%"></i></span><span class="note">Voz a ítems estructurados y OCR de tickets están resueltos</span></div>
+    <div class="meter-row"><span class="k">Tamaño del problema</span><span class="bar"><i class="hi" style="width:95%"></i></span><span class="note">17% del consumo del hogar, cerca de USD 3 000 al año por familia</span></div>
+    <div class="meter-row"><span class="k">Retención B2C</span><span class="bar"><i class="lo" style="width:28%"></i></span><span class="note">El eje que mata la categoría. Depende de la descarga de inventario</span></div>
+    <div class="meter-row"><span class="k">Pago del consumidor</span><span class="bar"><i class="lo" style="width:25%"></i></span><span class="note">Ahorrar no convence si cuesta dos minutos diarios de registro</span></div>
+    <div class="meter-row"><span class="k">Pago B2B</span><span class="bar"><i class="hi" style="width:90%"></i></span><span class="note">Restaurantes y hoteles ya pagan por merma y cumplimiento</span></div>
+    <div class="meter-row"><span class="k">Defensibilidad</span><span class="bar"><i class="mid" style="width:58%"></i></span><span class="note">No está en el algoritmo: está en datos locales por país</span></div>
+    <div class="meter-row"><span class="k">Riesgo regulatorio</span><span class="bar"><i class="mid" style="width:62%"></i></span><span class="note">Alto con campos clínicos; ordinario con preferencias declaradas</span></div>
+  </div>
+</section>
+
+<section id="mecanismo">
+  <h2><span class="n">02</span> El mecanismo</h2>
+  <p>Todo el producto es un ciclo. La idea original tenía las flechas de entrada y las de lectura, pero le faltaba la de retorno: nada devolvía al inventario la información de lo que se consumió.</p>
+  <figure>
+    <svg viewBox="0 0 880 380" role="img" aria-label="Ciclo del inventario: la foto del ticket y la nota de voz cargan el inventario; el inventario ordena por caducidad y alimenta las sugerencias de receta; cocinar una receta descuenta los ingredientes y devuelve el estado al inventario; los faltantes van a la lista de compras y la compra vuelve a entrar por el ticket.">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"></path>
+        </marker>
+        <marker id="ar-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#14939f"></path>
+        </marker>
+      </defs>
+
+      <!-- entradas -->
+      <rect x="10" y="40" width="150" height="46" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"></rect>
+      <text x="85" y="62" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Foto del ticket</text>
+      <text x="85" y="78" text-anchor="middle" font-size="11" fill="currentColor" opacity=".7">vía principal · 30 ítems</text>
+
+      <rect x="10" y="110" width="150" height="46" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"></rect>
+      <text x="85" y="132" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Nota de voz</text>
+      <text x="85" y="148" text-anchor="middle" font-size="11" fill="currentColor" opacity=".7">excepción · 3 ítems</text>
+
+      <rect x="10" y="180" width="150" height="38" rx="2" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 3" opacity=".6"></rect>
+      <text x="85" y="204" text-anchor="middle" font-size="12" fill="currentColor" opacity=".6">Manual (último recurso)</text>
+
+      <!-- inventario -->
+      <rect x="250" y="80" width="170" height="120" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect>
+      <text x="335" y="108" text-anchor="middle" font-size="14" font-weight="700" fill="currentColor">Inventario</text>
+      <text x="335" y="130" text-anchor="middle" font-size="11" fill="currentColor" opacity=".75">zona de guardado</text>
+      <text x="335" y="147" text-anchor="middle" font-size="11" fill="currentColor" opacity=".75">fecha de apertura</text>
+      <text x="335" y="164" text-anchor="middle" font-size="11" fill="currentColor" opacity=".75">cantidad</text>
+      <text x="335" y="185" text-anchor="middle" font-size="11" fill="currentColor" opacity=".75">estado declarado</text>
+
+      <!-- fefo -->
+      <rect x="500" y="30" width="160" height="60" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"></rect>
+      <text x="580" y="54" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Aprovecha primero</text>
+      <text x="580" y="72" text-anchor="middle" font-size="11" fill="currentColor" opacity=".7">orden FEFO</text>
+
+      <!-- receta -->
+      <rect x="500" y="120" width="160" height="60" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"></rect>
+      <text x="580" y="144" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Receta sugerida</text>
+      <text x="580" y="162" text-anchor="middle" font-size="11" fill="currentColor" opacity=".7">filtrada por perfiles</text>
+
+      <!-- cociné esto -->
+      <rect x="500" y="210" width="160" height="60" rx="2" fill="none" stroke="#14939f" stroke-width="2"></rect>
+      <text x="580" y="234" text-anchor="middle" font-size="13" font-weight="700" fill="#14939f">Cociné esto</text>
+      <text x="580" y="252" text-anchor="middle" font-size="11" fill="#14939f">un toque</text>
+
+      <!-- lista -->
+      <rect x="720" y="120" width="150" height="60" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"></rect>
+      <text x="795" y="144" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Lista viva</text>
+      <text x="795" y="162" text-anchor="middle" font-size="11" fill="currentColor" opacity=".7">compartida en el hogar</text>
+
+      <!-- desperdicio -->
+      <rect x="250" y="285" width="170" height="52" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"></rect>
+      <text x="335" y="308" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Tiré esto</text>
+      <text x="335" y="325" text-anchor="middle" font-size="11" fill="currentColor" opacity=".7">contador de dinero</text>
+
+      <!-- compra -->
+      <rect x="720" y="40" width="150" height="46" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"></rect>
+      <text x="795" y="62" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Compra</text>
+      <text x="795" y="78" text-anchor="middle" font-size="11" fill="currentColor" opacity=".7">tienda o domicilio</text>
+
+      <!-- flechas entrada -->
+      <line x1="160" y1="63" x2="245" y2="105" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar)"></line>
+      <line x1="160" y1="133" x2="245" y2="140" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar)"></line>
+      <line x1="160" y1="199" x2="245" y2="175" stroke="currentColor" stroke-width="1.2" opacity=".5" marker-end="url(#ar)"></line>
+
+      <!-- inventario -> fefo / receta -->
+      <line x1="420" y1="110" x2="495" y2="65" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar)"></line>
+      <line x1="420" y1="145" x2="495" y2="150" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar)"></line>
+      <text x="455" y="88" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".75">ordena</text>
+      <text x="457" y="140" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".75">surte</text>
+
+      <!-- fefo -> receta -->
+      <line x1="580" y1="90" x2="580" y2="115" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar)"></line>
+
+      <!-- receta -> cociné -->
+      <line x1="580" y1="180" x2="580" y2="205" stroke="#14939f" stroke-width="1.6" marker-end="url(#ar-a)"></line>
+
+      <!-- cociné -> inventario (la arista que faltaba) -->
+      <path d="M 500 240 C 430 240 420 215 420 200" fill="none" stroke="#14939f" stroke-width="2.2" marker-end="url(#ar-a)"></path>
+      <text x="452" y="262" text-anchor="middle" font-size="11.5" font-weight="600" fill="#14939f">descuenta ingredientes</text>
+
+      <!-- receta -> lista (faltantes) -->
+      <line x1="660" y1="150" x2="715" y2="150" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar)"></line>
+      <text x="688" y="141" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".75">faltantes</text>
+
+      <!-- inventario -> lista (agotado) -->
+      <path d="M 420 95 C 560 20 660 18 795 30" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55" marker-end="url(#ar)"></path>
+      <text x="610" y="18" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".7">se agotó</text>
+
+      <!-- lista -> compra -->
+      <line x1="795" y1="120" x2="795" y2="92" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar)"></line>
+
+      <!-- compra -> ticket (cierra por entrada) -->
+      <path d="M 720 63 C 560 -10 200 -5 85 34" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#ar)"></path>
+      <text x="330" y="14" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".7">ticket o correo de confirmación</text>
+
+      <!-- inventario -> tiré esto -->
+      <line x1="335" y1="200" x2="335" y2="280" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar)"></line>
+      <text x="345" y="245" font-size="10.5" fill="currentColor" opacity=".75">no llegó a tiempo</text>
+    </svg>
+    <figcaption>La arista en color es la corrección central: sin ella el inventario solo crece y nunca se descuenta, y las tres features que lo leen se degradan juntas. La flecha punteada de arriba es cómo la compra vuelve a entrar sin ninguna integración: por el ticket o por el correo de confirmación que el usuario comparte.</figcaption>
+  </figure>
+</section>
+
+<section id="features">
+  <h2><span class="n">03</span> Las seis features</h2>
+  <p>Cinco features planteadas en la lluvia de ideas más una nueva. Cada tarjeta lleva el cambio decisivo y las etiquetas de qué se dejó, se quitó, se cambió o se agregó.</p>
+  <div class="fgrid">
+    <div class="fcard">
+      <span class="code">CAPTURA</span>
+      <span class="t">Voz, ticket y manual</span>
+      <p>La voz se queda sin condiciones: grabar no es tratar un dato biométrico, y WhatsApp opera igual — el usuario aprieta un botón y la grabación es el servicio. El ticket pasa a ser la vía principal porque carga treinta ítems contra tres de una nota de voz.</p>
+      <p>Reglas: sin huella vocal, audio borrado tras transcribir, consentimiento aparte si algún día se entrena con él, y nada de audio en perfiles de menores.</p>
+      <div class="pillrow"><span class="chip c-keep">Deja voz</span><span class="chip c-swap">Ticket primero</span><span class="chip c-cut">Imagen del ticket</span></div>
+    </div>
+    <div class="fcard">
+      <span class="code">FE1</span>
+      <span class="t">Caducidad y prioridad</span>
+      <p>Se agrega la fecha de apertura del envase y la zona de guardado: el mismo producto tiene tres vidas útiles y la leche abierta dura cinco días contra semanas cerrada. La estimación por temperatura se ordena en tres niveles y solo el sensor real justifica decir "ajustado a tu nevera".</p>
+      <p>Nunca hay veredicto de inocuidad: la app sugiere qué aprovechar antes, muestra el estado que el usuario declaró, y la persona ve, huele y decide.</p>
+      <div class="pillrow"><span class="chip c-keep">FEFO</span><span class="chip c-add">Apertura</span><span class="chip c-add">Zona</span><span class="chip c-swap">Sin veredicto</span></div>
+    </div>
+    <div class="fcard">
+      <span class="code">FE2</span>
+      <span class="t">Recetas según inventario</span>
+      <p>Deja de ser un adorno: "cociné esto" descuenta los ingredientes y cierra el ciclo. Tres cubetas — cocinable ya, falta uno o dos, falta lo principal — ordenadas por lo que conviene aprovechar.</p>
+      <p>Los clásicos van con texto propio, porque la receta como idea no es protegible; las de autor van por enlace al blog, que además abre alianzas con creadores. Aviso visible de contenido generado con IA.</p>
+      <div class="pillrow"><span class="chip c-add">Cociné esto</span><span class="chip c-keep">Clásicos propios</span><span class="chip c-add">Blogs por enlace</span><span class="chip c-swap">Tono positivo</span></div>
+    </div>
+    <div class="fcard">
+      <span class="code">FE3</span>
+      <span class="t">Plan de alimentación</span>
+      <p>Todo entra como preferencia declarada por el usuario, no como dato clínico. Tres condiciones sostienen el encuadre: la app no pregunta por enfermedades, no usa lenguaje clínico ni claims, y nunca genera ni corrige el plan — solo ejecuta el que le dieron.</p>
+      <p>Fuera de la versión 1: peso, índice de masa corporal y condiciones médicas como campos. El canal de nutricionistas llega en la versión 3, con el profesional como cliente.</p>
+      <div class="pillrow"><span class="chip c-swap">Preferencias</span><span class="chip c-cut">Campos clínicos</span><span class="chip c-add">3 condiciones</span></div>
+    </div>
+    <div class="fcard">
+      <span class="code">FE4</span>
+      <span class="t">Sugerencias de compra</span>
+      <p>Se cae la lista de alimentos "principales": ni global ni por país, porque los básicos de dos casas del mismo país no coinciden. Queda una estrella de "esto nunca puede faltar" para la primera semana, y después manda la recompra observada.</p>
+      <p>Y una sola <strong>lista viva</strong> siempre disponible en vez de notificaciones que se pierden: cuatro fuentes de ítems, tres estados, compartida en tiempo real, ordenada por pasillo y funcional sin conexión.</p>
+      <div class="pillrow"><span class="chip c-cut">Básicos globales</span><span class="chip c-swap">Lista viva</span><span class="chip c-add">WhatsApp</span></div>
+    </div>
+    <div class="fcard">
+      <span class="code">FE5</span>
+      <span class="t">Compra desde la app</span>
+      <p>No se descarta: se ordena en peldaños. Rappi y Uber Eats no tienen API de consumidor — sus APIs son del lado del comercio —, pero Instacart y Kroger sí operan el modelo hoy, así que el objetivo es real y llega por vía comercial, no técnica.</p>
+      <p>Versión 1: enlace profundo, portapapeles, WhatsApp y afiliados. Cubren el 90% del beneficio percibido con el 2% del trabajo.</p>
+      <div class="pillrow"><span class="chip c-keep">Objetivo</span><span class="chip c-swap">Enlace profundo</span><span class="chip c-cut">API de carrito</span></div>
+    </div>
+    <div class="fcard">
+      <span class="code">FE6 · NUEVA</span>
+      <span class="t">Perfiles familiares</span>
+      <p>Tres listas de ingredientes por persona — no puede, evita, le encanta — con presets, jerarquía que cubre derivados y selector de quién come en cada comida.</p>
+      <p>Es lo que hace que la app sirva a una casa y no a una persona, y lo que vuelve FE3 concreta sin riesgo regulatorio: no hay diagnósticos, solo ingredientes que la gente declara.</p>
+      <div class="pillrow"><span class="chip c-add">Nueva</span><span class="chip c-add">Unión de filtros</span><span class="chip c-add">Matriz por miembro</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="perfiles">
+  <h2><span class="n">04</span> Perfiles familiares</h2>
+  <p>La regla que no es obvia en prosa: el filtro duro de una comida es la <em>unión</em> de las restricciones de todos los que van a comer, no las del que cocina. Y opera por categoría, así que "sin lácteos" tiene que arrastrar mantequilla, crema y queso.</p>
+  <figure>
+    <svg viewBox="0 0 860 330" role="img" aria-label="Resolución de perfiles: de los tres miembros seleccionados como comensales se toma la unión de sus restricciones duras, que excluye recetas; la unión de lo que evitan solo baja el orden, y lo que les encanta lo sube.">
+      <defs>
+        <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"></path>
+        </marker>
+        <marker id="ar2c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#cf5245"></path>
+        </marker>
+      </defs>
+
+      <text x="10" y="20" font-size="11" font-weight="600" letter-spacing="1.2" fill="currentColor" opacity=".65">COMENSALES DE HOY</text>
+
+      <rect x="10" y="32" width="180" height="66" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"></rect>
+      <text x="24" y="52" font-size="13" font-weight="700" fill="currentColor">Ana</text>
+      <text x="24" y="70" font-size="11" fill="#cf5245">no puede: frutos secos</text>
+      <text x="24" y="87" font-size="11" fill="currentColor" opacity=".75">evita: picante</text>
+
+      <rect x="10" y="112" width="180" height="66" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"></rect>
+      <text x="24" y="132" font-size="13" font-weight="700" fill="currentColor">Luis</text>
+      <text x="24" y="150" font-size="11" fill="#cf5245">no puede: lácteos</text>
+      <text x="24" y="167" font-size="11" fill="currentColor" opacity=".75">le encanta: pollo</text>
+
+      <rect x="10" y="192" width="180" height="66" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"></rect>
+      <text x="24" y="212" font-size="13" font-weight="700" fill="currentColor">Sofía</text>
+      <text x="24" y="230" font-size="11" fill="currentColor" opacity=".75">evita: cilantro</text>
+      <text x="24" y="247" font-size="11" fill="currentColor" opacity=".75">le encanta: pasta</text>
+
+      <rect x="10" y="272" width="180" height="46" rx="2" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 3" opacity=".55"></rect>
+      <text x="24" y="292" font-size="12" fill="currentColor" opacity=".6">Invitado (temporal)</text>
+      <text x="24" y="308" font-size="11" fill="currentColor" opacity=".6">no puede: mariscos</text>
+
+      <!-- union -->
+      <rect x="270" y="92" width="180" height="106" rx="2" fill="none" stroke="#cf5245" stroke-width="2"></rect>
+      <text x="360" y="118" text-anchor="middle" font-size="13" font-weight="700" fill="#cf5245">Unión de "no puede"</text>
+      <text x="360" y="140" text-anchor="middle" font-size="11.5" fill="#cf5245">frutos secos</text>
+      <text x="360" y="157" text-anchor="middle" font-size="11.5" fill="#cf5245">lácteos · y derivados</text>
+      <text x="360" y="174" text-anchor="middle" font-size="11.5" fill="#cf5245">mariscos</text>
+      <text x="360" y="191" text-anchor="middle" font-size="10.5" fill="#cf5245" opacity=".8">filtro duro</text>
+
+      <line x1="190" y1="65" x2="265" y2="110" stroke="#cf5245" stroke-width="1.4" marker-end="url(#ar2c)"></line>
+      <line x1="190" y1="145" x2="265" y2="145" stroke="#cf5245" stroke-width="1.4" marker-end="url(#ar2c)"></line>
+      <line x1="190" y1="225" x2="265" y2="180" stroke="currentColor" stroke-width="1.2" opacity=".5" marker-end="url(#ar2)"></line>
+      <line x1="190" y1="292" x2="265" y2="195" stroke="#cf5245" stroke-width="1.2" opacity=".6" marker-end="url(#ar2c)"></line>
+
+      <!-- catalogo -->
+      <rect x="530" y="30" width="150" height="52" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"></rect>
+      <text x="605" y="52" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Excluidas</text>
+      <text x="605" y="69" text-anchor="middle" font-size="11" fill="currentColor" opacity=".7">con motivo visible</text>
+
+      <rect x="530" y="112" width="150" height="52" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"></rect>
+      <text x="605" y="134" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Sustituibles</text>
+      <text x="605" y="151" text-anchor="middle" font-size="11" fill="currentColor" opacity=".7">leche por bebida vegetal</text>
+
+      <rect x="530" y="194" width="150" height="52" rx="2" fill="none" stroke="currentColor" stroke-width="1.2"></rect>
+      <text x="605" y="216" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Ordenadas</text>
+      <text x="605" y="233" text-anchor="middle" font-size="11" fill="currentColor" opacity=".7">gustos suben, disgustos bajan</text>
+
+      <line x1="450" y1="120" x2="525" y2="62" stroke="#cf5245" stroke-width="1.4" marker-end="url(#ar2c)"></line>
+      <line x1="450" y1="145" x2="525" y2="138" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar2)"></line>
+      <line x1="450" y1="172" x2="525" y2="215" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar2)"></line>
+
+      <!-- salida -->
+      <rect x="730" y="112" width="120" height="52" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect>
+      <text x="790" y="134" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">Sugerencias</text>
+      <text x="790" y="151" text-anchor="middle" font-size="11" fill="currentColor" opacity=".7">para esta mesa</text>
+      <line x1="680" y1="138" x2="725" y2="138" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar2)"></line>
+    </svg>
+    <figcaption>Con estos cuatro comensales, una receta con queso queda excluida por Luis aunque el filtro venga de una sola persona. Antes de excluir se intenta sustituir, y la app dice cuántas recetas escondió y por qué, para que el catálogo no se vacíe en silencio.</figcaption>
+  </figure>
+  <div class="rail bad">
+    <span class="label">El peor modo de falla</span>
+    <p>Si la jerarquía de ingredientes no cubre derivados, el filtro falla en silencio: la receta se muestra como apta y no lo es. Por eso esa ruta necesita pruebas dedicadas y permanentes, y por eso la app nunca afirma seguridad — dice "según los ingredientes que registramos" y remite a la etiqueta.</p>
+  </div>
+</section>
+
+<section id="mercado">
+  <h2><span class="n">05</span> Mercado y competencia</h2>
+  <div class="compare">
+    <div class="col">
+      <h3>Familias</h3>
+      <dl class="kv">
+        <dt>Qué le duele</dt><dd>Tirar comida, no saber qué cocinar</dd>
+        <dt>Quién decide</dt><dd>Una persona, en dos minutos</dd>
+        <dt>Ticket</dt><dd>USD 0–5 al mes</dd>
+        <dt>Ciclo</dt><dd>Instantáneo, tienda de apps</dd>
+        <dt>Precisión</dt><dd>Aproximado sirve</dd>
+        <dt>Recetas</dt><dd>Centrales</dd>
+      </dl>
+      <p><strong>Mercado de crecimiento.</strong> Sirve para aprender el dominio: vida útil, productos, tickets, comportamiento.</p>
+    </div>
+    <div class="col">
+      <h3>Restaurantes y hoteles</h3>
+      <dl class="kv">
+        <dt>Qué le duele</dt><dd>Costo de alimentos, merma, inspección</dd>
+        <dt>Quién decide</dt><dd>Chef ejecutivo, operaciones, compras</dd>
+        <dt>Ticket</dt><dd>USD 50–500 al mes por sede</dd>
+        <dt>Ciclo</dt><dd>1 a 6 meses, con piloto</dd>
+        <dt>Precisión</dt><dd>Auditable, con responsable y hora</dd>
+        <dt>Recetas</dt><dd>Irrelevantes: el menú está fijado</dd>
+      </dl>
+      <p><strong>Mercado de ingreso.</strong> Lo que compran es etiquetado FEFO, bitácora de temperatura y costo de merma. Otro producto, otra venta.</p>
+    </div>
+  </div>
+  <div class="callout">
+    <span class="big">€72k</span>
+    <p>Ahorro anual por sede que reportan los sistemas de merma con cámara, con retorno de la inversión en 1,1 a 1,8 meses — pero vendidos por cotización a grupos multi-sede. El restaurante de 3 a 20 sedes queda fuera por precio, y ese es el hueco atendible con teléfono, etiquetas y un sensor de USD 20.</p>
+  </div>
+  <h3>Quién ya está en la cancha</h3>
+  <div class="scroller">
+    <table>
+      <thead><tr><th>Quién</th><th>Qué hace</th><th>Dónde está flojo</th></tr></thead>
+      <tbody>
+        <tr><td>Pantry Check</td><td>Lector de códigos muy rápido, ubicaciones, lista sugerida</td><td>Solo iOS; tope de ~200 ítems gratis; todo entra escaneando</td></tr>
+        <tr><td>NoWaste</td><td>Caducidad primero, hace visible el costo de tirar</td><td>Sin recetas ni planificación; registro manual</td></tr>
+        <tr><td>Kitche</td><td>Importa la compra desde la cuenta de fidelidad del súper</td><td>Atado al retail británico. La idea es excelente y es copiable</td></tr>
+        <tr><td>SuperCook · Samsung Food</td><td>Recetas con lo que tienes</td><td>No sostienen inventario ni caducidad</td></tr>
+        <tr><td>Samsung Family Hub</td><td>Cámara interna, reconocimiento con Gemini, OCR de empaques</td><td>Requiere comprar la nevera. Alcance de gama alta</td></tr>
+        <tr><td>Winnow · Orbisk · Leanpath · Kitro</td><td>Merma con cámara y balanza, ~800 ingredientes con ~90% de acierto</td><td>Venta empresarial por cotización; nada para el hogar</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>Dónde está el diferencial</h3>
+  <ul>
+    <li><strong>Español y ticket latinoamericano.</strong> Los incumbentes son de Estados Unidos, Reino Unido o Europa, en inglés y con el lector de códigos como puerta de entrada.</li>
+    <li><strong>Importación desde fidelidad local</strong> al estilo Kitche: Puntos Colombia, Soriana, Walmart.</li>
+    <li><strong>Vida útil con cortes de luz.</strong> "Tu nevera estuvo a 12 °C durante tres horas: revisa lácteos y carne" no lo da ninguna app, y en la región tiene valor inmediato.</li>
+    <li><strong>Contador de dinero desperdiciado.</strong> Es lo que hace que la app se sienta útil en la semana dos.</li>
+  </ul>
+  <div class="rail">
+    <span class="label">No cuenta como diferencial</span>
+    <p>"Recetas con IA según lo que tienes" ya no distingue a nadie en 2026: lo hacen SuperCook, Samsung Food, la propia nevera de Samsung y cualquier asistente de propósito general. Si el pitch descansa ahí, no hay pitch.</p>
+  </div>
+</section>
+
+<section id="compra">
+  <h2><span class="n">06</span> Integraciones de compra</h2>
+  <p>La plataforma de domicilio no vende una puerta de entrada para que otra app le traiga pedidos: vende una vitrina para que los comercios le vendan a <em>sus</em> usuarios. Freezai no es comercio ni punto de venta, así que no hay figura en la que encaje — hasta que lleve volumen a la mesa.</p>
+  <div class="steps">
+    <div class="step ready"><span class="lvl">0</span><span class="what"><b>Enlace profundo, portapapeles, WhatsApp</b>Cada renglón abre la búsqueda del producto; la lista se manda al grupo de la casa o al tendero del barrio</span><span class="chip c-keep acc">Hoy</span></div>
+    <div class="step ready"><span class="lvl">1</span><span class="what"><b>Programa de afiliados</b>Uber tiene programa público que paga comisión por primer pedido, negociable por país. En Rappi hay que preguntar: no hay programa público documentado</span><span class="chip c-keep acc">Hoy</span></div>
+    <div class="step ready"><span class="lvl">2</span><span class="what"><b>Carrito real donde ya hay API abierta</b>Instacart es auto-servicio desde julio de 2026: se genera una página de lista o receta y el usuario elige tienda y paga. Kroger agrega ítems al carrito del usuario con OAuth2 y PKCE</span><span class="chip c-keep acc">Hoy · EEUU</span></div>
+    <div class="step later"><span class="lvl">3</span><span class="what"><b>Middleware de receta a carrito</b>Chicory con más de 70 retailers y Albertsons sumado en 2026; Northfork con Walmart. Un contrato y se heredan decenas de tiendas</span><span class="chip c-swap acc">Acuerdo</span></div>
+    <div class="step later"><span class="lvl">4</span><span class="what"><b>Retailer directo en Latinoamérica</b>Éxito, Cencosud, Soriana, Chedraui. Sin API pública, pero la moneda es dato de canasta y recompra — y suele abrir antes que la plataforma de reparto</span><span class="chip c-swap acc">Acuerdo</span></div>
+    <div class="step later"><span class="lvl">5</span><span class="what"><b>Programa de socios de Rappi o Uber</b>Carrito armado de verdad. Es el objetivo original, y llega al final: la conversación es comercial, no técnica</span><span class="chip c-cut acc">Con volumen</span></div>
+  </div>
+  <div class="callout">
+    <span class="big">3</span>
+    <p>De más de treinta plataformas revisadas, solo tres ofrecen una vía técnica real para armar un carrito: Instacart, Kroger y el chat de WhatsApp del tendero de la esquina. Eso resume el tamaño de la oportunidad y por dónde empezar.</p>
+  </div>
+  <h3>Los bloqueos que importan</h3>
+  <div class="scroller">
+    <table>
+      <thead><tr><th>Bloqueo</th><th>Por qué</th><th>Tipo</th></tr></thead>
+      <tbody>
+        <tr><td>Sin OAuth de consumidor en Rappi ni Uber Eats</td><td>No existe el permiso "actuar sobre el carrito de este usuario final". No es limitación técnica: la figura no existe</td><td class="num">Duro</td></tr>
+        <tr><td>Cobrar en la app te vuelve comercio de registro</td><td>Pasarela, KYC, PCI DSS, contracargos y factura electrónica por país — CFDI en México, DIAN en Colombia</td><td class="num">Duro</td></tr>
+        <tr><td>No devuelven los datos del pedido</td><td>Sin líneas ni sustituciones, la compra no entra al inventario y la feature no cierra el ciclo. Se mitiga con el correo de confirmación, no con la API</td><td class="num">Funcional</td></tr>
+        <tr><td>Precio y disponibilidad que no controlas</td><td>Protección al consumidor: Profeco en México, SIC en Colombia. Si no tienes el precio por contrato, no lo muestres</td><td class="num">Legal</td></tr>
+        <tr><td>Raspar el catálogo o automatizar la sesión</td><td>Viola términos, se rompe con cada versión, y en la UE choca con el derecho <em>sui generis</em> de bases de datos</td><td class="num">Duro</td></tr>
+        <tr><td>Surtido de tienda oscura</td><td>La canasta semanal de una familia muchas veces no es surtible; el usuario abandona a mitad</td><td class="num">Utilidad</td></tr>
+        <tr><td>Economía del usuario</td><td>Tarifa de domicilio más sobreprecio contra el mercado presencial. Puede que no se use aunque exista</td><td class="num">Demanda</td></tr>
+      </tbody>
+      <caption>Un miedo que no aplica: las reglas de compra dentro de la app no cubren bienes físicos, así que enlazar hacia afuera está permitido en iOS y Android.</caption>
+    </table>
+  </div>
+  <h3>Cómo abordarlo en una demo con un cliente</h3>
+  <p>Quien pregunta por Rappi no está pidiendo una integración: está pidiendo ver que la compra se resuelve sin retipear. Eso se demuestra hoy, en su teléfono. La regla es mostrar lo real y ser explícito sobre lo que falta — un flujo presentado como integrado cuando no lo está es lo que hunde la credibilidad en la segunda reunión.</p>
+  <div class="scroller">
+    <table>
+      <thead><tr><th>Minuto</th><th>Qué se muestra</th></tr></thead>
+      <tbody>
+        <tr><td class="num">0:00</td><td>La lista viva ya armada con faltantes reales. Si se consiguen dos tickets del cliente antes de la reunión, la demo corre con sus propios datos y vale diez veces más</td></tr>
+        <tr><td class="num">0:40</td><td>Botón de comprar: hoja con las opciones reales — abrir en la app de domicilio, mandar por WhatsApp al tendero, copiar la lista</td></tr>
+        <tr><td class="num">1:00</td><td>Se abre la app de domicilio con el producto ya buscado; se agrega allí y al volver el ítem queda como pendiente de confirmar</td></tr>
+        <tr><td class="num">1:40</td><td>Se comparte el correo de confirmación y los ítems entran al inventario con su fecha estimada. <strong>Aquí se ve el ciclo cerrado</strong>, que es lo que la competencia no muestra</td></tr>
+        <tr><td class="num">2:10</td><td>Segundo dispositivo o grabación: el carrito completo armado por API, hecho con Instacart. Prueba que el camino existe cuando la plataforma abre</td></tr>
+        <tr><td class="num">2:40</td><td>Cierre con la métrica: qué porcentaje de listas termina en compra. Ese número es el que abre la conversación con Rappi</td></tr>
+      </tbody>
+      <caption>Tres minutos, sin una sola pantalla simulada.</caption>
+    </table>
+  </div>
+  <div class="compare">
+    <div class="col">
+      <h3>Las tres preguntas que siempre llegan</h3>
+      <p><strong>"¿Está integrado con Rappi?"</strong> — Salimos hacia Rappi con la compra pre-armada. El carrito dentro de Rappi requiere su programa de socios, que se abre por volumen; en Estados Unidos el flujo completo ya lo hacemos con Instacart.</p>
+      <p><strong>"¿Cuándo estaría?"</strong> — No lo prometemos por fecha porque no depende de nosotros: depende del volumen que llevemos. Lo que sí prometemos es la métrica que lo desbloquea.</p>
+      <p><strong>"¿Y si nunca abren?"</strong> — El 90% del beneficio para el usuario no depende de ellos y ya está en la versión 1. Y en esta región la puerta más corta no es el repartidor, es el retailer.</p>
+    </div>
+    <div class="col">
+      <h3>Qué no hacer en la demo</h3>
+      <p><strong>No automatizar la app ajena en escena.</strong> Viola términos, se rompe con cualquier actualización, y un cliente técnico lo detecta.</p>
+      <p><strong>No mostrar precios de la plataforma.</strong> Sin acuerdo no hay derecho a esos datos, y un precio que no se cumple es materia de protección al consumidor.</p>
+      <p><strong>No usar el logo ni la marca ajena.</strong> La pantalla dice "tu app de domicilio". Evita además que la demo parezca una alianza que no existe.</p>
+      <p><strong>No llamar "integrado" a un flujo simulado.</strong> Si hace falta maqueta, la etiqueta "flujo ilustrativo, no integrado" va visible en pantalla.</p>
+    </div>
+  </div>
+  <div class="rail">
+    <span class="label">La jugada comercial detrás de la pregunta</span>
+    <p>Quien pregunta por Rappi suele ser quien puede abrir una puerta, así que conviene invertir la carga. Si es un <strong>retailer</strong>: "te integramos a ti antes que a Rappi", porque lo que gana es recompra y datos de canasta. Si es un <strong>inversionista</strong>: la métrica del 30%. Si es un <strong>cliente corporativo</strong> que quiere la integración: que firme intención de uso, y con ese volumen documentado se pide la reunión de partnerships — no antes.</p>
+  </div>
+
+  <h3>Cómo dejarlo por escrito sin comprometerse</h3>
+  <p>Si la instrucción es que Rappi y Uber Eats aparezcan en la propuesta, aparecen. La forma de hacerlo sin quedar expuesto es <strong>incluir la condición dentro de la misma frase</strong>, no en una nota al pie ni en una conversación posterior. Así, el día en que haya que decir que el carrito no va, no es un retroceso: es lo que el documento decía desde el principio.</p>
+  <figure>
+    <figcaption style="order:2">Ese párrafo hace tres cosas a la vez: nombra Rappi y Uber Eats, describe algo que ya funciona hoy, y deja registrada la dependencia externa. Es el mismo contenido que pide el jefe, con el seguro puesto.</figcaption>
+    <blockquote style="margin:0;padding-left:1.05rem;border-left:3px solid var(--accent);font-size:1rem">
+      <p><strong>Compra del faltante.</strong> Desde la lista de compras, Freezai lleva al usuario a la plataforma donde quiera comprar — Rappi, PedidosYa, Uber Eats, el supermercado o el tendero del barrio por WhatsApp — con los productos ya identificados, y la compra regresa al inventario a partir del comprobante. El carrito armado automáticamente dentro de cada plataforma depende del programa de socios de cada una, que se habilita por volumen de pedidos generados; el diseño contempla esa integración y no la requiere para funcionar.</p>
+    </blockquote>
+  </figure>
+  <h4>Bullet listo para "pasos posteriores"</h4>
+  <blockquote style="margin:0;padding-left:1.05rem;border-left:3px solid var(--line-strong);font-size:.98rem">
+    <p><strong>A futuro — compra dentro de la plataforma.</strong> Habilitar el carrito armado en Rappi, Uber Eats y otras plataformas de domicilio, sujeto al programa de socios de cada una. En la versión 1 la compra ya sale hacia esas apps con los productos identificados y regresa al inventario por comprobante.</p>
+  </blockquote>
+  <p>Cuidado con el verbo: "implementar en Rappi" suena a que depende del equipo, y si después no ocurre, la culpa queda de este lado. <strong>Habilitar</strong>, <strong>sumar</strong> o <strong>abrir</strong>, siempre con "sujeto al programa de socios", nombran la dependencia sin sonar a excusa. Dos frases para tener listas: <em>"¿eso está?"</em> — "está la salida hacia la plataforma; el carrito dentro de ella depende de su programa de socios"; <em>"¿cuándo?"</em> — "no lo comprometemos por fecha porque no depende de nosotros: depende del volumen de pedidos que generemos".</p>
+  <p>En la tabla de alcance se lista como fase con <strong>dependencia</strong>, nunca con fecha: una fecha convierte una expectativa en un compromiso; una dependencia declarada mantiene la expectativa y traslada la causa a donde de verdad está.</p>
+  <div class="scroller">
+    <table>
+      <thead><tr><th>Fase</th><th>Alcance</th><th>Depende de</th></tr></thead>
+      <tbody>
+        <tr><td class="num">v1</td><td>Salida a la plataforma con productos identificados; retorno al inventario por comprobante</td><td>Nada</td></tr>
+        <tr><td class="num">Futuro</td><td>Carrito armado dentro de la plataforma</td><td>Programa de socios de cada plataforma, habilitado por volumen</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="rail bad">
+    <span class="label">Lo único que no conviene hacer</span>
+    <p>Presentarlo como integración existente. Ese es el escenario en que "luego decimos que no puede ir" sí duele: el cliente ya tomó decisiones con esa información, y el equipo pierde credibilidad en todo lo demás que dijo, incluso en lo que era cierto. El objetivo de que Rappi aparezca y sostenga la conversación se cumple igual con el párrafo de arriba, sin esa factura.</p>
+  </div>
+
+  <div class="rail key">
+    <span class="label">Cómo se decide, sin discutirlo más</span>
+    <p>Lanza el peldaño 0 y mide una sola cosa: qué porcentaje de listas termina en un enlace abierto hacia una plataforma de compra. Por debajo del 10%, la integración profunda no cambiaría nada. Por encima del 30%, tienes el número que abre la conversación comercial — y ahí ya no pides acceso: llevas demanda.</p>
+  </div>
+</section>
+
+<section id="hardware">
+  <h2><span class="n">07</span> Hardware</h2>
+  <p>Versión 1 sin hardware: teléfono, micrófono y cámara. Después entra como accesorio opcional que legitima FE1, y como producto vendible en el canal B2B.</p>
+  <div class="scroller">
+    <table>
+      <thead><tr><th>Hardware</th><th>Costo</th><th>Qué habilita</th><th>Cuándo</th></tr></thead>
+      <tbody>
+        <tr><td>Sensor BLE de temperatura y humedad</td><td class="num"><span class="cost"><span class="bar"><i class="hi" style="width:8%"></i></span>USD 10–25</span></td><td>Vida útil ajustada de verdad; alerta por corte de luz o puerta abierta</td><td class="num">v2 · alto retorno</td></tr>
+        <tr><td>Etiquetas NFC o QR para recipientes</td><td class="num"><span class="cost"><span class="bar"><i class="hi" style="width:2%"></i></span>USD 0,3–1</span></td><td>Sobras en un toque: qué es, de cuándo, cuántos días</td><td class="num">v2 · barato</td></tr>
+        <tr><td>Impresora térmica Bluetooth</td><td class="num"><span class="cost"><span class="bar"><i class="mid" style="width:15%"></i></span>USD 40–120</span></td><td>Etiqueta FEFO con producto, fecha, hora y responsable</td><td class="num">B2B · vendible ya</td></tr>
+        <tr><td>Báscula Bluetooth de cocina</td><td class="num"><span class="cost"><span class="bar"><i class="mid" style="width:9%"></i></span>USD 20–60</span></td><td>Cantidades reales; peso de merma</td><td class="num">Opcional</td></tr>
+        <tr><td>Red de sondas con concentrador</td><td class="num"><span class="cost"><span class="bar"><i class="lo" style="width:100%"></i></span>USD 300–1 500</span></td><td>Bitácora HACCP continua y a prueba de manipulación</td><td class="num">B2B · es el ingreso</td></tr>
+        <tr><td>Cámara dentro de la nevera</td><td class="num"><span class="cost"><span class="bar"><i class="lo" style="width:11%"></i></span>USD 30–80</span></td><td>Inventario automático</td><td class="num">No hacerlo</td></tr>
+      </tbody>
+      <caption>La cámara interna implica condensación, oclusión, iluminación y alimentación eléctrica: un proyecto de hardware completo, y el terreno donde Samsung juega con escala.</caption>
+    </table>
+  </div>
+  <p>El sensor de temperatura es el único accesorio que convierte una promesa en un hecho, y no hay que fabricar nada: se certifican dos modelos comerciales como compatibles y se leen por Bluetooth. Cero inventario, cero soporte de fabricación, 90% del beneficio.</p>
+  <h3>La versión honesta sin sensor</h3>
+  <div class="scroller">
+    <table>
+      <thead><tr><th>Alimento</th><th>Refrigerado a 4 °C</th><th>Después de abrir</th></tr></thead>
+      <tbody>
+        <tr><td>Pollo o carne molida cruda</td><td class="num">1–2 días</td><td class="num">—</td></tr>
+        <tr><td>Leche</td><td class="num">hasta la fecha impresa</td><td class="num">5–7 días</td></tr>
+        <tr><td>Huevos con cáscara</td><td class="num">3–5 semanas</td><td class="num">—</td></tr>
+        <tr><td>Espinaca y hojas verdes</td><td class="num">3–5 días</td><td class="num">2–3 días</td></tr>
+        <tr><td>Queso duro</td><td class="num">6 meses</td><td class="num">3–4 semanas</td></tr>
+        <tr><td>Sobras cocidas</td><td class="num">3–4 días</td><td class="num">—</td></tr>
+      </tbody>
+      <caption>Tablas públicas (FoodKeeper de la FDA, USDA) más la zona de guardado. La diferencia entre columnas es justo lo que la idea original no capturaba: el momento de apertura.</caption>
+    </table>
+  </div>
+</section>
+
+<section id="legal">
+  <h2><span class="n">08</span> Legislación</h2>
+  <p>El detonante de casi todo es el tratamiento de datos de salud. Con el plan como preferencia declarada y sin campos clínicos, el panorama se vuelve ordinario.</p>
+  <div class="scroller">
+    <table>
+      <thead><tr><th>Región</th><th>Qué aplica</th><th>Consecuencia práctica</th></tr></thead>
+      <tbody>
+        <tr><td class="g">Estados Unidos</td><td>Mosaico estatal (CCPA/CPRA y ~20 estados). My Health My Data de Washington, con derecho privado de acción. Regla de notificación de brechas de la FTC. COPPA con menores</td><td>Las inferencias sobre dieta pueden contar como datos de salud del consumidor. Consentimiento por finalidad; no vender ni compartir</td></tr>
+        <tr><td class="g">Unión Europea</td><td>RGPD art. 9 (categoría especial). Ley de IA art. 50 desde el 2 de agosto de 2026, multas hasta 15 M EUR o 3%. MDR anexo VIII regla 11</td><td>Hay que declarar que hay IA. Software de asesoría nutricional para gestionar una enfermedad cae en clase IIa; como bienestar general queda fuera. La diferencia está en cómo se describe</td></tr>
+        <tr><td class="g">México</td><td>Nueva LFPDPPP de marzo de 2025: penas penales, tribunales especializados, multas duplicadas para datos sensibles. NOM-051</td><td>Consentimiento expreso y medidas técnicas demostrables. Los sellos NOM-051 son además dato aprovechable</td></tr>
+        <tr><td class="g">Colombia</td><td>Ley 1581 de 2012: datos sensibles solo con autorización explícita, registro ante la SIC, art. 7 para menores. Reforma presentada en agosto de 2025</td><td>Autorización explícita, separada y documentada. El marco se endurecerá durante la vida del producto</td></tr>
+        <tr><td class="g">Resto de América</td><td>LGPD en Brasil, ley 21.719 en Chile, 25.326 con reforma pendiente en Argentina</td><td>Convergen al modelo europeo: diseñar al estándar RGPD y el resto sale casi gratis</td></tr>
+        <tr><td class="g">Si entra B2B</td><td>Código de Alimentos de la FDA (frío a 41 °F / 5 °C con registro), FSMA 204 corrido al 20 de julio de 2028, HACCP en la UE</td><td>No es obstáculo: es el argumento de venta, porque el cumplimiento es la partida que sí se aprueba</td></tr>
+      </tbody>
+      <caption>Panorama para orientar decisiones de producto, no asesoría legal. Antes de recolectar cualquier dato de salud, revisión con abogado por mercado.</caption>
+    </table>
+  </div>
+  <div class="rail key">
+    <span class="label">Tres reglas de diseño que ahorran casi todo lo anterior</span>
+    <ul>
+      <li>Los datos de salud son opcionales y separables: la app funciona completa sin ellos.</li>
+      <li>Nunca se emite un juicio de inocuidad. "Estimado", "revisa la etiqueta", y la decisión es del usuario.</li>
+      <li>Se declara siempre que hay IA de por medio, y el filtro de alérgenos se prueba con casos dedicados.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="ruta">
+  <h2><span class="n">09</span> Versión 1 y hoja de ruta</h2>
+  <div class="road">
+    <div class="phase">
+      <div class="h"><b>v1</b><span>Sin hardware</span></div>
+      <ul>
+        <li>Inventario con zona, apertura y cantidad</li>
+        <li>Captura por ticket, voz y manual escondido</li>
+        <li>Pantalla "usa esto hoy" como inicio</li>
+        <li>Cociné esto · Tiré esto con dinero</li>
+        <li>Recetas en tres cubetas</li>
+        <li>Lista viva compartida y por WhatsApp</li>
+        <li>Perfiles familiares (FE6)</li>
+        <li>Sobras y modo congelador</li>
+        <li>Offline y Android de gama baja</li>
+      </ul>
+    </div>
+    <div class="phase">
+      <div class="h"><b>v2</b><span>~6 meses</span></div>
+      <ul>
+        <li>Sensor BLE y alerta de corte de frío</li>
+        <li>Importación desde fidelidad de retail</li>
+        <li>Plan semanal y presupuesto</li>
+        <li>Base de productos colaborativa</li>
+        <li>Etiquetas NFC para recipientes</li>
+      </ul>
+    </div>
+    <div class="phase">
+      <div class="h"><b>v3</b><span>Nuevo cliente</span></div>
+      <ul>
+        <li>B2B mediano: etiquetas FEFO, bitácora y costo de merma</li>
+        <li>Canal de nutricionistas, el profesional como cliente</li>
+        <li>Licenciamiento a fabricantes de neveras</li>
+      </ul>
+    </div>
+    <div class="phase">
+      <div class="h"><b>Futuro</b><span>Sin fecha</span></div>
+      <ul>
+        <li>Habilitar el carrito dentro de la plataforma — Rappi, Uber Eats y otras — sujeto al programa de socios de cada una</li>
+        <li>Donación de excedentes entre vecinos</li>
+      </ul>
+    </div>
+  </div>
+  <div class="rail">
+    <span class="label">Fuera de la versión 1, a propósito</span>
+    <p>Sensores y hardware. Integración por API con plataformas de domicilio. Campos clínicos y canal de nutricionistas. Restaurantes y hoteles. Cámara dentro de la nevera. Ninguna es mala idea; las cinco son mejores ideas cuando ya existe un inventario que se mantiene exacto solo.</p>
+  </div>
+</section>
+
+<section id="siguiente">
+  <h2><span class="n">10</span> Siguiente paso</h2>
+  <div class="lead">
+    <p><strong>Prueba de conserje antes de construir.</strong> Diez familias, dos semanas, notas de voz a un número de WhatsApp y alguien del equipo registrando a mano. Contesta la única pregunta que decide si el producto existe — ¿la gente registra lo que consume? — sin escribir una línea de producto.</p>
+    <p>La métrica que importa no es usuarios activos: es <strong>exactitud del inventario al día 30</strong>. Y la prueba comercial que hace falta conseguir es "reducimos el desperdicio medido un X% en ocho semanas", que es a la vez el pitch de venta y el material para levantar capital.</p>
+  </div>
+  <h3>Lo que conviene tener resuelto en paralelo</h3>
+  <ul>
+    <li><strong>Techo de costo por usuario</strong> desde el día uno: voz, OCR y recetas son costo variable en un producto de ingreso bajo o nulo.</li>
+    <li><strong>El nombre</strong>: revisar registro y dominio, y considerar que "freez" ancla al congelador cuando el producto habla de la nevera y de la compra.</li>
+    <li><strong>Alguien de datos de alimentos</strong> en el equipo — vida útil, alérgenos, equivalencias de ingredientes. No es un problema de desarrollo.</li>
+    <li><strong>Riesgo de plataforma</strong>: Samsung y Google pueden empaquetar esto en el electrodoméstico. Su alcance son neveras de gama alta, no teléfonos, pero la ventana no es infinita.</li>
+    <li><strong>Alianzas que aceleran</strong>: Open Food Facts para sembrar productos, fidelidad de retail para cargar la compra, fabricantes de neveras para licenciar.</li>
+  </ul>
+</section>
+
+<footer>
+  <p><strong>Documentos de detalle</strong> — este dossier consolida los cinco archivos del repositorio: la idea original, el análisis de viabilidad, el refinamiento feature por feature, las integraciones de compra y los perfiles familiares.</p>
+  <p>Fuentes principales: EPA, <em>Estimating the Cost of Food Waste to American Consumers</em> (abril de 2025); comparativas de apps de despensa 2026; Orbisk y Winnow sobre sistemas de merma; Samsung Newsroom (CES 2026 y actualización de mayo de 2026); documentación de desarrolladores de Instacart, Kroger, Uber y Walmart; Chicory y Northfork; NAMSA sobre clasificación MDR; Ley de IA de la UE art. 50; LFPDPPP de México 2025; Ley 1581 de 2012 de Colombia; Federal Register sobre FSMA 204.</p>
+  <p>Estado de plataformas verificado en septiembre de 2026. Panorama regulatorio para orientar decisiones de producto, no asesoría legal.</p>
+</footer>
+
+</main>
+</div>
+</div>
